@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <!-- Tab Navigation -->
+    <div class="tab-nav-container">
+      <div class="tab-nav">
+        <button class="tab-nav-item active" data-tab="user" onclick="switchTab('user')">
+          <i class="fa-solid fa-users"></i>
+          <span>用户管理</span>
+        </button>
+        <button class="tab-nav-item" data-tab="role" onclick="switchTab('role')">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>角色管理</span>
+        </button>
+        <button class="tab-nav-item" data-tab="app" onclick="switchTab('app')">
+          <i class="fa-solid fa-mobile-screen"></i>
+          <span>应用管理</span>
+        </button>
+        <button class="tab-nav-item" data-tab="logs" onclick="switchTab('logs')">
+          <i class="fa-solid fa-file-lines"></i>
+          <span>日志管理</span>
+        </button>
+        <button class="tab-nav-item" data-tab="security" onclick="switchTab('security')">
+          <i class="fa-solid fa-lock"></i>
+          <span>安全配置</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content-area" id="tabContent">
+      <iframe id="iframe-user" src="user.html" style="display:none;"></iframe>
+      <iframe id="iframe-role" src="role.html" style="display:none;"></iframe>
+      <iframe id="iframe-app" src="app.html" style="display:none;"></iframe>
+      <iframe id="iframe-logs" src="logs.html" style="display:none;"></iframe>
+      <iframe id="iframe-security" src="config.html" style="display:none;"></iframe>
+      <iframe id="iframe-permission" src="permission.html" style="display:none;"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // 默认显示用户管理
+    document.getElementById('iframe-user').style.display = 'block';
+
+    function switchTab(tab) {
+      // 更新 tab 高亮
+      document.querySelectorAll('.tab-nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+      });
+
+      // 切换 iframe 显示
+      const iframes = ['user', 'role', 'app', 'logs', 'security', 'permission'];
+      iframes.forEach(t => {
+        document.getElementById('iframe-' + t).style.display = t === tab ? 'block' : 'none';
+      });
+
+      // 页面标题
+      const titles = {
+        'user': '用户管理',
+        'role': '角色管理',
+        'app': '应用管理',
+        'logs': '日志管理',
+        'security': '安全配置'
+      };
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'menuHighlight', url: tab + '.html' }, '*');
+      }
+    }
+
+    function navigateToTab(tab) {
+      // app-detail, app-create 等子页面映射到 app tab
+      // permission 页面保持在 role tab，但显示 permission iframe
+      const tabMapping = {
+        'app-detail': 'app',
+        'app-create': 'app',
+        'permission': 'role',
+        'permission.html': 'role'
+      };
+
+      // permission 页面需要特殊处理：高亮 role tab，但显示 permission iframe
+      let showIframe = tab;
+      if (tab === 'permission' || tab === 'permission.html') {
+        showIframe = 'permission';
+        tab = 'role';
+      }
+      tab = tabMapping[tab] || tab;
+
+      // 更新 tab 高亮
+      document.querySelectorAll('.tab-nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+      });
+
+      // 切换 iframe 显示
+      const iframes = ['user', 'role', 'app', 'logs', 'security', 'permission'];
+      iframes.forEach(t => {
+        document.getElementById('iframe-' + t).style.display = t === showIframe ? 'block' : 'none';
+      });
+    }
+
+    // 监听子 iframe 消息
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'navigate') {
+        // 找到对应的 iframe 并导航
+        const url = e.data.url;
+        const pageToTab = {
+          'user.html': 'iframe-user',
+          'role.html': 'iframe-role',
+          'app.html': 'iframe-app',
+          'app-detail.html': 'iframe-app',
+          'app-create.html': 'iframe-app',
+          'logs.html': 'iframe-logs',
+          'config.html': 'iframe-security',
+          'permission.html': 'iframe-permission'
+        };
+
+        // 支持带参数的 URL 匹配
+        let iframeId = pageToTab[url];
+        let targetTab = url.replace('.html', '').split('/').pop().split('?')[0];
+
+        if (!iframeId) {
+          // 尝试从 URL 中提取文件名
+          const fileName = url.split('/').pop().split('?')[0];
+          iframeId = pageToTab[fileName];
+          targetTab = fileName.replace('.html', '');
+        }
+
+        if (iframeId) {
+          const iframe = document.getElementById(iframeId);
+          iframe.src = url;
+          // 切换到对应的 tab
+          navigateToTab(targetTab);
+        }
+      }
+    });
+
+    // 通知父页面当前页面
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'admin.html' }, '*');
+    }
+  </script>
+
+  <style>
+    .tab-nav-container {
+      background: #fff;
+      border-bottom: 1px solid #E5E7EB;
+      /* 白色背景向下延伸覆盖内容区顶部，实现宽度一致 */
+      box-shadow: 0 1px 0 0 #fff;
+    }
+    .tab-content-area {
+      background: #fff;
+    }
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      padding: 0 24px;
+      max-width: 100%;
+    }
+    .tab-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      font-size: 14px;
+      color: #687280;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+      margin-bottom: -1px;
+    }
+    .tab-nav-item:hover {
+      color: #1F2937;
+    }
+    .tab-nav-item.active {
+      color: #4F46E5;
+      border-bottom-color: #4F46E5;
+      font-weight: 500;
+    }
+    .tab-nav-item i {
+      font-size: 14px;
+    }
+    .tab-content-area {
+      flex: 1;
+      overflow: hidden;
+    }
+    .tab-content-area iframe {
+      width: 100%;
+      height: calc(100vh - var(--header-height, 60px) - 48px);
+      border: none;
+      background: #F6F7FB;
+    }
+  </style>
+</body>
+</html>

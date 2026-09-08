@@ -1,0 +1,249 @@
+{
+  "overview": {
+    "aiCapabilityCount": 156,
+    "totalCalls": 2847392,
+    "activeApps": 89,
+    "serviceCompanies": 234,
+    "tokenConsumption": 156789456,
+    "successRate": 99.45
+  },
+  "topCapability": [
+    {
+      "id": "cap-001",
+      "name": "智能编目",
+      "calls": 489230,
+      "apps": 45,
+      "rating": 4.8,
+      "valueIndex": 98.5,
+      "growthRate": 23.5
+    },
+    {
+      "id": "cap-002",
+      "name": "找数寻源",
+      "calls": 412890,
+      "apps": 38,
+      "rating": 4.6,
+      "valueIndex": 95.2,
+      "growthRate": 18.2
+    },
+    {
+      "id": "cap-003",
+      "name": "运营助手",
+      "calls": 356120,
+      "apps": 52,
+      "rating": 4.9,
+      "valueIndex": 97.8,
+      "growthRate": 31.5
+    },
+    {
+      "id": "cap-004",
+      "name": "开发助手",
+      "calls": 298450,
+      "apps": 34,
+      "rating": 4.7,
+      "valueIndex": 93.4,
+      "growthRate": 15.8
+    },
+    {
+      "id": "cap-005",
+      "name": "数据脱敏",
+      "calls": 234560,
+      "apps": 28,
+      "rating": 4.5,
+      "valueIndex": 88.9,
+      "growthRate": 12.3
+    },
+    {
+      "id": "cap-006",
+      "name": "报表生成",
+      "calls": 198230,
+      "apps": 41,
+      "rating": 4.4,
+      "valueIndex": 85.6,
+      "growthRate": 22.1
+    },
+    {
+      "id": "cap-007",
+      "name": "数据清洗",
+      "calls": 176890,
+      "apps": 25,
+      "rating": 4.3,
+      "valueIndex": 82.1,
+      "growthRate": 8.5
+    },
+    {
+      "id": "cap-008",
+      "name": "智能问答",
+      "calls": 154320,
+      "apps": 33,
+      "rating": 4.6,
+      "valueIndex": 87.3,
+      "growthRate": 28.9
+    },
+    {
+      "id": "cap-009",
+      "name": "文本分类",
+      "calls": 132450,
+      "apps": 19,
+      "rating": 4.2,
+      "valueIndex": 79.8,
+      "growthRate": 5.2
+    },
+    {
+      "id": "cap-010",
+      "name": "实体识别",
+      "calls": 108920,
+      "apps": 15,
+      "rating": 4.4,
+      "valueIndex": 81.5,
+      "growthRate": 11.7
+    }
+  ],
+  "department": [
+    { "id": "dept-001", "name": "运营部", "calls": 892340, "ratio": 31.3, "growth": 28.5, "users": 156, "topCap": "运营助手" },
+    { "id": "dept-002", "name": "开发部", "calls": 756230, "ratio": 26.6, "growth": 18.2, "users": 132, "topCap": "开发助手" },
+    { "id": "dept-003", "name": "数据治理部", "calls": 523450, "ratio": 18.4, "growth": 35.8, "users": 98, "topCap": "智能编目" },
+    { "id": "dept-004", "name": "审批部", "calls": 298120, "ratio": 10.5, "growth": 12.3, "users": 45, "topCap": "报表生成" },
+    { "id": "dept-005", "name": "数据开放部", "calls": 276890, "ratio": 9.7, "growth": 45.2, "users": 67, "topCap": "找数寻源" },
+    { "id": "dept-006", "name": "其他", "calls": 100362, "ratio": 3.5, "growth": 8.9, "users": 28, "topCap": "文本分类" }
+  ],
+  "prompt": [
+    {
+      "id": "prompt-001",
+      "name": "智能编目Prompt",
+      "hitRate": 94.5,
+      "successRate": 99.2,
+      "failRate": 0.8,
+      "satisfaction": 4.8,
+      "currentVersion": "v3.2",
+      "previousVersion": "v3.1",
+      "previousSuccessRate": 97.8,
+      "previousFailRate": 2.2
+    },
+    {
+      "id": "prompt-002",
+      "name": "运营助手Prompt",
+      "hitRate": 91.2,
+      "successRate": 98.5,
+      "failRate": 1.5,
+      "satisfaction": 4.9,
+      "currentVersion": "v2.5",
+      "previousVersion": "v2.4",
+      "previousSuccessRate": 96.2,
+      "previousFailRate": 3.8
+    },
+    {
+      "id": "prompt-003",
+      "name": "找数寻源Prompt",
+      "hitRate": 88.7,
+      "successRate": 97.8,
+      "failRate": 2.2,
+      "satisfaction": 4.6,
+      "currentVersion": "v4.1",
+      "previousVersion": "v4.0",
+      "previousSuccessRate": 95.5,
+      "previousFailRate": 4.5
+    },
+    {
+      "id": "prompt-004",
+      "name": "开发助手Prompt",
+      "hitRate": 92.3,
+      "successRate": 99.1,
+      "failRate": 0.9,
+      "satisfaction": 4.7,
+      "currentVersion": "v2.8",
+      "previousVersion": "v2.7",
+      "previousSuccessRate": 98.3,
+      "previousFailRate": 1.7
+    },
+    {
+      "id": "prompt-005",
+      "name": "数据脱敏Prompt",
+      "hitRate": 96.8,
+      "successRate": 99.6,
+      "failRate": 0.4,
+      "satisfaction": 4.5,
+      "currentVersion": "v1.9",
+      "previousVersion": "v1.8",
+      "previousSuccessRate": 98.9,
+      "previousFailRate": 1.1
+    }
+  ],
+  "knowledge": {
+    "knowledgeBaseCount": 18,
+    "ragHitRate": 87.5,
+    "citationCount": 89234,
+    "coverage": 92.3,
+    "avgRetrievalMs": 280
+  },
+  "services": {
+    "api": [
+      { "id": "svc-api-001", "name": "能力调用API", "calls": 612340, "responseTime": 96, "failRate": 0.09 },
+      { "id": "svc-api-002", "name": "数据查询API", "calls": 489230, "responseTime": 132, "failRate": 0.12 },
+      { "id": "svc-api-003", "name": "文件上传API", "calls": 176890, "responseTime": 210, "failRate": 0.18 },
+      { "id": "svc-api-004", "name": "鉴权API", "calls": 892340, "responseTime": 45, "failRate": 0.03 },
+      { "id": "svc-api-005", "name": "回调通知API", "calls": 98450, "responseTime": 168, "failRate": 0.22 }
+    ],
+    "mcp": [
+      { "id": "svc-mcp-001", "name": "文件系统MCP", "calls": 234560, "responseTime": 125, "failRate": 0.12 },
+      { "id": "svc-mcp-002", "name": "数据库MCP", "calls": 198230, "responseTime": 89, "failRate": 0.08 },
+      { "id": "svc-mcp-003", "name": "API网关MCP", "calls": 176890, "responseTime": 156, "failRate": 0.15 },
+      { "id": "svc-mcp-004", "name": "搜索MCP", "calls": 154320, "responseTime": 203, "failRate": 0.21 },
+      { "id": "svc-mcp-005", "name": "邮件MCP", "calls": 132450, "responseTime": 178, "failRate": 0.18 }
+    ],
+    "agent": [
+      { "id": "svc-agent-001", "name": "智能编目Agent", "calls": 489230, "responseTime": 1850, "failRate": 0.14 },
+      { "id": "svc-agent-002", "name": "数据脱敏Agent", "calls": 234560, "responseTime": 1320, "failRate": 0.11 },
+      { "id": "svc-agent-003", "name": "报表生成Agent", "calls": 198230, "responseTime": 2240, "failRate": 0.19 },
+      { "id": "svc-agent-004", "name": "数据清洗Agent", "calls": 176890, "responseTime": 1680, "failRate": 0.16 },
+      { "id": "svc-agent-005", "name": "智能问答Agent", "calls": 154320, "responseTime": 980, "failRate": 0.07 }
+    ]
+  },
+  "advice": [
+    {
+      "id": "advice-001",
+      "type": "optimize",
+      "title": "建议优化：运营助手Prompt",
+      "desc": "运营助手用户满意度4.9分，但命中率仅91.2%，低于92%阈值。建议优化Prompt结构，提升意图识别准确率，预计可提升命中率至95%+。",
+      "metric": "命中率 91.2% · 低于92%阈值",
+      "priority": "high",
+      "icon": "fa-wand-magic-sparkles"
+    },
+    {
+      "id": "advice-002",
+      "type": "upgrade",
+      "title": "建议推广：数据脱敏能力",
+      "desc": "数据脱敏调用增长12.3%，但覆盖应用仅28个，低于均值。建议在数据治理场景加强推广，扩大应用覆盖。",
+      "metric": "覆盖应用 28个 · 增长率 12.3%",
+      "priority": "medium",
+      "icon": "fa-arrow-up"
+    },
+    {
+      "id": "advice-003",
+      "type": "new",
+      "title": "建议新增：数据治理知识库",
+      "desc": "当前RAG命中率87.5%，知识覆盖率92.3%。建议新增数据治理专业知识库，进一步提升检索效果与覆盖率。",
+      "metric": "RAG命中率 87.5% · 覆盖率 92.3%",
+      "priority": "medium",
+      "icon": "fa-book-plus"
+    },
+    {
+      "id": "advice-004",
+      "type": "republish",
+      "title": "建议重新发布：数据清洗能力",
+      "desc": "数据清洗能力增长率仅8.5%，连续3个月下降，低于平台均值。建议优化能力介绍并重新发布。",
+      "metric": "增长率 8.5% · 连续3月下降",
+      "priority": "low",
+      "icon": "fa-rocket"
+    },
+    {
+      "id": "advice-005",
+      "type": "optimize",
+      "title": "建议优化：找数寻源延迟",
+      "desc": "找数寻源P99延迟达1200ms，高于800ms阈值，影响用户体验。建议优化缓存策略或升级模型版本。",
+      "metric": "P99延迟 1200ms · 高于800ms阈值",
+      "priority": "high",
+      "icon": "fa-gauge-high"
+    }
+  ]
+}

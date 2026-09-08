@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统配置 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Content Card -->
+    <div class="content-card">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-bar-left">
+          <div class="admin-select">
+            <select id="search-category">
+              <option value="">全部分类</option>
+              <option value="basic">基础配置</option>
+              <option value="ai">AI配置</option>
+              <option value="modelDefaults">模型默认配置</option>
+              <option value="mcpDefaults">MCP默认配置</option>
+              <option value="notification">通知配置</option>
+              <option value="security">安全配置</option>
+              <option value="fileUpload">文件上传配置</option>
+            </select>
+          </div>
+          <button class="admin-btn admin-btn-secondary" id="btn-search">
+            <i class="fa-solid fa-magnifying-glass"></i> 查询
+          </button>
+          <button class="admin-btn admin-btn-ghost" id="btn-reset">
+            <i class="fa-solid fa-rotate-left"></i> 重置
+          </button>
+        </div>
+        <div class="search-bar-right">
+          <button class="admin-btn admin-btn-primary" id="btn-add">
+            <i class="fa-solid fa-plus"></i> 新增配置
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>配置名称</th>
+              <th>配置Key</th>
+              <th>配置值</th>
+              <th>分类</th>
+              <th>更新时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="config-table-body">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="admin-pagination">
+        <div class="admin-pagination-info" id="pagination-info">共 0 条记录</div>
+        <div class="admin-pagination-controls" id="pagination-controls">
+          <button class="admin-pagination-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="admin-pagination-btn active">1</button>
+          <button class="admin-pagination-btn" disabled><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Drawer -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+  <div class="drawer drawer-right" id="edit-drawer">
+    <div class="drawer-header">
+      <h3 class="drawer-title" id="drawer-title">编辑配置</h3>
+      <button class="drawer-close" id="drawer-close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="admin-form-group">
+        <label class="admin-form-label">配置名称 <span class="required">*</span></label>
+        <input type="text" class="admin-form-input" id="edit-name" placeholder="请输入配置名称">
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">配置Key <span class="required">*</span></label>
+        <input type="text" class="admin-form-input" id="edit-key" placeholder="请输入配置Key">
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">配置分类</label>
+        <select class="admin-form-select" id="edit-category">
+          <option value="basic">基础配置</option>
+          <option value="ai">AI配置</option>
+          <option value="modelDefaults">模型默认配置</option>
+          <option value="mcpDefaults">MCP默认配置</option>
+          <option value="notification">通知配置</option>
+          <option value="security">安全配置</option>
+          <option value="fileUpload">文件上传配置</option>
+        </select>
+      </div>
+      <div class="admin-form-group">
+        <label class="admin-form-label">配置值</label>
+        <input type="text" class="admin-form-input" id="edit-value" placeholder="请输入配置值">
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="admin-btn admin-btn-secondary" id="btn-cancel">取消</button>
+      <button class="admin-btn admin-btn-primary" id="btn-save">保存</button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script>
+    // Mock Data
+    const MOCK_CONFIGS = [
+      { key: 'platform_name', name: '平台名称', value: 'AI能力开放平台', category: 'basic', updateTime: '2026-06-28 10:18' },
+      { key: 'platform_version', name: '平台版本', value: 'V1.0.0', category: 'basic', updateTime: '2026-01-01 00:00' },
+      { key: 'default_language', name: '默认语言', value: 'zh-CN', category: 'basic', updateTime: '2026-01-01 00:00' },
+      { key: 'default_model', name: '默认模型', value: 'GPT-4o', category: 'ai', updateTime: '2026-01-01 00:00' },
+      { key: 'max_tokens', name: '最大Token数', value: '128000', category: 'ai', updateTime: '2026-01-01 00:00' },
+      { key: 'temperature', name: '默认温度参数', value: '0.7', category: 'ai', updateTime: '2026-01-01 00:00' },
+      { key: 'enable_streaming', name: '启用流式输出', value: 'true', category: 'ai', updateTime: '2026-01-01 00:00' },
+      { key: 'model_timeout', name: '模型调用超时(秒)', value: '60', category: 'modelDefaults', updateTime: '2026-01-01 00:00' },
+      { key: 'model_retry', name: '模型重试次数', value: '3', category: 'modelDefaults', updateTime: '2026-01-01 00:00' },
+      { key: 'mcp_timeout', name: 'MCP调用超时(秒)', value: '30', category: 'mcpDefaults', updateTime: '2026-01-01 00:00' },
+      { key: 'mcp_max_connections', name: '最大连接数', value: '100', category: 'mcpDefaults', updateTime: '2026-01-01 00:00' },
+      { key: 'enable_email_notify', name: '启用邮件通知', value: 'true', category: 'notification', updateTime: '2026-01-01 00:00' },
+      { key: 'smtp_host', name: 'SMTP服务器', value: 'smtp.aiplatform.com', category: 'notification', updateTime: '2026-01-01 00:00' },
+      { key: 'enable_webhook', name: '启用Webhook', value: 'false', category: 'notification', updateTime: '2026-01-01 00:00' },
+      { key: 'password_min_length', name: '密码最小长度', value: '8', category: 'security', updateTime: '2026-01-01 00:00' },
+      { key: 'enable_2fa', name: '启用双因素认证', value: 'false', category: 'security', updateTime: '2026-01-01 00:00' },
+      { key: 'session_timeout', name: '会话超时(分钟)', value: '30', category: 'security', updateTime: '2026-01-01 00:00' },
+      { key: 'max_file_size', name: '最大文件大小(MB)', value: '50', category: 'fileUpload', updateTime: '2026-01-01 00:00' },
+      { key: 'enable_preview', name: '启用文件预览', value: 'true', category: 'fileUpload', updateTime: '2026-01-01 00:00' }
+    ];
+
+    const categoryMap = {
+      'basic': '基础配置',
+      'ai': 'AI配置',
+      'modelDefaults': '模型默认配置',
+      'mcpDefaults': 'MCP默认配置',
+      'notification': '通知配置',
+      'security': '安全配置',
+      'fileUpload': '文件上传配置'
+    };
+
+    let configs = [...MOCK_CONFIGS];
+    let currentEditKey = null;
+    const pageSize = 10;
+    let currentPage = 1;
+
+    // Render table
+    function renderTable() {
+      const container = document.getElementById('config-table-body');
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = configs.slice(start, end);
+
+      container.innerHTML = pageData.map(config => `
+        <tr>
+          <td>${config.name}</td>
+          <td><code class="config-key">${config.key}</code></td>
+          <td>
+            ${config.value === 'true' ? '<span class="tag tag-success">启用</span>' :
+              config.value === 'false' ? '<span class="tag tag-secondary">禁用</span>' :
+              `<span class="config-value">${config.value}</span>`}
+          </td>
+          <td><span class="tag tag-outline">${categoryMap[config.category] || config.category}</span></td>
+          <td>${config.updateTime}</td>
+          <td>
+            <div class="admin-actions">
+              <button class="admin-action-btn" onclick="handleEdit('${config.key}')" title="编辑"><i class="fa-solid fa-pen"></i></button>
+              <button class="admin-action-btn admin-action-btn-danger" onclick="handleDelete('${config.key}')" title="删除"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // Update pagination
+      const total = configs.length;
+      const totalPages = Math.ceil(total / pageSize);
+      document.getElementById('pagination-info').textContent = `共 ${total} 条记录`;
+
+      const controls = document.getElementById('pagination-controls');
+      let paginationHTML = '';
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `<button class="admin-pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+      }
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+      controls.innerHTML = paginationHTML;
+    }
+
+    function goToPage(page) {
+      const totalPages = Math.ceil(configs.length / pageSize);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      renderTable();
+    }
+
+    // Search and filter
+    function handleSearch() {
+      const category = document.getElementById('search-category').value;
+
+      configs = MOCK_CONFIGS.filter(config => {
+        const matchCategory = !category || config.category === category;
+        return matchCategory;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function handleReset() {
+      document.getElementById('search-category').value = '';
+      configs = [...MOCK_CONFIGS];
+      currentPage = 1;
+      renderTable();
+    }
+
+    // CRUD operations
+    function handleAdd() {
+      currentEditKey = null;
+      document.getElementById('drawer-title').textContent = '新增配置';
+      document.getElementById('edit-name').value = '';
+      document.getElementById('edit-key').value = '';
+      document.getElementById('edit-category').value = 'basic';
+      document.getElementById('edit-value').value = '';
+      openDrawer();
+    }
+
+    function handleEdit(key) {
+      const config = configs.find(c => c.key === key);
+      if (!config) return;
+      currentEditKey = key;
+      document.getElementById('drawer-title').textContent = '编辑配置';
+      document.getElementById('edit-name').value = config.name;
+      document.getElementById('edit-key').value = config.key;
+      document.getElementById('edit-category').value = config.category;
+      document.getElementById('edit-value').value = config.value;
+      openDrawer();
+    }
+
+    function handleSave() {
+      const name = document.getElementById('edit-name').value.trim();
+      const key = document.getElementById('edit-key').value.trim();
+      const category = document.getElementById('edit-category').value;
+      const value = document.getElementById('edit-value').value.trim();
+
+      if (!name || !key) {
+        showToast('请填写必填项', 'error');
+        return;
+      }
+
+      if (currentEditKey) {
+        // Update
+        const index = configs.findIndex(c => c.key === currentEditKey);
+        if (index !== -1) {
+          configs[index] = { ...configs[index], name, key, category, value, updateTime: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-') };
+          showToast('配置更新成功');
+        }
+      } else {
+        // Create
+        const newConfig = {
+          key,
+          name,
+          category,
+          value,
+          updateTime: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '-')
+        };
+        configs.unshift(newConfig);
+        showToast('配置创建成功');
+      }
+
+      closeDrawer();
+      renderTable();
+    }
+
+    function handleDelete(key) {
+      const config = configs.find(c => c.key === key);
+      if (!config) return;
+      if (config.category === 'basic' && ['platform_name', 'platform_version'].includes(key)) {
+        showToast('系统关键配置无法删除', 'error');
+        return;
+      }
+      if (!confirm('确定要删除该配置吗？')) return;
+      configs = configs.filter(c => c.key !== key);
+      showToast('配置已删除');
+      renderTable();
+    }
+
+    function openDrawer() {
+      document.getElementById('drawer-overlay').classList.add('active');
+      document.getElementById('edit-drawer').classList.add('active');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer-overlay').classList.remove('active');
+      document.getElementById('edit-drawer').classList.remove('active');
+    }
+
+    function showToast(message, type) {
+      type = type || 'success';
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'admin-toast admin-toast-' + type;
+      toast.innerHTML = '<i class="fa-solid ' + (type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation') + '"></i><span>' + message + '</span>';
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('active'));
+      setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Event bindings
+    document.getElementById('btn-search').addEventListener('click', handleSearch);
+    document.getElementById('btn-reset').addEventListener('click', handleReset);
+    document.getElementById('btn-add').addEventListener('click', handleAdd);
+    document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+    document.getElementById('btn-cancel').addEventListener('click', closeDrawer);
+    document.getElementById('btn-save').addEventListener('click', handleSave);
+    document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+
+    // Menu highlight
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'config.html' }, '*');
+    }
+
+    // Init
+    renderTable();
+  </script>
+
+  <style>
+    .search-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .search-bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .search-bar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .config-key {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      padding: 2px 6px;
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+    }
+    .config-value {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-sm);
+    }
+    .tag-outline {
+      padding: 2px 8px;
+      font-size: var(--font-size-xs);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      color: var(--color-text-secondary);
+      background: transparent;
+    }
+    .tag-secondary {
+      padding: 2px 8px;
+      font-size: var(--font-size-xs);
+      border-radius: var(--radius-full);
+      background: var(--color-bg-alt);
+      color: var(--color-text-muted);
+    }
+
+    /* Drawer */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: var(--z-modal);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-normal);
+    }
+    .drawer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 480px;
+      max-width: 100%;
+      background: var(--color-surface);
+      box-shadow: var(--shadow-2xl);
+      z-index: calc(var(--z-modal) + 1);
+      transform: translateX(100%);
+      transition: transform var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-right.active {
+      transform: translateX(0);
+    }
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .drawer-title {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+    .drawer-close {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+    .drawer-close:hover {
+      background: var(--color-bg-alt);
+      color: var(--color-text-primary);
+    }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-6);
+    }
+    .drawer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg);
+    }
+  </style>
+</body>
+</html>

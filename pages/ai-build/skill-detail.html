@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skill详情 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/skill.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <div class="sk-page">
+
+      <div class="sk-page-head">
+        <div class="sk-page-head-title">
+          <button class="sk-back-btn" onclick="SkillDetail.goList()" title="返回列表"><i class="fa-solid fa-arrow-left"></i></button>
+          <div>
+            <h1 class="sk-page-title" id="detail-title">Skill详情</h1>
+            <p class="sk-page-sub" id="detail-sub"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 详情头部信息卡 -->
+      <div class="sk-detail-top hidden" id="detail-top">
+        <div class="sk-detail-idbox">
+          <div class="sk-detail-icon"><i class="fa-solid fa-certificate"></i></div>
+          <div>
+            <div class="sk-detail-name-row">
+              <h2 class="sk-detail-name" id="d-name"></h2>
+              <span id="d-status"></span>
+              <span id="d-version"></span>
+              <span class="sk-type-tag" id="d-type"></span>
+            </div>
+            <p class="sk-detail-desc" id="d-desc"></p>
+            <div class="sk-detail-meta" id="d-meta"></div>
+          </div>
+        </div>
+        <div class="sk-detail-head-actions" id="head-actions"></div>
+      </div>
+
+      <!-- 未找到占位 -->
+      <div id="detail-missing" class="hidden" style="padding: 80px 0;">
+        <div class="empty-state">
+          <div class="empty-state-icon"><i class="fa-solid fa-certificate"></i></div>
+          <div class="empty-state-title">未找到该 Skill</div>
+          <div class="empty-state-desc">它可能已被删除，请返回 Skill 列表查看。</div>
+          <div class="empty-state-action">
+            <button class="btn btn-primary" onclick="SkillDetail.goList()"><i class="fa-solid fa-arrow-left"></i> 返回 Skill 列表</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="detail-main" class="hidden">
+        <!-- 页签 -->
+        <div class="sk-detail-tabs">
+          <button class="sk-detail-tab active" data-tab="overview" onclick="SkillDetail.setTab('overview')"><i class="fa-regular fa-circle-dot"></i> 概览</button>
+          <button class="sk-detail-tab" data-tab="config" onclick="SkillDetail.setTab('config')"><i class="fa-solid fa-sliders"></i> 能力配置</button>
+          <button class="sk-detail-tab" data-tab="rules" onclick="SkillDetail.setTab('rules')"><i class="fa-solid fa-route"></i> 执行规则</button>
+          <button class="sk-detail-tab" data-tab="io" onclick="SkillDetail.setTab('io')"><i class="fa-solid fa-right-left"></i> 输入输出</button>
+          <button class="sk-detail-tab" data-tab="tests" onclick="SkillDetail.setTab('tests')">在线测试 <span class="cnt" id="badge-tests">0</span></button>
+          <button class="sk-detail-tab" data-tab="versions" onclick="SkillDetail.setTab('versions')">版本记录 <span class="cnt" id="badge-versions">0</span></button>
+        </div>
+
+        <div class="sk-detail-body" id="detail-body"></div>
+      </div>
+
+    </div><!-- /.sk-page -->
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/skill.js"></script>
+  <script src="../../assets/js/skill-detail.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'skill.html' }, '*');
+      window.parent.postMessage({ type: 'contentLoaded', url: 'skill-detail.html' }, '*');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      SkillDetail.init();
+    });
+  </script>
+</body>
+</html>

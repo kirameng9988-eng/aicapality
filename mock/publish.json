@@ -1,0 +1,280 @@
+{
+  "overview": {
+    "pendingCount": 8,
+    "publishedCount": 24,
+    "approvingCount": 3,
+    "successRate": 94.2
+  },
+  "pendingList": [
+    {
+      "id": "pend-001",
+      "name": "智能问答",
+      "type": "Prompt",
+      "version": "1.0.0",
+      "owner": "李明",
+      "publishTime": "2026-06-28",
+      "status": "待发布",
+      "description": "基于 RAG 的智能问答能力，支持多轮对话与知识检索溯源",
+      "boundResources": { "model": "GLM-4", "knowledge": "产品知识库 v3", "mcp": "-" },
+      "changelog": "首次发布；新增多轮对话与溯源引用能力",
+      "validation": {
+        "promptComplete": true,
+        "modelBound": true,
+        "knowledgeBound": true,
+        "mcpBound": false,
+        "permissionConfigured": true,
+        "documentationComplete": true
+      }
+    },
+    {
+      "id": "pend-002",
+      "name": "数据清洗",
+      "type": "Agent",
+      "version": "1.1.0",
+      "owner": "王芳",
+      "publishTime": "2026-06-28",
+      "status": "待发布",
+      "description": "面向数据清洗任务的智能体能力，支持自定义清洗规则与标准化处理",
+      "boundResources": { "model": "GLM-4-Air", "knowledge": "-", "mcp": "数据源连接器" },
+      "changelog": "新增地址字段标准化规则；修复空值处理缺陷",
+      "validation": {
+        "promptComplete": true,
+        "modelBound": true,
+        "knowledgeBound": false,
+        "mcpBound": true,
+        "permissionConfigured": true,
+        "documentationComplete": true
+      }
+    },
+    {
+      "id": "pend-003",
+      "name": "报表生成",
+      "type": "Knowledge",
+      "version": "2.0.0",
+      "owner": "张强",
+      "publishTime": "2026-06-27",
+      "status": "待发布",
+      "description": "基于知识库的智能报表生成，支持自然语言驱动的数据透视",
+      "boundResources": { "model": "GLM-4", "knowledge": "财务报表知识库", "mcp": "-" },
+      "changelog": "2.0 大版本重构；支持多表关联与图表渲染",
+      "validation": {
+        "promptComplete": true,
+        "modelBound": true,
+        "knowledgeBound": true,
+        "mcpBound": false,
+        "permissionConfigured": true,
+        "documentationComplete": true
+      }
+    },
+    {
+      "id": "pend-004",
+      "name": "图像识别",
+      "type": "Model",
+      "version": "1.5.0",
+      "owner": "陈静",
+      "publishTime": "2026-06-27",
+      "status": "待发布",
+      "description": "通用图像识别模型，支持 200+ 场景分类与目标检测",
+      "boundResources": { "model": "视觉模型 v1.5", "knowledge": "-", "mcp": "-" },
+      "changelog": "模型精度提升 4.2%；新增 30 个细粒度场景",
+      "validation": {
+        "promptComplete": true,
+        "modelBound": true,
+        "knowledgeBound": false,
+        "mcpBound": false,
+        "permissionConfigured": false,
+        "documentationComplete": true
+      }
+    },
+    {
+      "id": "pend-005",
+      "name": "文件解析",
+      "type": "MCP",
+      "version": "1.2.0",
+      "owner": "刘洋",
+      "publishTime": "2026-06-26",
+      "status": "待发布",
+      "description": "多格式文件解析 MCP 工具，支持 PDF/Word/Excel 结构化抽取",
+      "boundResources": { "model": "-", "knowledge": "-", "mcp": "文件解析服务" },
+      "changelog": "新增 Excel 合并单元格处理；提升表格识别准确率",
+      "validation": {
+        "promptComplete": true,
+        "modelBound": false,
+        "knowledgeBound": false,
+        "mcpBound": true,
+        "permissionConfigured": true,
+        "documentationComplete": true
+      }
+    },
+    {
+      "id": "pend-006",
+      "name": "情感分析",
+      "type": "Prompt",
+      "version": "1.0.0",
+      "owner": "赵雷",
+      "publishTime": "2026-06-26",
+      "status": "待发布",
+      "description": "文本情感分析与倾向判断，输出正/负/中性及置信度",
+      "boundResources": { "model": "GLM-4-Air", "knowledge": "-", "mcp": "-" },
+      "changelog": "首次发布；支持批量推理与置信度输出",
+      "validation": {
+        "promptComplete": true,
+        "modelBound": true,
+        "knowledgeBound": false,
+        "mcpBound": false,
+        "permissionConfigured": false,
+        "documentationComplete": false
+      }
+    },
+    {
+      "id": "pend-007",
+      "name": "数据抽取",
+      "type": "Agent",
+      "version": "1.3.0",
+      "owner": "孙燕",
+      "publishTime": "2026-06-25",
+      "status": "待发布",
+      "description": "面向非结构化文本实体抽取的智能体能力，支持自定义抽取 schema",
+      "boundResources": { "model": "GLM-4", "knowledge": "实体词典库", "mcp": "数据源连接器" },
+      "changelog": "新增关系抽取技能；优化抽取吞吐性能",
+      "validation": {
+        "promptComplete": true,
+        "modelBound": true,
+        "knowledgeBound": true,
+        "mcpBound": true,
+        "permissionConfigured": true,
+        "documentationComplete": true
+      }
+    },
+    {
+      "id": "pend-008",
+      "name": "知识图谱",
+      "type": "Knowledge",
+      "version": "1.0.0",
+      "owner": "周杰",
+      "publishTime": "2026-06-25",
+      "status": "待发布",
+      "description": "行业知识图谱构建与问答，支持实体关系推理",
+      "boundResources": { "model": "GLM-4", "knowledge": "行业图谱库 v1", "mcp": "-" },
+      "changelog": "首次发布；提供图谱可视化与推理问答",
+      "validation": {
+        "promptComplete": true,
+        "modelBound": true,
+        "knowledgeBound": true,
+        "mcpBound": false,
+        "permissionConfigured": true,
+        "documentationComplete": true
+      }
+    }
+  ],
+  "publishFlow": {
+    "steps": [
+      { "id": 1, "name": "能力创建", "icon": "fa-plus-circle", "desc": "创建并配置能力" },
+      { "id": 2, "name": "测试验证", "icon": "fa-vial", "desc": "功能与性能测试" },
+      { "id": 3, "name": "配置策略", "icon": "fa-sliders", "desc": "开放策略与权限" },
+      { "id": 4, "name": "发布审批", "icon": "fa-clipboard-check", "desc": "审批流程确认" },
+      { "id": 5, "name": "能力上线", "icon": "fa-rocket", "desc": "正式发布上线" },
+      { "id": 6, "name": "市场上架", "icon": "fa-store", "desc": "同步至能力市场" }
+    ],
+    "currentStep": 3
+  },
+  "publishConfig": {
+    "publishName": "",
+    "version": "",
+    "publishNote": "",
+    "environments": ["测试", "预发布", "生产"],
+    "selectedEnvironments": [],
+    "openProtocols": [
+      { "id": "mcp", "name": "MCP", "icon": "fa-plug", "desc": "Model Context Protocol" },
+      { "id": "openapi", "name": "OpenAPI", "icon": "fa-code", "desc": "RESTful API" },
+      { "id": "sdk", "name": "SDK", "icon": "fa-box", "desc": "软件开发工具包" }
+    ],
+    "selectedProtocols": []
+  },
+  "validation": {
+    "promptComplete": true,
+    "modelBound": true,
+    "knowledgeBound": true,
+    "mcpBound": true,
+    "permissionConfigured": true,
+    "documentationComplete": true
+  },
+  "history": [
+    {
+      "id": "hist-001",
+      "publishTime": "2026-06-22 14:30:00",
+      "publisher": "张明",
+      "capabilityName": "开发助手",
+      "version": "2.0.0",
+      "result": "成功",
+      "duration": "4分32秒",
+      "approvalStatus": "已通过",
+      "environment": "生产",
+      "protocol": "OpenAPI",
+      "approver": "周主管",
+      "approvalComment": "测试全部通过，性能达标，同意发布至生产",
+      "changelog": "支持代码补全多语言；上下文窗口扩展至 128K"
+    },
+    {
+      "id": "hist-002",
+      "publishTime": "2026-06-20 10:15:00",
+      "publisher": "张明",
+      "capabilityName": "智能编目",
+      "version": "2.1.0",
+      "result": "成功",
+      "duration": "3分18秒",
+      "approvalStatus": "已通过",
+      "environment": "生产",
+      "protocol": "MCP",
+      "approver": "周主管",
+      "approvalComment": "编目准确率达标，同意发布",
+      "changelog": "新增字段自动映射；编目准确率提升至 96%"
+    },
+    {
+      "id": "hist-003",
+      "publishTime": "2026-06-19 16:45:00",
+      "publisher": "王芳",
+      "capabilityName": "数据脱敏",
+      "version": "1.2.0",
+      "result": "成功",
+      "duration": "5分02秒",
+      "approvalStatus": "已通过",
+      "environment": "预发布",
+      "protocol": "SDK",
+      "approver": "李主管",
+      "approvalComment": "脱敏规则覆盖度达标，同意发布至预发布",
+      "changelog": "新增身份证与银行卡脱敏规则；支持自定义保留位"
+    },
+    {
+      "id": "hist-004",
+      "publishTime": "2026-06-18 09:20:00",
+      "publisher": "李明",
+      "capabilityName": "找数寻源",
+      "version": "1.8.0",
+      "result": "成功",
+      "duration": "4分45秒",
+      "approvalStatus": "已通过",
+      "environment": "生产",
+      "protocol": "OpenAPI",
+      "approver": "周主管",
+      "approvalComment": "同意发布",
+      "changelog": "优化数据源检索排序；修复分页缺陷"
+    },
+    {
+      "id": "hist-005",
+      "publishTime": "2026-06-15 11:30:00",
+      "publisher": "张强",
+      "capabilityName": "运营助手",
+      "version": "1.5.0",
+      "result": "失败",
+      "duration": "2分10秒",
+      "approvalStatus": "已拒绝",
+      "failReason": "测试用例未通过",
+      "environment": "生产",
+      "protocol": "OpenAPI",
+      "approver": "周主管",
+      "approvalComment": "回归测试 3 个用例未通过，驳回修复后重新提审",
+      "changelog": "新增运营看板模块（本次发布未成功）"
+    }
+  ]
+}

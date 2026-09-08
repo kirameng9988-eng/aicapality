@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skill管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/skill.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <div class="sk-page">
+
+      <!-- 工具栏 + 列表 -->
+      <div class="sk-toolbar">
+        <div class="sk-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="search-input" placeholder="搜索 Skill 名称 / 编码" autocomplete="off">
+        </div>
+        <select class="sk-filter-select" id="type-filter">
+          <option value="">全部类型</option>
+          <option value="数据处理">数据处理</option>
+          <option value="内容生成">内容生成</option>
+          <option value="数据分析">数据分析</option>
+          <option value="数据治理">数据治理</option>
+          <option value="知识问答">知识问答</option>
+          <option value="其他">其他</option>
+        </select>
+        <select class="sk-filter-select" id="status-filter">
+          <option value="">全部状态</option>
+          <option value="draft">草稿</option>
+          <option value="published">已发布</option>
+          <option value="stopped">已停用</option>
+        </select>
+        <div class="sk-toolbar-right">
+          <button class="btn btn-primary" id="new-skill-btn">
+            <i class="fa-solid fa-plus"></i> 新建 Skill
+          </button>
+        </div>
+      </div>
+
+      <div class="sk-table-card">
+        <div class="sk-table-wrap">
+          <table class="sk-table">
+            <thead>
+              <tr>
+                <th>Skill名称</th>
+                <th>Skill编码</th>
+                <th>Skill类型</th>
+                <th>模型</th>
+                <th>关联知识库</th>
+                <th>可用工具</th>
+                <th>关联Agent</th>
+                <th>状态</th>
+                <th>更新时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="skill-table-body">
+              <!-- 由 skill.js 渲染 -->
+            </tbody>
+          </table>
+        </div>
+        <div class="sk-pager">
+          <span class="info" id="table-count"></span>
+          <div id="skill-pagination"></div>
+        </div>
+      </div>
+
+    </div><!-- /.sk-page -->
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/skill.js"></script>
+  <script>
+    // 若父页面存在则通知已加载（高亮菜单）
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'skill.html' }, '*');
+      window.parent.postMessage({ type: 'contentLoaded', url: 'skill.html' }, '*');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      SkillListPage.init();
+    });
+  </script>
+</body>
+</html>

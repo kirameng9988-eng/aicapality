@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>编辑文档 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/knowledge.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .chunk-list-item {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      margin-bottom: var(--space-2);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .chunk-list-item:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chunk-list-item.active {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+    }
+
+    .chunk-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-2);
+    }
+
+    .chunk-index {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary);
+    }
+
+    .chunk-badge {
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: var(--font-weight-medium);
+    }
+
+    .chunk-badge.completed { background: #ECFDF5; color: #059669; }
+    .chunk-badge.pending { background: #F1F5F9; color: #64748B; }
+    .chunk-badge.failed { background: #FEF2F2; color: #DC2626; }
+
+    .chunk-content {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--line-height-relaxed);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .chunk-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-top: var(--space-2);
+    }
+
+    .chunk-detail-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      margin-top: var(--space-4);
+    }
+
+    .chunk-detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .chunk-detail-title {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+
+    .chunk-detail-content {
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--line-height-relaxed);
+      white-space: pre-wrap;
+      margin-bottom: var(--space-4);
+    }
+
+    .chunk-detail-meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-3);
+    }
+
+    .chunk-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .chunk-meta-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .chunk-meta-value {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
+    .doc-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+    }
+
+    .doc-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .doc-info-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .doc-info-value {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+    }
+  </style>
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <!-- Page Header -->
+    <div class="page-header" style="margin-bottom: var(--space-5);">
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <a href="knowledge.html" class="btn btn-ghost btn-sm" style="padding: var(--space-2);">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="empty-state" style="padding: 60px;">
+      <div class="empty-state-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      <div class="empty-state-title">加载中...</div>
+      <div class="empty-state-desc">正在获取文档信息</div>
+    </div>
+
+    <!-- Content -->
+    <div id="content" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1fr 400px; gap: var(--space-5);">
+        <!-- Left: Document Info -->
+        <div>
+          <!-- Basic Info Card -->
+          <div class="card" style="margin-bottom: var(--space-5);">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-info-circle" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+                文档信息
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="doc-info-grid">
+                <div class="doc-info-item">
+                  <span class="doc-info-label">文档名称</span>
+                  <span class="doc-info-value" id="doc-name-display">-</span>
+                </div>
+                <div class="doc-info-item">
+                  <span class="doc-info-label">文档格式</span>
+                  <span class="doc-info-value" id="doc-format">-</span>
+                </div>
+                <div class="doc-info-item">
+                  <span class="doc-info-label">文档大小</span>
+                  <span class="doc-info-value" id="doc-size">-</span>
+                </div>
+                <div class="doc-info-item">
+                  <span class="doc-info-label">所属知识库</span>
+                  <span class="doc-info-value" id="doc-kb">-</span>
+                </div>
+                <div class="doc-info-item">
+                  <span class="doc-info-label">解析状态</span>
+                  <span class="doc-info-value" id="doc-parse-status">-</span>
+                </div>
+                <div class="doc-info-item">
+                  <span class="doc-info-label">Embedding状态</span>
+                  <span class="doc-info-value" id="doc-embedding-status">-</span>
+                </div>
+                <div class="doc-info-item">
+                  <span class="doc-info-label">Chunk数量</span>
+                  <span class="doc-info-value" id="doc-chunk-count">-</span>
+                </div>
+                <div class="doc-info-item">
+                  <span class="doc-info-label">更新时间</span>
+                  <span class="doc-info-value" id="doc-updated-at">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit Form Card -->
+          <div class="card" style="margin-bottom: var(--space-5);">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-pen-to-square" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+                编辑信息
+              </div>
+            </div>
+            <div class="card-body">
+              <form id="doc-form">
+                <div class="form-group">
+                  <label class="form-label">文档名称</label>
+                  <input type="text" class="form-input" id="doc-name" placeholder="请输入文档名称" maxlength="100">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">文档标签</label>
+                  <input type="text" class="form-input" id="doc-tags" placeholder="输入标签，多个标签用逗号分隔">
+                  <div class="form-help">例如：标准规范, 数据治理, 安全管理</div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label">文档描述</label>
+                  <textarea class="form-textarea" id="doc-description" placeholder="请输入文档描述信息" rows="3" maxlength="300"></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="card-footer" style="display: flex; justify-content: flex-end; gap: var(--space-3);">
+              <button type="button" class="btn btn-secondary" onclick="reparseDocument()">
+                <i class="fa-solid fa-rotate-right"></i>
+                重新解析
+              </button>
+              <button type="button" class="btn btn-primary" onclick="saveDocument()">
+                <i class="fa-solid fa-check"></i>
+                保存修改
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Chunk List -->
+        <div>
+          <div class="card" style="position: sticky; top: 0;">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-layer-group" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+                Chunk 列表 (<span id="chunk-count">0</span>)
+              </div>
+            </div>
+            <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+              <div id="chunk-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chunk Detail Panel -->
+      <div id="chunk-detail-panel" class="chunk-detail-panel" style="display: none;">
+        <div class="chunk-detail-header">
+          <div class="chunk-detail-title">
+            <i class="fa-solid fa-scissors" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+            Chunk <span id="chunk-detail-index">1</span> 详情
+          </div>
+          <button class="drawer-close" onclick="closeChunkDetail()" style="width: 28px; height: 28px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); cursor: pointer; border: none; background: none;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="chunk-detail-content" id="chunk-detail-content"></div>
+        <div class="chunk-detail-meta">
+          <div class="chunk-meta-item">
+            <span class="chunk-meta-label">长度</span>
+            <span class="chunk-meta-value" id="chunk-detail-length">-</span>
+          </div>
+          <div class="chunk-meta-item">
+            <span class="chunk-meta-label">Token数</span>
+            <span class="chunk-meta-value" id="chunk-detail-token">-</span>
+          </div>
+          <div class="chunk-meta-item">
+            <span class="chunk-meta-label">Embedding</span>
+            <span class="chunk-meta-value" id="chunk-detail-embedding">-</span>
+          </div>
+          <div class="chunk-meta-item">
+            <span class="chunk-meta-label">引用次数</span>
+            <span class="chunk-meta-value" id="chunk-detail-ref">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Not Found State -->
+    <div id="not-found-state" class="empty-state" style="padding: 60px; display: none;">
+      <div class="empty-state-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="empty-state-title">文档不存在</div>
+      <div class="empty-state-desc">无法找到指定的文档，请检查链接是否正确</div>
+      <div style="margin-top: var(--space-4);">
+        <a href="knowledge.html" class="btn btn-primary">
+          <i class="fa-solid fa-arrow-left"></i>
+          返回知识库列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script>
+    let currentDoc = null;
+    let currentChunks = [];
+    let selectedChunkId = null;
+
+    // Get document ID from URL
+    function getDocId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    // Load document data
+    async function loadDocument() {
+      const docId = getDocId();
+
+      if (!docId) {
+        showNotFound();
+        return;
+      }
+
+      const data = await loadMockData('knowledge');
+      if (!data) {
+        showNotFound();
+        return;
+      }
+
+      const doc = data.documents.find(d => d.id === docId);
+      if (!doc) {
+        showNotFound();
+        return;
+      }
+
+      const kb = data.knowledgeBases.find(k => k.id === doc.kbId);
+      const chunks = data.chunks.filter(c => c.docId === docId);
+
+      currentDoc = doc;
+      currentChunks = chunks;
+
+      // Populate document info
+      document.getElementById('doc-name-display').textContent = doc.name;
+      document.getElementById('doc-format').innerHTML = `<span class="document-format ${doc.format.toLowerCase()}">${doc.format}</span>`;
+      document.getElementById('doc-size').textContent = doc.size;
+      document.getElementById('doc-kb').textContent = kb ? kb.name : '-';
+      document.getElementById('doc-parse-status').innerHTML = `<span class="status-tag ${doc.parseStatus}">${getParseStatusText(doc.parseStatus)}</span>`;
+      document.getElementById('doc-embedding-status').innerHTML = `<span class="status-tag ${doc.embeddingStatus}">${getEmbeddingStatusText(doc.embeddingStatus)}</span>`;
+      document.getElementById('doc-chunk-count').textContent = doc.chunkCount;
+      document.getElementById('doc-updated-at').textContent = doc.updatedAt;
+
+      // Populate form
+      document.getElementById('doc-name').value = doc.name;
+
+      // Update page title
+      const _tEl = document.getElementById('page-title');
+      const _sEl = document.getElementById('page-subtitle');
+      if (_tEl) _tEl.textContent = '编辑文档：' + doc.name;
+      if (_sEl) _sEl.textContent = '修改文档 "' + doc.name + '" 的信息和标签';
+
+      // Render chunk list
+      renderChunkList(chunks);
+
+      // Show content
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    // Get parse status text
+    function getParseStatusText(status) {
+      const map = { 'completed': '已完成', 'processing': '处理中', 'failed': '失败', 'pending': '等待中' };
+      return map[status] || status;
+    }
+
+    // Get embedding status text
+    function getEmbeddingStatusText(status) {
+      const map = { 'completed': '已完成', 'processing': '处理中', 'failed': '失败', 'pending': '等待中' };
+      return map[status] || status;
+    }
+
+    // Render chunk list
+    function renderChunkList(chunks) {
+      const container = document.getElementById('chunk-list');
+      const countEl = document.getElementById('chunk-count');
+
+      countEl.textContent = chunks.length;
+
+      if (chunks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 40px;">
+            <div class="empty-state-icon"><i class="fa-solid fa-scissors"></i></div>
+            <div class="empty-state-title">暂无Chunk</div>
+            <div class="empty-state-desc">该文档尚未被解析或分块</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = chunks.map(chunk => `
+        <div class="chunk-list-item ${selectedChunkId === chunk.id ? 'active' : ''}"
+             onclick="viewChunkDetail('${chunk.id}')">
+          <div class="chunk-header">
+            <span class="chunk-index">Chunk ${chunk.index}</span>
+            <span class="chunk-badge ${chunk.embeddingStatus}">${getEmbeddingStatusText(chunk.embeddingStatus)}</span>
+          </div>
+          <div class="chunk-content">${chunk.content}</div>
+          <div class="chunk-meta">
+            <span><i class="fa-solid fa-text-width"></i> ${chunk.length} 字符</span>
+            <span><i class="fa-solid fa-coins"></i> ${chunk.tokenCount} Token</span>
+            <span><i class="fa-solid fa-link"></i> ${chunk.referenceCount} 引用</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // View chunk detail
+    function viewChunkDetail(chunkId) {
+      const chunk = currentChunks.find(c => c.id === chunkId);
+      if (!chunk) return;
+
+      selectedChunkId = chunkId;
+
+      // Update detail panel
+      document.getElementById('chunk-detail-index').textContent = chunk.index;
+      document.getElementById('chunk-detail-content').textContent = chunk.content;
+      document.getElementById('chunk-detail-length').textContent = chunk.length + ' 字符';
+      document.getElementById('chunk-detail-token').textContent = chunk.tokenCount + ' Token';
+      document.getElementById('chunk-detail-embedding').textContent = getEmbeddingStatusText(chunk.embeddingStatus);
+      document.getElementById('chunk-detail-ref').textContent = chunk.referenceCount + ' 次';
+
+      // Show panel
+      document.getElementById('chunk-detail-panel').style.display = 'block';
+
+      // Update list item states
+      document.querySelectorAll('.chunk-list-item').forEach(item => {
+        item.classList.toggle('active', item.getAttribute('onclick')?.includes(chunkId));
+      });
+    }
+
+    // Close chunk detail
+    function closeChunkDetail() {
+      selectedChunkId = null;
+      document.getElementById('chunk-detail-panel').style.display = 'none';
+      document.querySelectorAll('.chunk-list-item').forEach(item => {
+        item.classList.remove('active');
+      });
+    }
+
+    // Show not found state
+    function showNotFound() {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('not-found-state').style.display = 'flex';
+    }
+
+    // Save document
+    function saveDocument() {
+      if (!currentDoc) return;
+
+      const newName = document.getElementById('doc-name').value.trim();
+      if (!newName) {
+        Toast.danger('请输入文档名称');
+        return;
+      }
+
+      currentDoc.name = newName;
+      currentDoc.tags = document.getElementById('doc-tags').value.trim();
+      currentDoc.description = document.getElementById('doc-description').value.trim();
+
+      Toast.success('文档信息已保存！');
+    }
+
+    // Reparse document
+    function reparseDocument() {
+      if (!currentDoc) return;
+
+      currentDoc.parseStatus = 'processing';
+      currentDoc.embeddingStatus = 'pending';
+      currentDoc.chunkCount = 0;
+
+      // Update UI
+      document.getElementById('doc-parse-status').innerHTML = `<span class="status-tag processing">处理中</span>`;
+      document.getElementById('doc-embedding-status').innerHTML = `<span class="status-tag pending">等待中</span>`;
+      document.getElementById('doc-chunk-count').textContent = '0';
+
+      Toast.success('文档重新解析任务已提交');
+
+      // Simulate reparse completion after a delay
+      setTimeout(() => {
+        currentDoc.parseStatus = 'completed';
+        currentDoc.embeddingStatus = 'completed';
+        currentDoc.chunkCount = Math.floor(Math.random() * 50) + 10;
+
+        document.getElementById('doc-parse-status').innerHTML = `<span class="status-tag completed">已完成</span>`;
+        document.getElementById('doc-embedding-status').innerHTML = `<span class="status-tag completed">已完成</span>`;
+        document.getElementById('doc-chunk-count').textContent = currentDoc.chunkCount;
+
+        Toast.success('文档解析完成');
+      }, 3000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadDocument);
+
+    // Notify parent
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'document-edit.html' }, '*');
+    }
+  </script>
+</body>
+</html>

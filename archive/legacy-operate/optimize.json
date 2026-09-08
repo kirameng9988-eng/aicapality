@@ -1,0 +1,364 @@
+{
+  "overview": {
+    "pendingOptimization": 12,
+    "optimizationTasks": 8,
+    "completedThisMonth": 23,
+    "avgEffectImprovement": 18.5,
+    "successRate": 92.3,
+    "totalVersionsPublished": 156
+  },
+  "suggestions": [
+    {
+      "id": "sug-001",
+      "type": "prompt",
+      "typeLabel": "Prompt优化",
+      "capabilityName": "运营助手",
+      "capabilityId": "cap-003",
+      "priority": "high",
+      "priorityLabel": "高",
+      "reason": "当前Prompt命中率仅91.2%，低于平台平均水平95%。用户意图识别不够精准。",
+      "expectedBenefit": "预计提升命中率至96%+，用户满意度提升0.2分",
+      "status": "pending",
+      "statusLabel": "待处理",
+      "createdAt": "2026-06-20"
+    },
+    {
+      "id": "sug-002",
+      "type": "model",
+      "typeLabel": "模型切换",
+      "capabilityName": "找数寻源",
+      "capabilityId": "cap-002",
+      "priority": "medium",
+      "priorityLabel": "中",
+      "reason": "DeepSeek-V2性价比更高，效果与当前模型相当，成本降低40%。",
+      "expectedBenefit": "预计节省成本40%，响应时间降低15%",
+      "status": "pending",
+      "statusLabel": "待处理",
+      "createdAt": "2026-06-18"
+    },
+    {
+      "id": "sug-003",
+      "type": "knowledge",
+      "typeLabel": "知识库补充",
+      "capabilityName": "智能编目",
+      "capabilityId": "cap-001",
+      "priority": "high",
+      "priorityLabel": "高",
+      "reason": "知识库覆盖率为85%，数据治理领域专业知识缺失较多。",
+      "expectedBenefit": "预计RAG命中率提升至92%+",
+      "status": "pending",
+      "statusLabel": "待处理",
+      "createdAt": "2026-06-22"
+    },
+    {
+      "id": "sug-004",
+      "type": "agent",
+      "typeLabel": "Agent优化",
+      "capabilityName": "开发助手",
+      "capabilityId": "cap-004",
+      "priority": "medium",
+      "priorityLabel": "中",
+      "reason": "当前Agent引用的Skill与MCP工具存在重复调用，分析发现可精简执行配置。",
+      "expectedBenefit": "预计响应时间降低20%，维护成本降低30%",
+      "status": "pending",
+      "statusLabel": "待处理",
+      "createdAt": "2026-06-15"
+    },
+    {
+      "id": "sug-005",
+      "type": "mcp",
+      "typeLabel": "MCP升级",
+      "capabilityName": "数据脱敏",
+      "capabilityId": "cap-005",
+      "priority": "low",
+      "priorityLabel": "低",
+      "reason": "当前MCP服务版本为v1.2，最新版本v1.5修复了3个安全问题。",
+      "expectedBenefit": "安全性提升，服务稳定性增强",
+      "status": "pending",
+      "statusLabel": "待处理",
+      "createdAt": "2026-06-10"
+    },
+    {
+      "id": "sug-006",
+      "type": "prompt",
+      "typeLabel": "Prompt优化",
+      "capabilityName": "报表生成",
+      "capabilityId": "cap-006",
+      "priority": "medium",
+      "priorityLabel": "中",
+      "reason": "用户反馈生成的报表格式不够灵活，缺少自定义选项。",
+      "expectedBenefit": "预计满意度提升0.3分",
+      "status": "pending",
+      "statusLabel": "待处理",
+      "createdAt": "2026-06-25"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-001",
+      "name": "运营助手Prompt优化",
+      "capabilityName": "运营助手",
+      "capabilityId": "cap-003",
+      "owner": "张明",
+      "status": "in_progress",
+      "statusLabel": "进行中",
+      "planEndDate": "2026-07-05",
+      "progress": 65,
+      "createdAt": "2026-06-20"
+    },
+    {
+      "id": "task-002",
+      "name": "找数寻源模型切换",
+      "capabilityName": "找数寻源",
+      "capabilityId": "cap-002",
+      "owner": "李华",
+      "status": "pending",
+      "statusLabel": "待开始",
+      "planEndDate": "2026-07-10",
+      "progress": 0,
+      "createdAt": "2026-06-18"
+    },
+    {
+      "id": "task-003",
+      "name": "智能编目知识库补充",
+      "capabilityName": "智能编目",
+      "capabilityId": "cap-001",
+      "owner": "王芳",
+      "status": "in_progress",
+      "statusLabel": "进行中",
+      "planEndDate": "2026-07-08",
+      "progress": 40,
+      "createdAt": "2026-06-22"
+    },
+    {
+      "id": "task-004",
+      "name": "开发助手Agent优化",
+      "capabilityName": "开发助手",
+      "capabilityId": "cap-004",
+      "owner": "赵强",
+      "status": "completed",
+      "statusLabel": "已完成",
+      "planEndDate": "2026-06-28",
+      "progress": 100,
+      "createdAt": "2026-06-15"
+    },
+    {
+      "id": "task-005",
+      "name": "数据脱敏MCP升级",
+      "capabilityName": "数据脱敏",
+      "capabilityId": "cap-005",
+      "owner": "钱伟",
+      "status": "pending",
+      "statusLabel": "待开始",
+      "planEndDate": "2026-07-15",
+      "progress": 0,
+      "createdAt": "2026-06-10"
+    },
+    {
+      "id": "task-006",
+      "name": "报表生成Prompt优化",
+      "capabilityName": "报表生成",
+      "capabilityId": "cap-006",
+      "owner": "孙丽",
+      "status": "pending",
+      "statusLabel": "待开始",
+      "planEndDate": "2026-07-12",
+      "progress": 0,
+      "createdAt": "2026-06-25"
+    }
+  ],
+  "versions": [
+    {
+      "id": "ver-001",
+      "capabilityId": "cap-003",
+      "capabilityName": "运营助手",
+      "version": "v2.5",
+      "publishedAt": "2026-06-25",
+      "optimizationContent": "优化Prompt结构，增加示例3个，调整意图识别逻辑",
+      "effectImprovement": "命中率提升4.8%，满意度提升0.2分",
+      "publishRecord": "PUB-20260625-003"
+    },
+    {
+      "id": "ver-002",
+      "capabilityId": "cap-004",
+      "capabilityName": "开发助手",
+      "version": "v2.8",
+      "publishedAt": "2026-06-28",
+      "optimizationContent": "精简Agent引用的Skill与MCP工具，优化执行路径",
+      "effectImprovement": "响应时间降低22%，维护成本降低30%",
+      "publishRecord": "PUB-20260628-001"
+    },
+    {
+      "id": "ver-003",
+      "capabilityId": "cap-001",
+      "capabilityName": "智能编目",
+      "version": "v3.2",
+      "publishedAt": "2026-06-20",
+      "optimizationContent": "补充数据治理专业知识库文档120篇",
+      "effectImprovement": "RAG命中率从87.5%提升至93.2%",
+      "publishRecord": "PUB-20260620-002"
+    },
+    {
+      "id": "ver-004",
+      "capabilityId": "cap-002",
+      "capabilityName": "找数寻源",
+      "version": "v4.1",
+      "publishedAt": "2026-06-15",
+      "optimizationContent": "切换至DeepSeek-V2模型",
+      "effectImprovement": "成本降低38%，响应时间降低18%",
+      "publishRecord": "PUB-20260615-004"
+    },
+    {
+      "id": "ver-005",
+      "capabilityId": "cap-005",
+      "capabilityName": "数据脱敏",
+      "version": "v1.9",
+      "publishedAt": "2026-06-10",
+      "optimizationContent": "优化脱敏规则算法，提升处理速度",
+      "effectImprovement": "处理速度提升35%，准确率提升至99.6%",
+      "publishRecord": "PUB-20260610-005"
+    },
+    {
+      "id": "ver-006",
+      "capabilityId": "cap-006",
+      "capabilityName": "报表生成",
+      "version": "v2.3",
+      "publishedAt": "2026-06-05",
+      "optimizationContent": "增加报表自定义模板功能",
+      "effectImprovement": "用户满意度从4.2提升至4.5",
+      "publishRecord": "PUB-20260605-006"
+    }
+  ],
+  "comparison": {
+    "capabilityName": "运营助手",
+    "before": {
+      "successRate": 96.2,
+      "responseTime": 1250,
+      "satisfaction": 4.7,
+      "costPerCall": 0.052
+    },
+    "after": {
+      "successRate": 98.5,
+      "responseTime": 1180,
+      "satisfaction": 4.9,
+      "costPerCall": 0.048
+    },
+    "improvements": {
+      "successRate": "+2.3%",
+      "responseTime": "-5.6%",
+      "satisfaction": "+0.2",
+      "costPerCall": "-7.7%"
+    }
+  },
+  "insights": [
+    {
+      "id": "insight-001",
+      "icon": "fa-wand-magic-sparkles",
+      "title": "Prompt命中率偏低",
+      "desc": "当前平台平均Prompt命中率为89.3%，建议为命中率低于85%的能力增加示例和Few-shot学习样本。",
+      "type": "warning"
+    },
+    {
+      "id": "insight-002",
+      "icon": "fa-coins",
+      "title": "模型成本优化空间大",
+      "desc": "GPT-4成本占比35.2%，但调用量仅占18%。建议将非核心场景切换至DeepSeek-V2，预计节省成本45%。",
+      "type": "success"
+    },
+    {
+      "id": "insight-003",
+      "icon": "fa-book",
+      "title": "知识库覆盖不足",
+      "desc": "12个能力的知识覆盖率低于90%，建议优先补充数据治理、财务、人力资源领域知识文档。",
+      "type": "info"
+    },
+    {
+      "id": "insight-004",
+      "icon": "fa-robot",
+      "title": "Agent工具引用有待精简",
+      "desc": "部分Agent同时引用多个功能重叠的Skill与MCP工具，导致执行链路冗余。建议梳理各Agent的引用清单、保留高价值工具，预计整体响应时间降低15%。",
+      "type": "warning"
+    },
+    {
+      "id": "insight-005",
+      "icon": "fa-rocket",
+      "title": "优化后发布及时性待提升",
+      "desc": "本月23次优化中，8次发布延迟超过3天。建议优化完成后立即发布，避免效果空窗期。",
+      "type": "danger"
+    }
+  ],
+  "history": [
+    {
+      "id": "hist-001",
+      "capabilityName": "开发助手",
+      "optimizationType": "Agent优化",
+      "optimizedAt": "2026-06-28",
+      "optimizer": "赵强",
+      "result": "成功",
+      "version": "v2.8"
+    },
+    {
+      "id": "hist-002",
+      "capabilityName": "运营助手",
+      "optimizationType": "Prompt优化",
+      "optimizedAt": "2026-06-25",
+      "optimizer": "张明",
+      "result": "成功",
+      "version": "v2.5"
+    },
+    {
+      "id": "hist-003",
+      "capabilityName": "智能编目",
+      "optimizationType": "知识库补充",
+      "optimizedAt": "2026-06-20",
+      "optimizer": "王芳",
+      "result": "成功",
+      "version": "v3.2"
+    },
+    {
+      "id": "hist-004",
+      "capabilityName": "找数寻源",
+      "optimizationType": "模型切换",
+      "optimizedAt": "2026-06-15",
+      "optimizer": "李华",
+      "result": "成功",
+      "version": "v4.1"
+    },
+    {
+      "id": "hist-005",
+      "capabilityName": "数据脱敏",
+      "optimizationType": "Prompt优化",
+      "optimizedAt": "2026-06-10",
+      "optimizer": "钱伟",
+      "result": "成功",
+      "version": "v1.9"
+    },
+    {
+      "id": "hist-006",
+      "capabilityName": "报表生成",
+      "optimizationType": "Prompt优化",
+      "optimizedAt": "2026-06-05",
+      "optimizer": "孙丽",
+      "result": "成功",
+      "version": "v2.3"
+    },
+    {
+      "id": "hist-007",
+      "capabilityName": "智能问答",
+      "optimizationType": "知识库补充",
+      "optimizedAt": "2026-05-28",
+      "optimizer": "王芳",
+      "result": "成功",
+      "version": "v3.1"
+    },
+    {
+      "id": "hist-008",
+      "capabilityName": "数据清洗",
+      "optimizationType": "MCP升级",
+      "optimizedAt": "2026-05-20",
+      "optimizer": "钱伟",
+      "result": "成功",
+      "version": "v2.4"
+    }
+  ]
+}

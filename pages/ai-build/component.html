@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>组件管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <!-- Tab Navigation -->
+    <div class="tab-nav-container">
+      <div class="tab-nav">
+        <button class="tab-nav-item active" data-tab="prompt" onclick="switchTab('prompt')">
+          <i class="fa-solid fa-terminal"></i>
+          <span>Prompt管理</span>
+        </button>
+        <button class="tab-nav-item" data-tab="model" onclick="switchTab('model')">
+          <i class="fa-solid fa-microchip"></i>
+          <span>模型管理</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content-area" id="tabContent">
+      <iframe id="iframe-prompt" src="prompt.html" style="display:none;"></iframe>
+      <iframe id="iframe-model" src="model.html" style="display:none;"></iframe>
+    </div>
+  </div>
+
+  <script>
+    // 默认显示 Prompt 管理
+    document.getElementById('iframe-prompt').style.display = 'block';
+
+    function switchTab(tab) {
+      // 更新 tab 高亮
+      document.querySelectorAll('.tab-nav-item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+      });
+
+      // 切换 iframe 显示
+      document.getElementById('iframe-prompt').style.display = tab === 'prompt' ? 'block' : 'none';
+      document.getElementById('iframe-model').style.display = tab === 'model' ? 'block' : 'none';
+
+      // 通知父页面更新导航
+      const pageMap = {
+        'prompt': 'prompt.html',
+        'model': 'model.html'
+      };
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'menuHighlight', url: pageMap[tab] }, '*');
+      }
+    }
+
+    // 监听子 iframe 消息
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'navigate') {
+        // 转发导航消息
+        const iframeMap = {
+          'prompt.html': 'iframe-prompt',
+          'model.html': 'iframe-model'
+        };
+        const iframeId = iframeMap[e.data.url];
+        if (iframeId) {
+          document.getElementById(iframeId).src = e.data.url;
+        }
+      }
+    });
+
+    // 通知父页面当前页面
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'component.html' }, '*');
+    }
+  </script>
+
+  <style>
+    .tab-nav-container {
+      background: #fff;
+      border-bottom: 1px solid #E5E7EB;
+      padding: 0 24px;
+    }
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+    }
+    .tab-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      font-size: 14px;
+      color: #687280;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+      margin-bottom: -1px;
+    }
+    .tab-nav-item:hover {
+      color: #1F2937;
+    }
+    .tab-nav-item.active {
+      color: #4F46E5;
+      border-bottom-color: #4F46E5;
+      font-weight: 500;
+    }
+    .tab-nav-item i {
+      font-size: 14px;
+    }
+    .tab-content-area {
+      flex: 1;
+      overflow: hidden;
+    }
+    .tab-content-area iframe {
+      width: 100%;
+      height: calc(100vh - var(--header-height, 60px) - 48px);
+      border: none;
+      background: #F6F7FB;
+    }
+  </style>
+</body>
+</html>

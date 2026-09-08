@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新建 Skill - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/skill.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <div class="sk-page">
+
+      <!-- 页面头 -->
+      <div class="sk-page-head">
+        <div class="sk-page-head-title">
+          <button class="sk-back-btn" onclick="SkillCreate.goBack()" title="返回列表"><i class="fa-solid fa-arrow-left"></i></button>
+          <div>
+            <h1 class="sk-page-title" id="create-page-title">新建 Skill</h1>
+            <p class="sk-page-sub" id="create-page-sub">定义一个可被 Agent 调用的专业任务能力。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 已发布 Skill 编辑提示 -->
+      <div class="sk-edit-notice hidden" id="edit-notice">
+        <i class="fa-solid fa-circle-info"></i>
+        <div>
+          正在基于 <b id="edit-notice-name"></b> 创建<b id="edit-notice-version"></b> 新版本。新版本发布后将自动成为当前版本。
+        </div>
+      </div>
+
+      <!-- ========== 入口选择区（新建时显示） ========== -->
+      <div id="entry-section">
+        <div class="sk-entry-grid">
+          <div class="sk-entry-card" onclick="SkillCreate.showZipUpload()">
+            <div class="sk-entry-icon">
+              <i class="fa-solid fa-file-zipper"></i>
+            </div>
+            <div class="sk-entry-body">
+              <div class="sk-entry-title">上传技能包</div>
+              <div class="sk-entry-desc">已有完整技能包？直接上传 ZIP 文件快速导入。</div>
+              <div class="sk-entry-hint">ZIP 包需包含 SKILL.md，以 YAML 格式编排名称与描述，10M 以内</div>
+            </div>
+            <div class="sk-entry-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          </div>
+          <div class="sk-entry-card" onclick="SkillCreate.showGuidedForm()">
+            <div class="sk-entry-icon primary">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="sk-entry-body">
+              <div class="sk-entry-title">引导式创建</div>
+              <div class="sk-entry-desc">填写基本信息，配置可选的能力资源，快速生成 Skill。</div>
+              <div class="sk-entry-hint">模型、Prompt、知识库、MCP 工具均非必填，可后续再配置</div>
+            </div>
+            <div class="sk-entry-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== ZIP 上传区 ========== -->
+      <div id="zip-section" class="hidden">
+        <div class="sk-form-card">
+          <div class="sk-form-card-head">
+            <button class="sk-back-btn" onclick="SkillCreate.backToEntry()" title="返回选择"><i class="fa-solid fa-arrow-left"></i></button>
+            <div>
+              <div class="sk-form-card-title">上传技能包</div>
+              <div class="sk-form-card-sub">ZIP 包需包含 SKILL.md，以 YAML 格式编排技能名称和描述，10M 以内</div>
+            </div>
+          </div>
+          <div class="sk-dropzone" id="sk-dropzone">
+            <div class="sk-dropzone-inner">
+              <div class="sk-dropzone-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+              <div class="sk-dropzone-text">拖拽 ZIP 文件到此处，或 <label for="zip-file-input" class="sk-dropzone-link">点击选择文件</label></div>
+              <input type="file" id="zip-file-input" accept=".zip" style="display:none;">
+              <div class="sk-dropzone-hint">支持 .zip，不超过 10MB</div>
+            </div>
+          </div>
+          <div id="zip-preview" class="hidden sk-zip-preview fade-in">
+            <div class="sk-zip-info">
+              <div class="sk-zip-icon"><i class="fa-solid fa-file-zipper"></i></div>
+              <div class="sk-zip-meta">
+                <div class="sk-zip-name" id="zip-file-name"></div>
+                <div class="sk-zip-size" id="zip-file-size"></div>
+              </div>
+              <button type="button" class="sk-op-btn danger" onclick="SkillCreate.clearZip()" title="移除文件"><i class="fa-regular fa-circle-xmark"></i></button>
+            </div>
+            <div id="zip-error" class="sk-zip-error hidden"></div>
+          </div>
+          <div class="sk-zip-yaml-preview hidden fade-in" id="zip-yaml-preview">
+            <div class="sk-form-section-title"><i class="fa-solid fa-file-code"></i> SKILL.md 预览</div>
+            <pre class="sk-json" id="yaml-content"></pre>
+          </div>
+          <div class="sk-form-actions" style="margin-top: var(--space-5);">
+            <button class="btn btn-secondary" onclick="SkillCreate.backToEntry()">取消</button>
+            <button class="btn btn-primary" id="import-zip-btn" onclick="SkillCreate.importZip()" disabled>
+              <i class="fa-solid fa-upload"></i> 导入并创建草稿
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== 引导式创建表单 ========== -->
+      <div id="guided-section" class="hidden">
+        <div class="sk-create-layout">
+          <!-- 主表单区域 -->
+          <div class="sk-step-area" id="guided-main-card">
+
+            <!-- 1. 基本信息 -->
+            <div class="sk-collapse-item show" id="block-basic">
+              <div class="sk-collapse-header" onclick="SkillCreate.toggleCollapse('basic')">
+                <div class="sk-collapse-title-wrap">
+                  <i class="fa-solid fa-info-circle sk-collapse-icon-left"></i>
+                  <span class="sk-collapse-title">基本信息</span>
+                </div>
+                <div class="sk-collapse-right">
+                  <span class="sk-collapse-badge" id="badge-basic"></span>
+                  <i class="fa-solid fa-chevron-down sk-collapse-arrow"></i>
+                </div>
+              </div>
+              <div class="sk-collapse-body" id="block-basic-body">
+                <div class="sk-form-section-sub">
+                  <div class="sk-grid-2">
+                    <div class="form-group">
+                      <label class="form-label-required">Skill 名称</label>
+                      <input class="form-input" id="f-name" placeholder="例如：数据资源智能编目" maxlength="30">
+                      <div class="form-help">Agent 选择能力时识别的名称，建议简洁具体。</div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label-required">Skill 编码</label>
+                      <input class="form-input" id="f-code" placeholder="例如：data-cataloging" maxlength="40">
+                      <div class="form-help">全局唯一，建议使用小写英文与连字符。</div>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label-required">Skill 类型</label>
+                      <select class="form-select" id="f-type">
+                        <option value="">请选择类型</option>
+                        <option value="数据处理">数据处理</option>
+                        <option value="内容生成">内容生成</option>
+                        <option value="数据分析">数据分析</option>
+                        <option value="数据治理">数据治理</option>
+                        <option value="知识问答">知识问答</option>
+                        <option value="其他">其他</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-top: var(--space-4);">
+                    <label class="form-label-required">能力说明（简介）</label>
+                    <textarea class="form-textarea" id="f-desc" rows="3" placeholder="说明该能力适用于什么场景、解决什么问题，帮助 Agent 判断何时选用本 Skill。"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. 任务目标 -->
+            <div class="sk-collapse-item show" id="block-goal">
+              <div class="sk-collapse-header" onclick="SkillCreate.toggleCollapse('goal')">
+                <div class="sk-collapse-title-wrap">
+                  <i class="fa-solid fa-bullseye sk-collapse-icon-left"></i>
+                  <span class="sk-collapse-title">任务目标 <span style="color:var(--color-danger);font-size:12px;margin-left:2px;">*</span></span>
+                </div>
+                <div class="sk-collapse-right">
+                  <span class="sk-collapse-badge" id="badge-goal"></span>
+                  <i class="fa-solid fa-chevron-down sk-collapse-arrow"></i>
+                </div>
+              </div>
+              <div class="sk-collapse-body" id="block-goal-body">
+                <div class="sk-form-section-sub">
+                  <textarea class="form-textarea" id="f-taskgoal" rows="3" placeholder="根据输入的数据资源元数据，生成符合数据资源目录规范的标准化编目信息。"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. 指令模板 -->
+            <div class="sk-collapse-item show" id="block-prompt">
+              <div class="sk-collapse-header" onclick="SkillCreate.toggleCollapse('prompt')">
+                <div class="sk-collapse-title-wrap">
+                  <i class="fa-solid fa-terminal sk-collapse-icon-left"></i>
+                  <span class="sk-collapse-title">指令模板 <span style="color:var(--color-danger);font-size:12px;margin-left:2px;">*</span> <span style="color:var(--color-primary);font-size:11px;font-weight:normal;">（核心）</span></span>
+                </div>
+                <div class="sk-collapse-right">
+                  <span class="sk-collapse-badge" id="badge-prompt"></span>
+                  <i class="fa-solid fa-chevron-down sk-collapse-arrow"></i>
+                </div>
+              </div>
+              <div class="sk-collapse-body" id="block-prompt-body">
+                <div class="sk-form-section-sub">
+                  <div class="sk-prompt-toolbar">
+                    <button type="button" class="btn btn-secondary btn-sm" id="import-prompt-btn" onclick="SkillCreate.importFromTemplate()">
+                      <i class="fa-solid fa-download"></i> 从模板库导入
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="view-example-btn" onclick="SkillCreate.viewPromptExample()">
+                      <i class="fa-regular fa-eye"></i> 查看示例
+                    </button>
+                  </div>
+                  <textarea class="form-textarea form-textarea-lg" id="f-prompt" rows="10" style="min-height:200px;" placeholder="你是一名专业的数据资源编目专家，请根据输入的数据资源元数据，生成符合数据资源目录规范的标准化编目信息。
+
+【输入】
+- resourceId: 数据资源唯一标识
+- resourceMetadata: 数据资源的字段与描述信息
+
+【任务】
+1. 解析资源元数据
+2. 依据分类标准判断资源类别
+3. 生成资源描述与标签
+4. 输出标准化编目结果
+
+【输出格式】
+- resourceName: 资源名称
+- categoryCode/categoryName: 分类信息
+- tags: 标签列表
+- description: 资源描述
+- updateFrequency: 更新频率"></textarea>
+                  <div class="sk-help-note">支持 <code style="background:#F0F0F0;padding:1px 5px;border-radius:3px;">{{变量名}}</code> 引用输入参数</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. 执行步骤 -->
+            <div class="sk-collapse-item" id="block-steps">
+              <div class="sk-collapse-header" onclick="SkillCreate.toggleCollapse('steps')">
+                <div class="sk-collapse-title-wrap">
+                  <i class="fa-solid fa-list-ol sk-collapse-icon-left"></i>
+                  <span class="sk-collapse-title">执行步骤</span>
+                </div>
+                <div class="sk-collapse-right">
+                  <span class="sk-collapse-badge" id="badge-steps"></span>
+                  <i class="fa-solid fa-chevron-down sk-collapse-arrow"></i>
+                </div>
+              </div>
+              <div class="sk-collapse-body" id="block-steps-body">
+                <div class="sk-form-section-sub">
+                  <div class="sk-form-section-title" style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+                    <i class="fa-solid fa-list-ol"></i> 步骤列表
+                    <button type="button" class="sk-add-btn" id="add-step-btn" onclick="SkillCreate.addStep()" style="margin-left:auto;"><i class="fa-solid fa-plus"></i> 添加步骤</button>
+                  </div>
+                  <div id="steps-list"></div>
+                  <div class="sk-help-note" style="margin-top:var(--space-2);">拖动步骤左侧手柄可调整顺序</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. 工作原则 -->
+            <div class="sk-collapse-item" id="block-principles">
+              <div class="sk-collapse-header" onclick="SkillCreate.toggleCollapse('principles')">
+                <div class="sk-collapse-title-wrap">
+                  <i class="fa-solid fa-handshake sk-collapse-icon-left"></i>
+                  <span class="sk-collapse-title">工作原则</span>
+                </div>
+                <div class="sk-collapse-right">
+                  <span class="sk-collapse-badge" id="badge-principles"></span>
+                  <i class="fa-solid fa-chevron-down sk-collapse-arrow"></i>
+                </div>
+              </div>
+              <div class="sk-collapse-body" id="block-principles-body">
+                <div class="sk-form-section-sub">
+                  <div class="sk-form-section-title" style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+                    <i class="fa-solid fa-handshake"></i> 行动指引
+                    <button type="button" class="sk-add-btn" onclick="SkillCreate.addPrinciple()" style="margin-left:auto;"><i class="fa-solid fa-plus"></i> 添加</button>
+                  </div>
+                  <div id="principles-list"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6. 约束规则 -->
+            <div class="sk-collapse-item" id="block-constraints">
+              <div class="sk-collapse-header" onclick="SkillCreate.toggleCollapse('constraints')">
+                <div class="sk-collapse-title-wrap">
+                  <i class="fa-solid fa-shield-halved sk-collapse-icon-left"></i>
+                  <span class="sk-collapse-title">约束规则</span>
+                </div>
+                <div class="sk-collapse-right">
+                  <span class="sk-collapse-badge" id="badge-constraints"></span>
+                  <i class="fa-solid fa-chevron-down sk-collapse-arrow"></i>
+                </div>
+              </div>
+              <div class="sk-collapse-body" id="block-constraints-body">
+                <div class="sk-form-section-sub">
+                  <div class="sk-form-section-title" style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+                    <i class="fa-solid fa-shield-halved"></i> 执行红线
+                    <button type="button" class="sk-add-btn" onclick="SkillCreate.addConstraint()" style="margin-left:auto;"><i class="fa-solid fa-plus"></i> 添加</button>
+                  </div>
+                  <div id="constraints-list"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7. 输入输出 -->
+            <div class="sk-collapse-item" id="block-io">
+              <div class="sk-collapse-header" onclick="SkillCreate.toggleCollapse('io')">
+                <div class="sk-collapse-title-wrap">
+                  <i class="fa-solid fa-right-left sk-collapse-icon-left"></i>
+                  <span class="sk-collapse-title">输入输出</span>
+                </div>
+                <div class="sk-collapse-right">
+                  <span class="sk-collapse-badge" id="badge-io"></span>
+                  <i class="fa-solid fa-chevron-down sk-collapse-arrow"></i>
+                </div>
+              </div>
+              <div class="sk-collapse-body" id="block-io-body">
+                <div class="sk-form-section-sub">
+                  <div class="sk-form-section-title" style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+                    <i class="fa-solid fa-arrow-down-to-line"></i> 输入参数
+                    <button type="button" class="sk-add-btn" id="add-input-btn" onclick="SkillCreate.addIoRow('input')" style="margin-left:auto;"><i class="fa-solid fa-plus"></i> 添加输入参数</button>
+                  </div>
+                  <div class="sk-seg" id="input-seg" style="margin-bottom:var(--space-3);width:fit-content;">
+                    <button type="button" class="sk-seg-btn active" data-mode="form" onclick="SkillCreate.setIoMode('input','form')">表单配置</button>
+                    <button type="button" class="sk-seg-btn" data-mode="json" onclick="SkillCreate.setIoMode('input','json')">JSON Schema</button>
+                  </div>
+                  <div class="sk-io-form-wrap" id="input-form-config"></div>
+                  <textarea class="form-textarea hidden" id="f-input-json" rows="5" placeholder='JSON Schema 格式，例如：
+{
+  "type": "object",
+  "required": ["resourceId"],
+  "properties": { "resourceId": { "type": "string" } }
+}'></textarea>
+                </div>
+                <div class="sk-form-section-sub" style="margin-top:var(--space-5);">
+                  <div class="sk-form-section-title" style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+                    <i class="fa-solid fa-arrow-up-from-line"></i> 输出参数
+                    <button type="button" class="sk-add-btn" id="add-output-btn" onclick="SkillCreate.addIoRow('output')" style="margin-left:auto;"><i class="fa-solid fa-plus"></i> 添加输出参数</button>
+                  </div>
+                  <div class="sk-seg" id="output-seg" style="margin-bottom:var(--space-3);width:fit-content;">
+                    <button type="button" class="sk-seg-btn active" data-mode="form" onclick="SkillCreate.setIoMode('output','form')">表单配置</button>
+                    <button type="button" class="sk-seg-btn" data-mode="json" onclick="SkillCreate.setIoMode('output','json')">JSON Schema</button>
+                  </div>
+                  <div class="sk-io-form-wrap" id="output-form-config"></div>
+                  <textarea class="form-textarea hidden" id="f-output-json" rows="5" placeholder='JSON Schema 格式'></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- 8. 使用能力（执行模型 / MCP工具 / 知识库） -->
+            <div class="sk-collapse-item show" id="block-ability">
+              <div class="sk-collapse-header" onclick="SkillCreate.toggleCollapse('ability')">
+                <div class="sk-collapse-title-wrap">
+                  <i class="fa-solid fa-rocket sk-collapse-icon-left"></i>
+                  <span class="sk-collapse-title">使用能力</span>
+                </div>
+                <div class="sk-collapse-right">
+                  <span class="sk-collapse-badge" id="badge-ability"></span>
+                  <i class="fa-solid fa-chevron-down sk-collapse-arrow"></i>
+                </div>
+              </div>
+              <div class="sk-collapse-body" id="block-ability-body">
+                <div class="sk-form-section-sub">
+                  <div class="sk-form-section-title" style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+                    <i class="fa-solid fa-microchip"></i> 执行模型
+                  </div>
+                  <div id="model-card" class="sk-choose-card empty" onclick="SkillCreate.openModelPicker()"></div>
+                </div>
+                <div class="sk-form-section-sub">
+                  <div class="sk-form-section-title" style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+                    <i class="fa-solid fa-plug"></i> MCP 工具授权
+                    <button type="button" class="btn btn-primary btn-sm" onclick="SkillCreate.openToolPicker()" style="margin-left:auto;"><i class="fa-solid fa-plus"></i> 添加 MCP 工具</button>
+                  </div>
+                  <div id="tool-area">
+                    <div id="tool-empty" class="sk-choose-card empty">
+                      <div class="sk-choose-icon"><i class="fa-solid fa-plug"></i></div>
+                      <div class="sk-choose-body"><div class="sk-choose-empty">尚未授权任何 MCP 工具</div></div>
+                    </div>
+                    <div id="tool-picked"></div>
+                  </div>
+                </div>
+                <div class="sk-form-section-sub">
+                  <div class="sk-form-section-title" style="font-size:var(--font-size-sm);color:var(--color-text-muted);margin-bottom:var(--space-3);">
+                    <i class="fa-solid fa-book-open"></i> 关联知识库
+                    <button type="button" class="btn btn-primary btn-sm" onclick="SkillCreate.openKbPicker()" style="margin-left:auto;"><i class="fa-solid fa-plus"></i> 添加知识库</button>
+                  </div>
+                  <div id="kb-card" class="sk-choose-card empty">
+                    <div class="sk-choose-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div class="sk-choose-body"><div class="sk-choose-empty">点击关联知识库</div></div>
+                  </div>
+                  <div id="kb-picked"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 底部操作栏 -->
+            <div class="sk-step-actions" style="margin-top:var(--space-5);">
+              <div class="left">
+                <button class="btn btn-secondary" onclick="SkillCreate.backToEntry()">取消</button>
+              </div>
+              <div class="right">
+                <button class="btn btn-secondary" id="save-draft-btn" onclick="SkillCreate.saveGuidedDraft()">
+                  <i class="fa-solid fa-floppy-disk"></i> 保存草稿
+                </button>
+                <button class="btn btn-primary" id="publish-btn" onclick="SkillCreate.publishSkill()">
+                  <i class="fa-solid fa-upload"></i> 发布
+                </button>
+              </div>
+            </div>
+
+          </div><!-- /.sk-step-area -->
+
+          <!-- 右侧 Skill 能力摘要 -->
+          <aside class="sk-summary" id="sk-summary">
+            <div class="sk-summary-head">
+              <i class="fa-solid fa-certificate"></i>
+              <span>Skill 能力摘要</span>
+            </div>
+            <div class="sk-summary-body" id="summary-body">
+              <!-- 由 JS 渲染 -->
+            </div>
+          </aside>
+        </div><!-- /.sk-create-layout -->
+      </div><!-- /#guided-section -->
+
+    </div><!-- /.sk-page -->
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/skill.js"></script>
+  <script src="../../assets/js/skill-create.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'skill.html' }, '*');
+      window.parent.postMessage({ type: 'contentLoaded', url: 'skill-create.html' }, '*');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      SkillCreate.init();
+    });
+  </script>
+</body>
+</html>

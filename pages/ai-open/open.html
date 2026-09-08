@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>开放服务 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/open.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-subtitle" id="pageSubtitle">一次发布，多种开放方式，让 AI 能力快速接入业务系统。</div>
+    </div>
+
+    <!-- Gateway Overview KPIs -->
+    <section class="gateway-kpi-section">
+      <div class="gateway-kpi-grid" id="gatewayKpiGrid">
+        <!-- Filled by JS -->
+      </div>
+    </section>
+
+    <!-- Open Tabs -->
+    <div class="gateway-tabs">
+      <button class="gateway-tab active" data-tab="mcp">
+        <i class="fa-solid fa-server"></i> MCP 服务
+        <span class="gateway-tab-badge" id="mcpBadge"></span>
+      </button>
+      <div class="gateway-tab-divider"></div>
+      <button class="gateway-tab" data-tab="api">
+        <i class="fa-solid fa-code"></i> Open API
+        <span class="gateway-tab-badge" id="apiBadge"></span>
+      </button>
+      <div class="gateway-tab-divider"></div>
+      <button class="gateway-tab" data-tab="sdk">
+        <i class="fa-solid fa-box"></i> SDK
+        <span class="gateway-tab-badge" id="sdkBadge"></span>
+      </button>
+
+      <!-- 接入流程 (hover popover) -->
+      <div class="flow-trigger-wrap" id="flowTriggerWrap">
+        <button class="btn btn-secondary btn-sm flow-trigger" type="button">
+          <i class="fa-solid fa-route"></i> 接入流程
+        </button>
+        <div class="flow-popover" id="flowPopover">
+          <div class="flow-popover-head">
+            <div class="flow-popover-title"><i class="fa-solid fa-route"></i> 接入流程</div>
+            <div class="flow-popover-desc">AI 能力从发布到业务系统接入的完整路径</div>
+          </div>
+          <div class="flow-popover-body" id="flowPopoverBody">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MCP Tab Panel -->
+    <div class="tab-panel active" id="panel-mcp">
+      <div class="mcp-table-container">
+        <table class="mcp-table">
+          <thead>
+            <tr>
+              <th>MCP 服务</th>
+              <th>能力组件</th>
+              <th>Endpoint</th>
+              <th>状态</th>
+              <th>调用次数</th>
+              <th>健康度</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="mcpTableBody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- API Tab Panel -->
+    <div class="tab-panel" id="panel-api">
+      <div class="api-table-container">
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>接口名称</th>
+              <th>URL</th>
+              <th>Method</th>
+              <th>认证方式</th>
+              <th>版本</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="apiTableBody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SDK Tab Panel -->
+    <div class="tab-panel" id="panel-sdk">
+      <div class="sdk-grid" id="sdkGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/open.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'open.html' }, '*');
+    }
+  </script>
+</body>
+</html>

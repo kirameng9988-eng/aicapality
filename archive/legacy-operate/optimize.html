@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimization Center（AI能力优化中心）- AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/optimization.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <!-- Loading State -->
+    <div class="optimization-loading" id="optimization-loading">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <span>加载中...</span>
+    </div>
+  </div>
+
+  <!-- Modal for Details -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">提示</div>
+        <button class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel">取消</button>
+        <button class="btn btn-primary" id="modal-confirm">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/optimization.js"></script>
+
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'optimize.html' }, '*');
+    }
+  </script>
+</body>
+</html>

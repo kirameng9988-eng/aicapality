@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>角色管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Content Card -->
+    <div class="content-card">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-bar-left">
+          <div class="admin-search">
+            <i class="fa-solid fa-search admin-search-icon"></i>
+            <input type="text" id="search-name" placeholder="搜索角色名称...">
+          </div>
+          <div class="admin-select">
+            <select id="search-status">
+              <option value="">全部状态</option>
+              <option value="active">启用</option>
+              <option value="inactive">禁用</option>
+            </select>
+          </div>
+          <button class="admin-btn admin-btn-secondary" id="btn-search">
+            <i class="fa-solid fa-magnifying-glass"></i> 查询
+          </button>
+          <button class="admin-btn admin-btn-ghost" id="btn-reset">
+            <i class="fa-solid fa-rotate-left"></i> 重置
+          </button>
+        </div>
+        <div class="search-bar-right">
+          <button class="admin-btn admin-btn-primary" id="btn-add">
+            <i class="fa-solid fa-plus"></i> 新增角色
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>角色名称</th>
+              <th>角色编码</th>
+              <th>权限数量</th>
+              <th>用户数量</th>
+              <th>状态</th>
+              <th>更新时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="role-table-body">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="admin-pagination">
+        <div class="admin-pagination-info" id="pagination-info">共 0 条记录</div>
+        <div class="admin-pagination-controls" id="pagination-controls">
+          <button class="admin-pagination-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="admin-pagination-btn active">1</button>
+          <button class="admin-pagination-btn" disabled><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Modal -->
+  <div class="admin-modal-overlay" id="role-modal">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="modal-title">新增角色</h3>
+        <button class="admin-modal-close" id="modal-close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="admin-form-group">
+          <label class="admin-form-label">角色名称 <span class="required">*</span></label>
+          <input type="text" class="admin-form-input" id="modal-name" placeholder="请输入角色名称">
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">角色编码 <span class="required">*</span></label>
+          <input type="text" class="admin-form-input" id="modal-code" placeholder="请输入角色编码">
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">描述</label>
+          <textarea class="admin-form-textarea" id="modal-description" placeholder="请输入角色描述" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button class="admin-btn admin-btn-secondary" id="modal-cancel">取消</button>
+        <button class="admin-btn admin-btn-primary" id="modal-save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script>
+    // Mock Data
+    const MOCK_ROLES = [
+      { id: 'role-001', name: '平台管理员', code: 'platform_admin', description: '拥有平台全部权限，可管理所有模块和用户', permissionCount: 128, memberCount: 2, status: 'active', updateTime: '2026-01-01 00:00:00' },
+      { id: 'role-002', name: 'AI运营管理员', code: 'ai_ops_admin', description: '负责AI能力的运营、监控和分析管理', permissionCount: 64, memberCount: 3, status: 'active', updateTime: '2026-01-01 00:00:00' },
+      { id: 'role-003', name: 'AI开发人员', code: 'ai_developer', description: '负责AI能力的开发、测试和发布', permissionCount: 48, memberCount: 5, status: 'active', updateTime: '2026-01-01 00:00:00' },
+      { id: 'role-004', name: '业务管理员', code: 'biz_admin', description: '负责业务相关的配置和审批', permissionCount: 32, memberCount: 4, status: 'active', updateTime: '2026-01-01 00:00:00' },
+      { id: 'role-005', name: '普通用户', code: 'user', description: '基础用户角色，可使用已授权的AI能力', permissionCount: 16, memberCount: 142, status: 'active', updateTime: '2026-01-01 00:00:00' }
+    ];
+
+    let roles = [...MOCK_ROLES];
+    let currentEditId = null;
+    const pageSize = 10;
+    let currentPage = 1;
+
+    // Render table
+    function renderTable() {
+      const container = document.getElementById('role-table-body');
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = roles.slice(start, end);
+
+      container.innerHTML = pageData.map(role => `
+        <tr>
+          <td>
+            <div class="role-name-cell">
+              <div class="role-icon role-icon-${role.code.split('_')[0]}">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <span class="role-name">${role.name}</span>
+            </div>
+          </td>
+          <td><code class="role-code">${role.code}</code></td>
+          <td>${role.permissionCount}</td>
+          <td>${role.memberCount}</td>
+          <td>
+            <span class="admin-status ${role.status === 'active' ? 'admin-status-active' : 'admin-status-inactive'}">
+              <span class="admin-status-dot"></span>
+              ${role.status === 'active' ? '启用' : '禁用'}
+            </span>
+          </td>
+          <td>${role.updateTime}</td>
+          <td>
+            <div class="admin-actions">
+              <button class="admin-action-btn" onclick="handleEdit('${role.id}')" title="编辑"><i class="fa-solid fa-pen"></i></button>
+              <button class="admin-action-btn" onclick="handlePermission('${role.id}')" title="权限配置"><i class="fa-solid fa-lock"></i></button>
+              <button class="admin-action-btn admin-action-btn-danger" onclick="handleDelete('${role.id}')" title="删除"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // Update pagination
+      const total = roles.length;
+      const totalPages = Math.ceil(total / pageSize);
+      document.getElementById('pagination-info').textContent = `共 ${total} 条记录`;
+
+      const controls = document.getElementById('pagination-controls');
+      let paginationHTML = '';
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `<button class="admin-pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+      }
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+      controls.innerHTML = paginationHTML;
+    }
+
+    function goToPage(page) {
+      const totalPages = Math.ceil(roles.length / pageSize);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      renderTable();
+    }
+
+    // Search and filter
+    function handleSearch() {
+      const name = document.getElementById('search-name').value.toLowerCase();
+      const status = document.getElementById('search-status').value;
+
+      roles = MOCK_ROLES.filter(role => {
+        const matchName = !name || role.name.toLowerCase().includes(name) || role.code.toLowerCase().includes(name);
+        const matchStatus = !status || role.status === status;
+        return matchName && matchStatus;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function handleReset() {
+      document.getElementById('search-name').value = '';
+      document.getElementById('search-status').value = '';
+      roles = [...MOCK_ROLES];
+      currentPage = 1;
+      renderTable();
+    }
+
+    // CRUD operations
+    function handleAdd() {
+      currentEditId = null;
+      document.getElementById('modal-title').textContent = '新增角色';
+      document.getElementById('modal-name').value = '';
+      document.getElementById('modal-code').value = '';
+      document.getElementById('modal-description').value = '';
+      document.getElementById('role-modal').classList.add('active');
+    }
+
+    function handleEdit(id) {
+      const role = roles.find(r => r.id === id);
+      if (!role) return;
+      currentEditId = id;
+      document.getElementById('modal-title').textContent = '编辑角色';
+      document.getElementById('modal-name').value = role.name;
+      document.getElementById('modal-code').value = role.code;
+      document.getElementById('modal-description').value = role.description;
+      document.getElementById('role-modal').classList.add('active');
+    }
+
+    function handleSave() {
+      const name = document.getElementById('modal-name').value.trim();
+      const code = document.getElementById('modal-code').value.trim();
+      const description = document.getElementById('modal-description').value.trim();
+
+      if (!name || !code) {
+        showToast('请填写必填项', 'error');
+        return;
+      }
+
+      if (currentEditId) {
+        // Update
+        const index = roles.findIndex(r => r.id === currentEditId);
+        if (index !== -1) {
+          roles[index] = { ...roles[index], name, code, description };
+          showToast('角色更新成功');
+        }
+      } else {
+        // Create
+        const newRole = {
+          id: 'role-' + Date.now(),
+          name,
+          code,
+          description,
+          permissionCount: 0,
+          memberCount: 0,
+          status: 'active',
+          updateTime: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\//g, '-')
+        };
+        roles.unshift(newRole);
+        showToast('角色创建成功');
+      }
+
+      closeModal();
+      renderTable();
+    }
+
+    function handleDelete(id) {
+      const role = roles.find(r => r.id === id);
+      if (role && role.code === 'platform_admin') {
+        showToast('系统角色无法删除', 'error');
+        return;
+      }
+      if (!confirm('确定要删除该角色吗？')) return;
+      roles = roles.filter(r => r.id !== id);
+      showToast('角色已删除');
+      renderTable();
+    }
+
+    function handlePermission(id) {
+      const role = roles.find(r => r.id === id);
+      if (!role) return;
+      // Navigate to permission page with roleId
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'navigate', url: `pages/system/permission.html?roleId=${id}` }, '*');
+      } else {
+        window.location.href = `permission.html?roleId=${id}`;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('role-modal').classList.remove('active');
+    }
+
+    function showToast(message, type) {
+      type = type || 'success';
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'admin-toast admin-toast-' + type;
+      toast.innerHTML = '<i class="fa-solid ' + (type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation') + '"></i><span>' + message + '</span>';
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('active'));
+      setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Event bindings
+    document.getElementById('btn-search').addEventListener('click', handleSearch);
+    document.getElementById('btn-reset').addEventListener('click', handleReset);
+    document.getElementById('btn-add').addEventListener('click', handleAdd);
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-save').addEventListener('click', handleSave);
+    document.getElementById('role-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'role-modal') closeModal();
+    });
+
+    // Menu highlight
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'role.html' }, '*');
+    }
+
+    // Init
+    renderTable();
+  </script>
+
+  <style>
+    .role-name-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .role-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .role-icon-platform { background: #F5F3FF; color: #7C3AED; }
+    .role-icon-ai { background: #EEF2FF; color: #4F46E5; }
+    .role-icon-biz { background: #ECFDF5; color: #059669; }
+    .role-name {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+    .role-code {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      padding: 2px 6px;
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+    }
+  </style>
+</body>
+</html>

@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>权限配置 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-actions">
+        <button class="admin-btn admin-btn-secondary" id="btn-back">
+          <i class="fa-solid fa-arrow-left"></i> 返回角色列表
+        </button>
+        <button class="admin-btn admin-btn-primary" id="btn-save">
+          <i class="fa-solid fa-floppy-disk"></i> 保存配置
+        </button>
+      </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="content-card">
+      <!-- View Toggle & Role Info -->
+      <div class="perm-header">
+        <div class="perm-role-info">
+          <div class="perm-role-badge">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="perm-role-details">
+            <div class="perm-role-name" id="role-name">加载中...</div>
+            <div class="perm-role-code" id="role-code"></div>
+          </div>
+        </div>
+        <div class="perm-view-toggle">
+          <button class="toggle-btn active" data-view="tree" id="btn-tree-view">
+            <i class="fa-solid fa-sitemap"></i> 树形视图
+          </button>
+          <button class="toggle-btn" data-view="table" id="btn-table-view">
+            <i class="fa-solid fa-list"></i> 表格视图
+          </button>
+        </div>
+      </div>
+
+      <!-- Permission Tree View -->
+      <div class="perm-content" id="tree-view">
+        <div class="perm-tree-container">
+          <div class="perm-tree-header">
+            <label class="perm-select-all">
+              <input type="checkbox" id="select-all" onchange="toggleSelectAll()">
+              <span>全选</span>
+            </label>
+            <span class="perm-selected-count" id="selected-count">已选择 0 项权限</span>
+          </div>
+          <div class="perm-tree" id="permission-tree">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Permission Table View -->
+      <div class="perm-content" id="table-view" style="display: none;">
+        <div class="perm-table-container">
+          <div class="perm-table-header">
+            <div class="perm-search">
+              <i class="fa-solid fa-search perm-search-icon"></i>
+              <input type="text" id="search-perm" placeholder="搜索权限名称或编码...">
+            </div>
+            <span class="perm-selected-count" id="table-selected-count">已选择 0 项权限</span>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th width="50">
+                    <input type="checkbox" id="table-select-all" onchange="toggleTableSelectAll()">
+                  </th>
+                  <th>权限名称</th>
+                  <th>权限编码</th>
+                  <th>所属模块</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody id="permission-table-body">
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script>
+    // Get role ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const roleId = urlParams.get('roleId') || 'role-001';
+    const roleNameMap = {
+      'role-001': { name: '平台管理员', code: 'platform_admin' },
+      'role-002': { name: 'AI运营管理员', code: 'ai_ops_admin' },
+      'role-003': { name: 'AI开发人员', code: 'ai_developer' },
+      'role-004': { name: '业务管理员', code: 'biz_admin' },
+      'role-005': { name: '普通用户', code: 'user' }
+    };
+
+    // Permission data structure
+    const PERMISSION_MODULES = [
+      {
+        id: 'module-user',
+        name: '用户管理',
+        icon: 'fa-users',
+        permissions: [
+          { id: 'user-view', name: '查看用户', code: 'user:view', desc: '查看用户列表和详情' },
+          { id: 'user-create', name: '创建用户', code: 'user:create', desc: '新建用户账号' },
+          { id: 'user-edit', name: '编辑用户', code: 'user:edit', desc: '修改用户信息' },
+          { id: 'user-delete', name: '删除用户', code: 'user:delete', desc: '删除用户账号' },
+          { id: 'user-reset-pwd', name: '重置密码', code: 'user:reset-pwd', desc: '重置用户登录密码' },
+          { id: 'user-enable', name: '启用/禁用', code: 'user:enable', desc: '启用或禁用用户账号' }
+        ]
+      },
+      {
+        id: 'module-role',
+        name: '角色管理',
+        icon: 'fa-shield-halved',
+        permissions: [
+          { id: 'role-view', name: '查看角色', code: 'role:view', desc: '查看角色列表和详情' },
+          { id: 'role-create', name: '创建角色', code: 'role:create', desc: '新建角色' },
+          { id: 'role-edit', name: '编辑角色', code: 'role:edit', desc: '修改角色信息' },
+          { id: 'role-delete', name: '删除角色', code: 'role:delete', desc: '删除角色' },
+          { id: 'role-permission', name: '权限配置', code: 'role:permission', desc: '配置角色权限' }
+        ]
+      },
+      {
+        id: 'module-capability',
+        name: 'AI能力管理',
+        icon: 'fa-robot',
+        permissions: [
+          { id: 'capability-view', name: '查看能力', code: 'capability:view', desc: '查看AI能力列表' },
+          { id: 'capability-create', name: '创建能力', code: 'capability:create', desc: '新建AI能力' },
+          { id: 'capability-edit', name: '编辑能力', code: 'capability:edit', desc: '修改AI能力配置' },
+          { id: 'capability-delete', name: '删除能力', code: 'capability:delete', desc: '删除AI能力' },
+          { id: 'capability-publish', name: '发布能力', code: 'capability:publish', desc: '发布AI能力到市场' },
+          { id: 'capability-test', name: '测试能力', code: 'capability:test', desc: '测试AI能力' }
+        ]
+      },
+      {
+        id: 'module-agent',
+        name: 'Agent管理',
+        icon: 'fa-user-tie',
+        permissions: [
+          { id: 'agent-view', name: '查看Agent', code: 'agent:view', desc: '查看Agent列表' },
+          { id: 'agent-create', name: '创建Agent', code: 'agent:create', desc: '新建Agent' },
+          { id: 'agent-edit', name: '编辑Agent', code: 'agent:edit', desc: '修改Agent配置' },
+          { id: 'agent-delete', name: '删除Agent', code: 'agent:delete', desc: '删除Agent' },
+          { id: 'agent-test', name: '测试Agent', code: 'agent:test', desc: '测试Agent' }
+        ]
+      },
+      {
+        id: 'module-prompt',
+        name: 'Prompt管理',
+        icon: 'fa-terminal',
+        permissions: [
+          { id: 'prompt-view', name: '查看Prompt', code: 'prompt:view', desc: '查看Prompt模板' },
+          { id: 'prompt-create', name: '创建Prompt', code: 'prompt:create', desc: '新建Prompt模板' },
+          { id: 'prompt-edit', name: '编辑Prompt', code: 'prompt:edit', desc: '修改Prompt模板' },
+          { id: 'prompt-delete', name: '删除Prompt', code: 'prompt:delete', desc: '删除Prompt模板' }
+        ]
+      },
+      {
+        id: 'module-knowledge',
+        name: '知识库管理',
+        icon: 'fa-book',
+        permissions: [
+          { id: 'knowledge-view', name: '查看知识库', code: 'knowledge:view', desc: '查看知识库列表' },
+          { id: 'knowledge-create', name: '创建知识库', code: 'knowledge:create', desc: '新建知识库' },
+          { id: 'knowledge-edit', name: '编辑知识库', code: 'knowledge:edit', desc: '修改知识库配置' },
+          { id: 'knowledge-delete', name: '删除知识库', code: 'knowledge:delete', desc: '删除知识库' },
+          { id: 'knowledge-upload', name: '上传文档', code: 'knowledge:upload', desc: '上传知识文档' }
+        ]
+      },
+      {
+        id: 'module-model',
+        name: '模型管理',
+        icon: 'fa-microchip',
+        permissions: [
+          { id: 'model-view', name: '查看模型', code: 'model:view', desc: '查看模型配置' },
+          { id: 'model-create', name: '创建模型', code: 'model:create', desc: '添加新模型' },
+          { id: 'model-edit', name: '编辑模型', code: 'model:edit', desc: '修改模型配置' },
+          { id: 'model-delete', name: '删除模型', code: 'model:delete', desc: '删除模型' },
+          { id: 'model-test', name: '测试模型', code: 'model:test', desc: '测试模型调用' }
+        ]
+      },
+      {
+        id: 'module-mcp',
+        name: 'MCP管理',
+        icon: 'fa-plug',
+        permissions: [
+          { id: 'mcp-view', name: '查看MCP', code: 'mcp:view', desc: '查看MCP服务列表' },
+          { id: 'mcp-create', name: '创建MCP', code: 'mcp:create', desc: '添加MCP服务' },
+          { id: 'mcp-edit', name: '编辑MCP', code: 'mcp:edit', desc: '修改MCP配置' },
+          { id: 'mcp-delete', name: '删除MCP', code: 'mcp:delete', desc: '删除MCP服务' },
+          { id: 'mcp-test', name: '测试MCP', code: 'mcp:test', desc: '测试MCP调用' }
+        ]
+      },
+      {
+        id: 'module-monitor',
+        name: '能力监控',
+        icon: 'fa-desktop',
+        permissions: [
+          { id: 'monitor-view', name: '查看监控', code: 'monitor:view', desc: '查看监控面板' },
+          { id: 'monitor-alert', name: '告警管理', code: 'monitor:alert', desc: '配置告警规则' },
+          { id: 'monitor-log', name: '日志查看', code: 'monitor:log', desc: '查看调用日志' }
+        ]
+      },
+      {
+        id: 'module-log',
+        name: '日志管理',
+        icon: 'fa-file-lines',
+        permissions: [
+          { id: 'log-view', name: '查看日志', code: 'log:view', desc: '查看系统日志' },
+          { id: 'log-export', name: '导出日志', code: 'log:export', desc: '导出日志文件' },
+          { id: 'log-clean', name: '清理日志', code: 'log:clean', desc: '清理过期日志' }
+        ]
+      },
+      {
+        id: 'module-config',
+        name: '系统配置',
+        icon: 'fa-gear',
+        permissions: [
+          { id: 'config-view', name: '查看配置', code: 'config:view', desc: '查看系统配置' },
+          { id: 'config-edit', name: '编辑配置', code: 'config:edit', desc: '修改系统配置' },
+          { id: 'config-export', name: '导出配置', code: 'config:export', desc: '导出配置备份' },
+          { id: 'config-import', name: '导入配置', code: 'config:import', desc: '导入配置恢复' }
+        ]
+      }
+    ];
+
+    // Role's current permissions (mock data)
+    const rolePermissions = {
+      'role-001': ['user-view', 'user-create', 'user-edit', 'user-delete', 'user-reset-pwd', 'user-enable', 'role-view', 'role-create', 'role-edit', 'role-delete', 'role-permission', 'capability-view', 'capability-create', 'capability-edit', 'capability-delete', 'capability-publish', 'capability-test', 'agent-view', 'agent-create', 'agent-edit', 'agent-delete', 'agent-test', 'prompt-view', 'prompt-create', 'prompt-edit', 'prompt-delete', 'knowledge-view', 'knowledge-create', 'knowledge-edit', 'knowledge-delete', 'knowledge-upload', 'model-view', 'model-create', 'model-edit', 'model-delete', 'model-test', 'mcp-view', 'mcp-create', 'mcp-edit', 'mcp-delete', 'mcp-test', 'monitor-view', 'monitor-alert', 'monitor-log', 'log-view', 'log-export', 'log-clean', 'config-view', 'config-edit', 'config-export', 'config-import'],
+      'role-002': ['capability-view', 'capability-publish', 'capability-test', 'monitor-view', 'monitor-alert', 'monitor-log', 'log-view'],
+      'role-003': ['capability-view', 'capability-create', 'capability-edit', 'capability-test', 'agent-view', 'agent-create', 'agent-edit', 'agent-test', 'prompt-view', 'prompt-create', 'prompt-edit', 'knowledge-view', 'knowledge-create', 'knowledge-edit', 'knowledge-upload', 'model-view', 'model-test', 'mcp-view', 'mcp-test'],
+      'role-004': ['capability-view', 'capability-publish', 'log-view', 'config-view'],
+      'role-005': ['capability-view', 'capability-test']
+    };
+
+    let selectedPermissions = new Set(rolePermissions[roleId] || []);
+    let currentView = 'tree';
+
+    // Initialize
+    function init() {
+      const roleInfo = roleNameMap[roleId] || roleNameMap['role-001'];
+      document.getElementById('role-name').textContent = roleInfo.name;
+      document.getElementById('role-code').textContent = roleInfo.code;
+      const _subEl = document.getElementById('page-subtitle');
+      if (_subEl) _subEl.textContent = `为「${roleInfo.name}」配置系统权限`;
+
+      renderTreeView();
+      renderTableView();
+      updateSelectedCount();
+      bindEvents();
+    }
+
+    // Render tree view
+    function renderTreeView() {
+      const container = document.getElementById('permission-tree');
+      container.innerHTML = PERMISSION_MODULES.map(module => `
+        <div class="perm-module">
+          <div class="perm-module-header">
+            <label class="perm-module-select">
+              <input type="checkbox"
+                class="module-checkbox"
+                data-module="${module.id}"
+                onchange="toggleModule('${module.id}')"
+                ${isModuleAllSelected(module.id) ? 'checked' : ''}
+                ${isModuleIndeterminate(module.id) ? 'indeterminate' : ''}>
+            </label>
+            <div class="perm-module-info" onclick="toggleModuleCollapse('${module.id}')">
+              <i class="fa-solid fa-chevron-right perm-module-arrow" id="arrow-${module.id}"></i>
+              <i class="fa-solid ${module.icon} perm-module-icon"></i>
+              <span class="perm-module-name">${module.name}</span>
+              <span class="perm-module-count">${module.permissions.length} 项权限</span>
+            </div>
+          </div>
+          <div class="perm-module-body" id="body-${module.id}">
+            ${module.permissions.map(perm => `
+              <label class="perm-item ${selectedPermissions.has(perm.id) ? 'selected' : ''}">
+                <input type="checkbox"
+                  class="perm-checkbox"
+                  data-perm-id="${perm.id}"
+                  onchange="togglePermission('${perm.id}')"
+                  ${selectedPermissions.has(perm.id) ? 'checked' : ''}>
+                <div class="perm-item-info">
+                  <div class="perm-item-name">${perm.name}</div>
+                  <div class="perm-item-code">${perm.code}</div>
+                </div>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render table view
+    function renderTableView() {
+      const container = document.getElementById('permission-table-body');
+      const searchTerm = document.getElementById('search-perm').value.toLowerCase();
+
+      let allPermissions = [];
+      PERMISSION_MODULES.forEach(module => {
+        module.permissions.forEach(perm => {
+          allPermissions.push({
+            ...perm,
+            moduleName: module.name,
+            moduleIcon: module.icon
+          });
+        });
+      });
+
+      // Filter by search
+      if (searchTerm) {
+        allPermissions = allPermissions.filter(p =>
+          p.name.toLowerCase().includes(searchTerm) ||
+          p.code.toLowerCase().includes(searchTerm) ||
+          p.moduleName.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      // Group by module
+      let groupedHTML = '';
+      let currentModule = '';
+      allPermissions.forEach(perm => {
+        if (perm.moduleName !== currentModule) {
+          currentModule = perm.moduleName;
+          groupedHTML += `
+            <tr class="perm-table-group-header">
+              <td colspan="5">
+                <i class="fa-solid ${perm.moduleIcon}"></i> ${perm.moduleName}
+              </td>
+            </tr>
+          `;
+        }
+        groupedHTML += `
+          <tr class="perm-table-row ${selectedPermissions.has(perm.id) ? 'selected' : ''}">
+            <td>
+              <input type="checkbox"
+                class="table-perm-checkbox"
+                data-perm-id="${perm.id}"
+                onchange="togglePermission('${perm.id}')"
+                ${selectedPermissions.has(perm.id) ? 'checked' : ''}>
+            </td>
+            <td>
+              <div class="perm-item-name-cell">${perm.name}</div>
+            </td>
+            <td><code class="perm-code">${perm.code}</code></td>
+            <td>${perm.moduleName}</td>
+            <td class="perm-desc">${perm.desc}</td>
+          </tr>
+        `;
+      });
+
+      container.innerHTML = groupedHTML;
+    }
+
+    // Toggle permission selection
+    function togglePermission(permId) {
+      if (selectedPermissions.has(permId)) {
+        selectedPermissions.delete(permId);
+      } else {
+        selectedPermissions.add(permId);
+      }
+      updateUI();
+    }
+
+    // Toggle module collapse
+    function toggleModuleCollapse(moduleId) {
+      const body = document.getElementById(`body-${moduleId}`);
+      const arrow = document.getElementById(`arrow-${moduleId}`);
+      body.classList.toggle('collapsed');
+      arrow.classList.toggle('collapsed');
+    }
+
+    // Toggle module selection
+    function toggleModule(moduleId) {
+      const module = PERMISSION_MODULES.find(m => m.id === moduleId);
+      if (!module) return;
+
+      const checkbox = document.querySelector(`input[data-module="${moduleId}"]`);
+      const isChecked = checkbox.checked;
+
+      module.permissions.forEach(perm => {
+        if (isChecked) {
+          selectedPermissions.add(perm.id);
+        } else {
+          selectedPermissions.delete(perm.id);
+        }
+      });
+
+      updateUI();
+    }
+
+    // Toggle select all
+    function toggleSelectAll() {
+      const checkbox = document.getElementById('select-all');
+      const isChecked = checkbox.checked;
+
+      if (isChecked) {
+        PERMISSION_MODULES.forEach(module => {
+          module.permissions.forEach(perm => selectedPermissions.add(perm.id));
+        });
+      } else {
+        selectedPermissions.clear();
+      }
+
+      updateUI();
+    }
+
+    // Toggle table select all
+    function toggleTableSelectAll() {
+      const checkbox = document.getElementById('table-select-all');
+      const isChecked = checkbox.checked;
+
+      if (isChecked) {
+        PERMISSION_MODULES.forEach(module => {
+          module.permissions.forEach(perm => selectedPermissions.add(perm.id));
+        });
+      } else {
+        selectedPermissions.clear();
+      }
+
+      updateUI();
+    }
+
+    // Update all UI elements
+    function updateUI() {
+      // Update tree view checkboxes
+      document.querySelectorAll('.perm-checkbox').forEach(cb => {
+        cb.checked = selectedPermissions.has(cb.dataset.permId);
+      });
+
+      document.querySelectorAll('.perm-item').forEach(item => {
+        const cb = item.querySelector('.perm-checkbox');
+        item.classList.toggle('selected', selectedPermissions.has(cb.dataset.permId));
+      });
+
+      // Update module checkboxes
+      PERMISSION_MODULES.forEach(module => {
+        const checkbox = document.querySelector(`input[data-module="${module.id}"]`);
+        if (checkbox) {
+          checkbox.checked = isModuleAllSelected(module.id);
+          checkbox.indeterminate = isModuleIndeterminate(module.id);
+        }
+      });
+
+      // Update table view checkboxes
+      document.querySelectorAll('.table-perm-checkbox').forEach(cb => {
+        cb.checked = selectedPermissions.has(cb.dataset.permId);
+      });
+
+      document.querySelectorAll('.perm-table-row').forEach(row => {
+        const cb = row.querySelector('.table-perm-checkbox');
+        row.classList.toggle('selected', cb && selectedPermissions.has(cb.dataset.permId));
+      });
+
+      // Update select all checkboxes
+      const allPerms = PERMISSION_MODULES.flatMap(m => m.permissions);
+      document.getElementById('select-all').checked = allPerms.every(p => selectedPermissions.has(p.id));
+      document.getElementById('table-select-all').checked = allPerms.every(p => selectedPermissions.has(p.id));
+
+      updateSelectedCount();
+    }
+
+    // Update selected count
+    function updateSelectedCount() {
+      const count = selectedPermissions.size;
+      document.getElementById('selected-count').textContent = `已选择 ${count} 项权限`;
+      document.getElementById('table-selected-count').textContent = `已选择 ${count} 项权限`;
+    }
+
+    // Check if module is all selected
+    function isModuleAllSelected(moduleId) {
+      const module = PERMISSION_MODULES.find(m => m.id === moduleId);
+      if (!module) return false;
+      return module.permissions.every(p => selectedPermissions.has(p.id));
+    }
+
+    // Check if module is partially selected
+    function isModuleIndeterminate(moduleId) {
+      const module = PERMISSION_MODULES.find(m => m.id === moduleId);
+      if (!module) return false;
+      const selected = module.permissions.filter(p => selectedPermissions.has(p.id)).length;
+      return selected > 0 && selected < module.permissions.length;
+    }
+
+    // Switch view
+    function switchView(view) {
+      currentView = view;
+      document.getElementById('tree-view').style.display = view === 'tree' ? 'block' : 'none';
+      document.getElementById('table-view').style.display = view === 'table' ? 'block' : 'none';
+
+      document.getElementById('btn-tree-view').classList.toggle('active', view === 'tree');
+      document.getElementById('btn-table-view').classList.toggle('active', view === 'table');
+
+      updateUI();
+    }
+
+    // Bind events
+    function bindEvents() {
+      document.getElementById('btn-tree-view').addEventListener('click', () => switchView('tree'));
+      document.getElementById('btn-table-view').addEventListener('click', () => switchView('table'));
+      document.getElementById('btn-save').addEventListener('click', handleSave);
+      document.getElementById('btn-back').addEventListener('click', handleBack);
+      document.getElementById('search-perm').addEventListener('input', renderTableView);
+    }
+
+    // Save configuration
+    function handleSave() {
+      showToast(`已保存 ${selectedPermissions.size} 项权限配置`);
+    }
+
+    // Back to role list
+    function handleBack() {
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'navigate', url: 'pages/system/role.html' }, '*');
+      } else {
+        window.location.href = 'role.html';
+      }
+    }
+
+    // Toast notification
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'admin-toast admin-toast-success';
+      toast.innerHTML = `<i class="fa-solid fa-check-circle"></i><span>${message}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('active'));
+      setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Menu highlight
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'permission.html' }, '*');
+    }
+
+    // Init
+    init();
+  </script>
+
+  <style>
+    .page-header-content {
+      flex: 1;
+    }
+
+    .page-header-actions {
+      display: flex;
+      gap: var(--space-3);
+      margin-left: auto;
+    }
+
+    /* Permission Header */
+    .perm-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg);
+    }
+
+    .perm-role-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .perm-role-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .perm-role-name {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+
+    .perm-role-code {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      font-family: var(--font-family-mono);
+    }
+
+    /* View Toggle */
+    .perm-view-toggle {
+      display: flex;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 2px;
+    }
+
+    .toggle-btn {
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-muted);
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      transition: all var(--transition-fast);
+    }
+
+    .toggle-btn:hover {
+      color: var(--color-text-primary);
+    }
+
+    .toggle-btn.active {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    /* Permission Tree */
+    .perm-tree-container {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .perm-tree-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .perm-select-all {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      cursor: pointer;
+    }
+
+    .perm-selected-count {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .perm-tree {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .perm-module {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .perm-module-header {
+      display: flex;
+      align-items: center;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .perm-module-select {
+      margin-right: var(--space-3);
+      cursor: pointer;
+    }
+
+    .perm-module-info {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .perm-module-arrow {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      transition: transform var(--transition-fast);
+    }
+
+    .perm-module-arrow.collapsed {
+      transform: rotate(0deg);
+    }
+
+    .perm-module-info:not(.collapsed) + .perm-module-body .perm-module-arrow {
+      transform: rotate(90deg);
+    }
+
+    .perm-module-icon {
+      color: var(--color-primary);
+      font-size: 14px;
+    }
+
+    .perm-module-name {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+
+    .perm-module-count {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-left: auto;
+    }
+
+    .perm-module-body {
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .perm-module-body.collapsed {
+      display: none;
+    }
+
+    .perm-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .perm-item:hover {
+      background: var(--color-bg);
+    }
+
+    .perm-item.selected {
+      background: var(--color-primary-light);
+    }
+
+    .perm-item-info {
+      flex: 1;
+    }
+
+    .perm-item-name {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+    }
+
+    .perm-item-code {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      font-family: var(--font-family-mono);
+      margin-top: 2px;
+    }
+
+    /* Permission Table */
+    .perm-table-container {
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .perm-table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .perm-search {
+      position: relative;
+      width: 280px;
+    }
+
+    .perm-search-icon {
+      position: absolute;
+      left: var(--space-3);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+    }
+
+    .perm-search input {
+      width: 100%;
+      padding: var(--space-2) var(--space-3) var(--space-2) var(--space-8);
+      font-size: var(--font-size-sm);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+    }
+
+    .perm-search input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .perm-table-group-header {
+      background: var(--color-bg) !important;
+    }
+
+    .perm-table-group-header td {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      padding: var(--space-3) var(--space-4) !important;
+    }
+
+    .perm-table-group-header td i {
+      margin-right: var(--space-2);
+      color: var(--color-primary);
+    }
+
+    .perm-table-row.selected {
+      background: var(--color-primary-light) !important;
+    }
+
+    .perm-item-name-cell {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
+    .perm-code {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      padding: 2px 6px;
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+    }
+
+    .perm-desc {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-xs);
+    }
+
+    /* Checkbox styling */
+    .module-checkbox:indeterminate::before {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      background: var(--color-primary);
+      border-radius: 2px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-4);
+      }
+
+      .page-header-actions {
+        width: 100%;
+      }
+
+      .perm-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-3);
+      }
+
+      .perm-view-toggle {
+        width: 100%;
+      }
+
+      .toggle-btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .perm-search {
+        width: 100%;
+      }
+    }
+  </style>
+</body>
+</html>

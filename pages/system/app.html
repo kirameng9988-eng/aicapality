@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>应用管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <div class="content-card">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-bar-left">
+          <div class="admin-search">
+            <i class="fa-solid fa-search admin-search-icon"></i>
+            <input type="text" id="search-keyword" placeholder="搜索应用名称 / 应用编码...">
+          </div>
+          <div class="admin-select">
+            <select id="search-status">
+              <option value="">全部状态</option>
+              <option value="active">正常</option>
+              <option value="inactive">停用</option>
+            </select>
+          </div>
+          <button class="admin-btn admin-btn-secondary" id="btn-search">
+            <i class="fa-solid fa-magnifying-glass"></i> 查询
+          </button>
+          <button class="admin-btn admin-btn-ghost" id="btn-reset">
+            <i class="fa-solid fa-rotate-left"></i> 重置
+          </button>
+        </div>
+        <div class="search-bar-right">
+          <button class="admin-btn admin-btn-primary" id="btn-add">
+            <i class="fa-solid fa-plus"></i> 新建应用
+          </button>
+        </div>
+      </div>
+
+      <!-- 能力(Agent)使用申请审批 -->
+      <div class="admin-card" id="apply-panel" style="display:none; margin-bottom: var(--space-4); background:#FFF7ED; border:1px solid #FCD34D; border-radius: var(--radius-lg); padding: var(--space-4);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--space-3);">
+          <span style="font-weight:600; color:#92400E;"><i class="fa-solid fa-file-circle-check"></i> 能力使用申请(待审核)</span>
+          <span style="font-size:var(--font-size-sm); color:#92400E;" id="apply-count"></span>
+        </div>
+        <div id="apply-list"></div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>应用名称</th>
+              <th>应用编码</th>
+              <th>应用类型</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>最近调用</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="app-table-body">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="admin-pagination">
+        <div class="admin-pagination-info" id="pagination-info">共 0 条记录</div>
+        <div class="admin-pagination-controls" id="pagination-controls">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script src="../../assets/js/application-store.js"></script>
+  <script>
+    // Mock Data
+    const MOCK_APPS = [
+      {
+        id: 'app-001',
+        name: '数据资源管理系统',
+        code: 'data-resource-system',
+        type: '业务应用',
+        description: '用于数据资源的全生命周期管理',
+        status: 'active',
+        createTime: '2026-07-15 10:30:00',
+        lastCall: '2026-07-15 16:32:00',
+        clientId: 'drs_' + generateRandomString(16),
+        clientSecret: 'drs_' + generateRandomString(32),
+        secretVisible: false,
+        authorizedAgents: [
+          { agentId: 'agt-001', status: 'approved', grantedAt: '2026-07-15 10:30:00' },
+          { agentId: 'agt-002', status: 'approved', grantedAt: '2026-07-15 10:30:00' },
+          { agentId: 'agt-003', status: 'approved', grantedAt: '2026-07-15 10:30:00' }
+        ]
+      },
+      {
+        id: 'app-002',
+        name: '数据产品管理系统',
+        code: 'data-product-system',
+        type: '业务应用',
+        description: '数据产品的登记、发布与授权管理',
+        status: 'active',
+        createTime: '2026-07-14 09:20:00',
+        lastCall: '2026-07-15 15:21:00',
+        clientId: 'dps_' + generateRandomString(16),
+        clientSecret: 'dps_' + generateRandomString(32),
+        secretVisible: false,
+        authorizedAgents: [
+          { agentId: 'agt-001', status: 'approved', grantedAt: '2026-07-14 09:20:00' },
+          { agentId: 'agt-004', status: 'approved', grantedAt: '2026-07-14 09:20:00' }
+        ]
+      },
+      {
+        id: 'app-003',
+        name: '公共数据门户',
+        code: 'public-data-portal',
+        type: '门户应用',
+        description: '面向公众的数据开放门户',
+        status: 'inactive',
+        createTime: '2026-07-12 14:00:00',
+        lastCall: '-',
+        clientId: 'pdp_' + generateRandomString(16),
+        clientSecret: 'pdp_' + generateRandomString(32),
+        secretVisible: false,
+        authorizedAgents: []
+      },
+      {
+        id: 'app-004',
+        name: '可信数据空间',
+        code: 'trusted-data-space',
+        type: '业务应用',
+        description: '企业间数据安全流通平台',
+        status: 'active',
+        createTime: '2026-07-10 08:00:00',
+        lastCall: '2026-07-14 11:20:00',
+        clientId: 'tds_' + generateRandomString(16),
+        clientSecret: 'tds_' + generateRandomString(32),
+        secretVisible: false,
+        authorizedAgents: [
+          { agentId: 'agt-002', status: 'approved', grantedAt: '2026-07-10 08:00:00' }
+        ]
+      },
+      {
+        id: 'app-005',
+        name: '数据质量平台',
+        code: 'data-quality-platform',
+        type: '业务应用',
+        description: '数据质量检测与评估',
+        status: 'active',
+        createTime: '2026-07-08 16:30:00',
+        lastCall: '2026-07-15 10:00:00',
+        clientId: 'dqp_' + generateRandomString(16),
+        clientSecret: 'dqp_' + generateRandomString(32),
+        secretVisible: false,
+        authorizedAgents: [
+          { agentId: 'agt-002', status: 'approved', grantedAt: '2026-07-08 16:30:00' },
+          { agentId: 'agt-003', status: 'approved', grantedAt: '2026-07-08 16:30:00' }
+        ]
+      }
+    ];
+
+    // State
+    let apps = [];
+    let currentPage = 1;
+    const pageSize = 10;
+
+    // Generate random string
+    function generateRandomString(length) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    // Load data from localStorage
+    function loadData() {
+      apps = ApplicationStore.list();
+      if (!apps.length) {
+        apps = JSON.parse(JSON.stringify(MOCK_APPS));
+        ApplicationStore.save(apps);
+      }
+    }
+
+    // Save data to localStorage
+    function saveData() {
+      ApplicationStore.save(apps);
+    }
+
+    // Render table
+    function renderTable() {
+      const container = document.getElementById('app-table-body');
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = apps.slice(start, end);
+
+      if (pageData.length === 0) {
+        container.innerHTML = `
+          <tr>
+            <td colspan="7" class="admin-empty-state">
+              <div class="empty-state">
+                <div class="empty-state-icon">
+                  <i class="fa-solid fa-mobile-screen"></i>
+                </div>
+                <div class="empty-state-title">暂无应用</div>
+                <div class="empty-state-desc">点击「新建应用」创建一个新的应用</div>
+              </div>
+            </td>
+          </tr>
+        `;
+      } else {
+        container.innerHTML = pageData.map(app => `
+          <tr>
+            <td>
+              <div class="admin-user-cell">
+                <div class="admin-user-avatar-placeholder">
+                  <i class="fa-solid fa-mobile-screen"></i>
+                </div>
+                <div>
+                  <div class="admin-user-name">${app.name}</div>
+                </div>
+              </div>
+            </td>
+            <td><code style="font-size: 12px; background: var(--color-bg); padding: 2px 6px; border-radius: 4px;">${app.code}</code></td>
+            <td><span class="tag tag-outline">${app.type}</span></td>
+            <td>
+              <span class="admin-status ${app.status === 'active' ? 'admin-status-active' : 'admin-status-inactive'}">
+                <span class="admin-status-dot"></span>
+                ${app.status === 'active' ? '正常' : '停用'}
+              </span>
+            </td>
+            <td>${app.createTime.split(' ')[0]}</td>
+            <td>${app.lastCall}</td>
+            <td>
+              <div class="admin-actions">
+                <button class="admin-action-btn" onclick="handleView('${app.id}')" title="查看">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+                <button class="admin-action-btn" onclick="handleEdit('${app.id}')" title="编辑">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button class="admin-action-btn ${app.status === 'active' ? 'admin-action-btn-danger' : ''}" onclick="handleToggleStatus('${app.id}')" title="${app.status === 'active' ? '停用' : '启用'}">
+                  <i class="fa-solid ${app.status === 'active' ? 'fa-ban' : 'fa-check'}"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Update pagination
+      updatePagination();
+    }
+
+    // Update pagination
+    function updatePagination() {
+      const total = apps.length;
+      const totalPages = Math.ceil(total / pageSize) || 1;
+      document.getElementById('pagination-info').textContent = `共 ${total} 条记录`;
+
+      const controls = document.getElementById('pagination-controls');
+      let paginationHTML = '';
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `<button class="admin-pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+      }
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+      controls.innerHTML = paginationHTML;
+    }
+
+    // Go to page
+    function goToPage(page) {
+      const totalPages = Math.ceil(apps.length / pageSize) || 1;
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      renderTable();
+    }
+
+    // Search
+    function handleSearch() {
+      const keyword = document.getElementById('search-keyword').value.toLowerCase().trim();
+      const status = document.getElementById('search-status').value;
+
+      loadData();
+
+      apps = apps.filter(app => {
+        const matchKeyword = !keyword || app.name.toLowerCase().includes(keyword) || app.code.toLowerCase().includes(keyword);
+        const matchStatus = !status || app.status === status;
+        return matchKeyword && matchStatus;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    // Reset
+    function handleReset() {
+      document.getElementById('search-keyword').value = '';
+      document.getElementById('search-status').value = '';
+      loadData();
+      currentPage = 1;
+      renderTable();
+    }
+
+    // View detail
+    function handleView(id) {
+      navigateToDetail(id);
+    }
+
+    // Edit
+    function handleEdit(id) {
+      navigateToCreate(id);
+    }
+
+    // Toggle status
+    function handleToggleStatus(id) {
+      const app = apps.find(a => a.id === id);
+      if (!app) return;
+
+      const newStatus = app.status === 'active' ? 'inactive' : 'active';
+      const action = newStatus === 'active' ? '启用' : '停用';
+
+      if (!confirm('确定要' + action + '应用「' + app.name + '」吗？')) return;
+
+      app.status = newStatus;
+      saveData();
+      showToast('应用已' + action);
+      renderTable();
+    }
+
+    // Navigate to detail page
+    function navigateToDetail(id) {
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'navigate', url: 'app-detail.html?id=' + id }, '*');
+      } else {
+        window.location.href = 'app-detail.html?id=' + id;
+      }
+    }
+
+    // Navigate to create/edit page
+    function navigateToCreate(id) {
+      const url = id ? 'app-create.html?id=' + id : 'app-create.html';
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'navigate', url: url }, '*');
+      } else {
+        window.location.href = url;
+      }
+    }
+
+    // Show toast
+    function showToast(message, type) {
+      type = type || 'success';
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'admin-toast admin-toast-' + type;
+      const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
+      toast.innerHTML = '<i class="fa-solid ' + icon + '"></i><span>' + message + '</span>';
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('active'));
+      setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // 渲染待审核的能力(Agent)使用申请
+    function renderApplyList() {
+      const panel = document.getElementById('apply-panel');
+      const listEl = document.getElementById('apply-list');
+      const countEl = document.getElementById('apply-count');
+      const items = (typeof ApplyStore !== 'undefined') ? ApplyStore.list().filter(a => a.status === 'submitted') : [];
+      if (!panel) return;
+      panel.style.display = items.length ? 'block' : 'none';
+      if (countEl) countEl.textContent = items.length + ' 条待处理';
+      if (!items.length) return;
+      listEl.innerHTML = items.map(it => `
+        <div style="display:flex; gap: var(--space-3); align-items:center; padding: var(--space-2) 0; border-top:1px solid #FDE68A; flex-wrap:wrap;">
+          <div style="flex:1; min-width: 220px;">
+            <div><strong>${it.appName}</strong> 申请使用 <strong>${it.agentName}</strong>(${it.protocol})</div>
+            <div style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">${it.useCase} · ${it.time}</div>
+          </div>
+          <div style="display:flex; gap: var(--space-2);">
+            <button class="admin-btn admin-btn-primary" onclick="handleApplyApprove('${it.id}')">通过并授权</button>
+            <button class="admin-btn admin-btn-secondary" onclick="handleApplyReject('${it.id}')">拒绝</button>
+          </div>
+        </div>`).join('');
+    }
+
+    // 通过申请: 自动创建/更新应用并授权对应 Agent(能力)
+    function handleApplyApprove(id) {
+      const item = ApplyStore.approve(id);
+      if (!item) { showToast('申请状态已变更或不存在', 'error'); return; }
+      showToast(`已为「${item.appName}」创建/更新应用并授权「${item.agentName}」`);
+      renderApplyList();
+      loadData();
+      renderTable();
+    }
+
+    // 拒绝申请
+    function handleApplyReject(id) {
+      const reason = prompt('拒绝原因(可留空)', '');
+      const item = ApplyStore.reject(id, reason || '');
+      if (!item) { showToast('申请状态已变更或不存在', 'error'); return; }
+      showToast('已拒绝该申请', 'success');
+      renderApplyList();
+    }
+
+    // Event bindings
+    document.getElementById('btn-search').addEventListener('click', handleSearch);
+    document.getElementById('btn-reset').addEventListener('click', handleReset);
+    document.getElementById('btn-add').addEventListener('click', () => navigateToCreate());
+    document.getElementById('search-keyword').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSearch();
+    });
+
+    // Menu highlight
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'app.html' }, '*');
+    }
+
+    // Init
+    loadData();
+    renderTable();
+    renderApplyList();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('acp-store-change', function () {
+        if (typeof ApplyStore !== 'undefined') renderApplyList();
+      });
+    }
+  </script>
+</body>
+</html>

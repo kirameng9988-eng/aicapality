@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Model Hub（模型中心） - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/model.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <!-- Model Hub Container -->
+    <div class="model-hub">
+    <!-- Tab Navigation -->
+    <div class="tabs" style="padding: var(--space-2) var(--space-4);">
+      <button class="tab-item active model-tab-btn" data-tab="library" onclick="switchTab('library')">
+        <i class="fa-solid fa-layer-group"></i> 模型列表
+      </button>
+      <button class="tab-item model-tab-btn" data-tab="playground" onclick="switchTab('playground')">
+        <i class="fa-solid fa-play"></i> 在线测试
+      </button>
+    </div>
+
+    <!-- ② Model Library -->
+    <div class="model-tabs-content active" id="tab-library">
+      <div class="model-main-content">
+        <!-- Model Library Panel -->
+        <section class="model-library-panel">
+          <div class="model-library-header">
+            <span class="model-library-title">模型列表</span>
+            <div class="model-library-actions">
+              <button class="btn btn-sm btn-primary" onclick="openAddModel()">
+                <i class="fa-solid fa-plus"></i> 添加模型
+              </button>
+            </div>
+          </div>
+          <div class="model-toolbar">
+            <div class="search-box model-search">
+              <span class="search-box-icon"><i class="fa-solid fa-search"></i></span>
+              <input type="text" class="search-box-input" id="modelSearch" placeholder="搜索模型名称、供应商..." oninput="handleSearch()">
+            </div>
+            <div class="model-filters">
+              <select class="form-select model-filter-select" id="typeFilterSelect" onchange="handleTypeFilterChange(this.value)">
+                <option value="all">全部类型</option>
+                <option value="多模态">多模态</option>
+                <option value="大语言模型">大语言模型</option>
+                <option value="向量模型">向量模型</option>
+              </select>
+              <select class="form-select model-filter-select" id="testFilterSelect" onchange="handleTestFilterChange(this.value)">
+                <option value="all">全部状态</option>
+                <option value="online">在线</option>
+                <option value="offline">离线</option>
+                <option value="default">默认</option>
+              </select>
+            </div>
+            <div class="model-toolbar-right">
+              <div class="dropdown">
+                <button class="btn btn-sm btn-secondary dropdown-toggle" id="sortDropdownBtn" onclick="toggleSortDropdown()">
+                  <i class="fa-solid fa-sort"></i> 排序
+                </button>
+                <div class="dropdown-menu" id="sortDropdownMenu">
+                  <div class="dropdown-item" onclick="handleSort('name', 'asc')">
+                    <i class="fa-solid fa-arrow-up-a-z"></i> 名称升序
+                  </div>
+                  <div class="dropdown-item" onclick="handleSort('name', 'desc')">
+                    <i class="fa-solid fa-arrow-down-z-a"></i> 名称降序
+                  </div>
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-item" onclick="handleSort('updatedAt', 'desc')">
+                    <i class="fa-solid fa-clock"></i> 更新时间最新
+                  </div>
+                  <div class="dropdown-item" onclick="handleSort('updatedAt', 'asc')">
+                    <i class="fa-solid fa-clock-rotate-left"></i> 更新时间最旧
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="model-table-wrapper">
+            <table class="model-table">
+              <thead>
+                <tr>
+                  <th class="sortable" data-sort="name" onclick="handleSort('name')">模型 <i class="fa-solid fa-sort"></i></th>
+                  <th>供应商</th>
+                  <th class="sortable" data-sort="type" onclick="handleSort('type')">类型 <i class="fa-solid fa-sort"></i></th>
+                  <th class="sortable" data-sort="testStatus" onclick="handleSort('testStatus')">测试结果 <i class="fa-solid fa-sort"></i></th>
+                  <th>默认</th>
+                  <th class="sortable" data-sort="updatedAt" onclick="handleSort('updatedAt')">更新时间 <i class="fa-solid fa-sort"></i></th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="modelTableBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ⑥ Playground (在线测试) -->
+    <div class="model-tabs-content" id="tab-playground">
+      <div class="playground-container">
+        <!-- Left: Messages -->
+        <div class="playground-main">
+          <div class="playground-header">
+            <div class="playground-model-select">
+              <select class="form-select" id="playgroundModelSelect">
+                <!-- Rendered by JS -->
+              </select>
+            </div>
+            <button class="btn btn-primary" id="playgroundRunBtn">
+              <i class="fa-solid fa-play"></i> 运行
+            </button>
+          </div>
+          <div class="playground-messages" id="playgroundMessages">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Right: Prompt & Params -->
+        <aside class="playground-sidebar">
+          <div class="playground-sidebar-tabs">
+            <button class="playground-sidebar-tab active" data-tab="prompt" onclick="switchPlaygroundSidebarTab('prompt')">
+              <i class="fa-solid fa-comment-dots"></i> Prompt
+            </button>
+            <button class="playground-sidebar-tab" data-tab="params" onclick="switchPlaygroundSidebarTab('params')">
+              <i class="fa-solid fa-sliders"></i> 参数配置
+            </button>
+            <button class="playground-sidebar-tab" data-tab="response" onclick="switchPlaygroundSidebarTab('response')">
+              <i class="fa-solid fa-bolt"></i> 响应
+            </button>
+          </div>
+
+          <!-- Prompt Panel -->
+          <div class="playground-panel" id="playgroundPanelPrompt">
+            <div class="playground-prompt-tabs">
+              <button class="playground-tab active" data-tab="user" onclick="switchPlaygroundTab('user')">用户提示词</button>
+              <button class="playground-tab" data-tab="system" onclick="switchPlaygroundTab('system')">系统提示词</button>
+            </div>
+            <div class="playground-input-wrapper" id="userPromptWrapper">
+              <textarea class="playground-textarea" id="playgroundUserPrompt" placeholder="输入您的Prompt..." onkeydown="if(event.ctrlKey&&event.key==='Enter') runPlayground()"></textarea>
+              <div class="playground-actions">
+                <button class="btn btn-icon" title="清空" onclick="clearPlaygroundInput()">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+                <button class="btn btn-primary" title="发送" onclick="runPlayground()">
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+            <div class="playground-input-wrapper" id="systemPromptWrapper" style="display: none;">
+              <textarea class="playground-textarea" id="playgroundSystemPrompt" placeholder="系统提示词（可选）..." style="min-height: 120px;"></textarea>
+            </div>
+          </div>
+
+          <!-- Params Panel -->
+          <div class="playground-panel" id="playgroundPanelParams" style="display:none;">
+            <div id="playgroundParamsList">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Response Panel -->
+          <div class="playground-panel" id="playgroundPanelResponse" style="display:none;">
+            <div class="playground-response-title">响应信息</div>
+            <div class="playground-response-stats" id="playgroundResponseStats">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Model Detail Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeModelDetail()"></div>
+  <aside class="drawer model-detail-drawer" id="modelDetailDrawer">
+    <div class="drawer-header">
+      <span class="drawer-title">模型详情</span>
+      <button class="drawer-close" onclick="closeModelDetail()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body" id="modelDetailContent">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" onclick="closeModelDetail()">关闭</button>
+      <button class="btn btn-primary" onclick="testModel(currentState.selectedModel); closeModelDetail();">
+        <i class="fa-solid fa-play"></i> 在线测试
+      </button>
+    </div>
+  </aside>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-overlay" id="deleteConfirmModal">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <span class="modal-title">确认删除</span>
+        <button class="modal-close" onclick="closeDeleteModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-confirm-content">
+          <div class="delete-confirm-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <p class="delete-confirm-text" id="deleteConfirmText">确定要删除此项吗？此操作不可撤销。</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeDeleteModal()">取消</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">
+          <i class="fa-solid fa-trash"></i> 删除
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Modal -->
+  <div class="modal-overlay" id="modelModal">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <span class="modal-title" id="modelModalTitle">添加模型</span>
+        <button class="modal-close" onclick="closeModelModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="modelForm">
+          <input type="hidden" id="modelId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label-required">模型名称</label>
+              <input type="text" class="form-input" id="modelName" placeholder="如：GPT-4o" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-required">供应商</label>
+              <select class="form-select" id="modelProvider" required>
+                <option value="">请选择供应商</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label-required">模型类型</label>
+              <select class="form-select" id="modelType" required>
+                <option value="">请选择类型</option>
+                <option value="多模态">多模态</option>
+                <option value="大语言模型">大语言模型</option>
+                <option value="向量模型">向量模型</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">API Endpoint</label>
+              <input type="text" class="form-input" id="modelEndpoint" placeholder="如：https://api.openai.com/v1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">API Key</label>
+            <div class="input-wrapper">
+              <input type="password" class="form-input" id="modelApiKey" placeholder="请输入API Key（可选）">
+              <button type="button" class="input-suffix" onclick="toggleApiKeyVisibility()" title="显示/隐藏">
+                <i class="fa-solid fa-eye" id="apiKeyToggleIcon"></i>
+              </button>
+            </div>
+            <div class="form-help">API Key将加密存储，仅管理员可见</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">连通性测试</label>
+            <div class="model-test-row">
+              <button type="button" class="btn btn-sm btn-secondary" id="modelConnTestBtn" onclick="runModelConnTest()">
+                <i class="fa-solid fa-bolt"></i> 运行测试
+              </button>
+              <span class="model-conn-badge" id="modelConnTestResult"></span>
+            </div>
+            <div class="form-help">测试通过后将自动启用模型，列表「测试结果」列显示为正常</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">描述说明</label>
+            <textarea class="form-textarea" id="modelDescription" placeholder="请输入模型描述（可选）" rows="2"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">状态</label>
+              <div class="form-switch-wrapper">
+                <input type="checkbox" class="form-switch" id="modelStatus" checked>
+                <span class="form-switch-label" id="modelStatusLabel">启用</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">设为默认模型</label>
+              <div class="form-switch-wrapper">
+                <input type="checkbox" class="form-switch" id="modelDefault">
+                <span class="form-switch-label" id="modelDefaultLabel">否</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModelModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveModel()">
+          <i class="fa-solid fa-check"></i> 保存
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/model.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'model.html' }, '*');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Hub（MCP服务中心） - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/mcp.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <!-- MCP Hub Container -->
+    <div class="mcp-hub">
+
+    <!-- Tab Navigation -->
+    <div class="mcp-tabs">
+      <button class="tab-item active mcp-tab-btn" data-tab="catalog" onclick="switchTab('catalog')">
+        <i class="fa-solid fa-server"></i> 服务目录
+      </button>
+      <button class="tab-item mcp-tab-btn" data-tab="playground" onclick="switchTab('playground')">
+        <i class="fa-solid fa-play"></i> MCP在线调试
+      </button>
+    </div>
+
+    <!-- Server Catalog + Tool Browser -->
+    <div class="mcp-tabs-content active" id="tab-catalog">
+      <div class="mcp-main-content">
+        <!-- Server Catalog Panel -->
+        <aside class="server-catalog-panel">
+          <div class="server-catalog-header">
+            <span class="server-catalog-title">MCP Server</span>
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">全部 <span id="serverCount">8</span> 个</span>
+              <button class="btn btn-primary btn-sm" onclick="openServerForm()">
+                <i class="fa-solid fa-plus"></i> 新建
+              </button>
+            </div>
+          </div>
+          <div class="server-catalog-search">
+            <div class="search-box">
+              <span class="search-box-icon"><i class="fa-solid fa-search"></i></span>
+              <input type="text" class="search-box-input" id="serverSearch" placeholder="搜索 Server..." oninput="handleServerSearch(this.value)">
+            </div>
+          </div>
+          <div class="server-tags-filter" id="serverTagsFilter">
+            <select class="form-select" id="serverTagSelect" onchange="handleServerTagChange(this.value)">
+              <!-- Rendered by JS -->
+            </select>
+          </div>
+          <div class="server-list" id="serverList">
+            <!-- Rendered by JS -->
+          </div>
+        </aside>
+
+        <!-- Tool Browser Panel -->
+        <section class="tool-browser-panel">
+          <div class="tool-browser-header">
+            <span class="tool-browser-title" id="toolBrowserTitle">全部 Tools</span>
+            <button class="btn btn-primary btn-sm" onclick="openToolForm()">
+              <i class="fa-solid fa-plus"></i> 新建
+            </button>
+          </div>
+          <div class="tool-browser-content">
+            <div class="tool-grid" id="toolGrid">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div class="tool-browser-pagination" id="toolPagination">
+            <!-- Rendered by JS -->
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- MCP Playground -->
+    <div class="mcp-tabs-content" id="tab-playground">
+      <div class="playground-container">
+        <div class="playground-main">
+          <div class="playground-header">
+            <span class="playground-title">MCP在线调试</span>
+            <div class="playground-selects">
+              <select class="form-select" id="playgroundServerSelect">
+                <!-- Rendered by JS -->
+              </select>
+              <select class="form-select" id="playgroundToolSelect">
+                <!-- Rendered by JS -->
+              </select>
+              <button class="btn btn-primary" id="playgroundRunBtn" onclick="executePlayground()">
+                <i class="fa-solid fa-play"></i> 执行
+              </button>
+            </div>
+          </div>
+          <div class="playground-messages" id="playgroundMessages">
+            <div class="playground-message request">
+              <div class="playground-message-avatar">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div class="playground-message-content">
+                <div class="playground-msg-header">
+                  <span class="playground-msg-tool-name">
+                    <i class="fa-solid fa-bolt"></i> get_data_resources
+                  </span>
+                  <span class="playground-msg-time">10:23:45</span>
+                </div>
+                <div class="playground-msg-params">
+                  <span class="playground-msg-param-tag">category: <em>sales</em></span>
+                  <span class="playground-msg-param-tag">tags: <em>["重要", "一手"]</em></span>
+                  <span class="playground-msg-param-tag">page: <em>1</em></span>
+                </div>
+              </div>
+            </div>
+            <div class="playground-message response">
+              <div class="playground-message-avatar">
+                <i class="fa-solid fa-plug"></i>
+              </div>
+              <div class="playground-message-content">
+                <div class="playground-msg-header">
+                  <span class="playground-msg-tool-name">
+                    <i class="fa-solid fa-check-circle"></i> MCP Response
+                  </span>
+                  <span class="playground-msg-badge success">成功 · 187ms</span>
+                </div>
+                <div class="playground-msg-result-summary">
+                  <i class="fa-solid fa-list"></i> 返回 <strong>2</strong> 条数据记录
+                </div>
+                <div class="playground-msg-result-table">
+                  <div class="playground-msg-result-row header">
+                    <span>资源名称</span>
+                    <span>分类</span>
+                    <span>标签</span>
+                    <span>记录数</span>
+                    <span>大小</span>
+                  </div>
+                  <div class="playground-msg-result-row">
+                    <span class="ellipsis" title="销售主题库">销售主题库</span>
+                    <span><span class="badge badge-sm">sales</span></span>
+                    <span class="ellipsis" title="重要, 一手, 日报">重要, 一手, 日报</span>
+                    <span>1,250,000</span>
+                    <span>2.3GB</span>
+                  </div>
+                  <div class="playground-msg-result-row">
+                    <span class="ellipsis" title="客户主数据">客户主数据</span>
+                    <span><span class="badge badge-sm">sales</span></span>
+                    <span class="ellipsis" title="重要, 一手">重要, 一手</span>
+                    <span>450,000</span>
+                    <span>856MB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="playground-sidebar">
+          <div class="playground-params">
+            <div class="playground-params-title">参数配置</div>
+            <div id="playgroundParams">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div class="playground-response">
+            <div class="playground-response-header">
+              <span class="playground-response-title">响应结果</span>
+            </div>
+            <div class="playground-response-stats" id="playgroundResponseStats">
+              <!-- Rendered by JS -->
+            </div>
+            <div class="playground-response-body" id="playgroundResponse">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <div class="playground-logs">
+            <div class="playground-logs-header">
+              <i class="fa-solid fa-list"></i> 执行日志
+            </div>
+            <div class="playground-logs-body" id="playgroundLogs">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Server Detail Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeAllDrawers()"></div>
+  <aside class="drawer mcp-detail-drawer" id="serverDetailDrawer">
+    <div class="drawer-header">
+      <span class="drawer-title">Server 详情</span>
+      <button class="drawer-close" onclick="closeDrawer('serverDetailDrawer')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body" id="serverDetailContent">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-danger" onclick="deleteServer()">
+        <i class="fa-solid fa-trash"></i> 删除
+      </button>
+      <button class="btn btn-secondary" onclick="closeDrawer('serverDetailDrawer')">关闭</button>
+      <button class="btn btn-secondary" onclick="editCurrentServer()">
+        <i class="fa-solid fa-edit"></i> 编辑
+      </button>
+      <button class="btn btn-primary" onclick="closeDrawer('serverDetailDrawer'); switchTab('playground');">
+        <i class="fa-solid fa-play"></i> 在线调试
+      </button>
+    </div>
+  </aside>
+
+  <!-- Tool Detail Drawer -->
+  <aside class="drawer mcp-detail-drawer" id="toolDetailDrawer">
+    <div class="drawer-header">
+      <span class="drawer-title">Tool 详情</span>
+      <button class="drawer-close" onclick="closeDrawer('toolDetailDrawer')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body" id="toolDetailContent">
+      <!-- Rendered by JS -->
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-danger" onclick="deleteTool()">
+        <i class="fa-solid fa-trash"></i> 删除
+      </button>
+      <button class="btn btn-secondary" onclick="closeDrawer('toolDetailDrawer')">关闭</button>
+      <button class="btn btn-secondary" onclick="editCurrentTool()">
+        <i class="fa-solid fa-edit"></i> 编辑
+      </button>
+      <button class="btn btn-primary" onclick="closeDrawer('toolDetailDrawer'); switchTab('playground');">
+        <i class="fa-solid fa-play"></i> 在线调试
+      </button>
+    </div>
+  </aside>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Server Form Modal -->
+  <div class="modal-overlay" id="serverFormModal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div class="modal-title" id="serverFormTitle">新建 Server</div>
+        <button class="modal-close" onclick="closeServerForm()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="serverForm">
+          <input type="hidden" id="serverFormId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label-required">Server 名称</label>
+              <input type="text" class="form-input" id="serverFormName" placeholder="例如：数据资源MCP" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-required">版本号</label>
+              <input type="text" class="form-input" id="serverFormVersion" placeholder="例如：1.0.0" value="1.0.0" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">描述</label>
+            <textarea class="form-textarea" id="serverFormDescription" placeholder="描述此Server提供的功能..." rows="2"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label-required">端点 URL</label>
+              <input type="url" class="form-input" id="serverFormEndpoint" placeholder="https://api.example.com/mcp" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-required">协议</label>
+              <select class="form-select" id="serverFormProtocol" required>
+                <option value="SSE">SSE</option>
+                <option value="WebSocket">WebSocket</option>
+                <option value="HTTP">HTTP</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label-required">负责人</label>
+              <input type="text" class="form-input" id="serverFormOwner" placeholder="负责人姓名" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">标签</label>
+              <input type="text" class="form-input" id="serverFormTags" placeholder="多个标签用逗号分隔，例如：数据,API,工具">
+            </div>
+          </div>
+
+          <!-- Auth Configuration Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fa-solid fa-shield-halved"></i> 鉴权配置
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">鉴权方式</label>
+              <select class="form-select" id="serverFormAuthType" onchange="handleAuthTypeChange()">
+                <option value="none">无鉴权</option>
+                <option value="fixed">固定 API Key</option>
+                <option value="dynamic">动态 Token</option>
+              </select>
+            </div>
+
+            <!-- Fixed API Key Fields -->
+            <div id="authFixedFields" class="auth-fields" style="display: none;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Header Key</label>
+                  <input type="text" class="form-input" id="serverFormHeaderKey" placeholder="例如：X-API-Key">
+                  <div class="form-help">HTTP 请求头名称</div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">API Key</label>
+                  <div class="input-wrapper">
+                    <input type="password" class="form-input" id="serverFormHeaderValue" placeholder="输入 API Key">
+                    <button type="button" class="input-suffix-btn" onclick="togglePasswordVisibility('serverFormHeaderValue')">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <div class="form-checkbox-wrapper">
+                    <input type="checkbox" class="form-checkbox" id="serverFormKeyRotation" onchange="handleKeyRotationChange()">
+                    <span class="form-checkbox-label">启用 Key 轮换</span>
+                  </div>
+                </div>
+                <div class="form-group" id="rotationDaysGroup" style="display: none;">
+                  <label class="form-label">轮换周期（天）</label>
+                  <input type="number" class="form-input" id="serverFormRotationDays" value="90" min="1" max="365">
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Token Fields -->
+            <div id="authDynamicFields" class="auth-fields" style="display: none;">
+              <div class="form-group">
+                <label class="form-label">Token 获取 URL</label>
+                <input type="url" class="form-input" id="serverFormTokenUrl" placeholder="https://auth.example.com/token">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Header Key</label>
+                  <input type="text" class="form-input" id="serverFormDynamicHeaderKey" placeholder="例如：Authorization">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Header Value Pattern</label>
+                  <div class="input-wrapper">
+                    <input type="password" class="form-input" id="serverFormDynamicHeaderValue" placeholder="Bearer {token} 或直接填 token">
+                    <button type="button" class="input-suffix-btn" onclick="togglePasswordVisibility('serverFormDynamicHeaderValue')">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                  </div>
+                  <div class="form-help">支持 {token} 变量占位符</div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">刷新间隔（分钟）</label>
+                  <input type="number" class="form-input" id="serverFormTokenRefreshInterval" value="60" min="5" max="1440">
+                </div>
+                <div class="form-group">
+                  <div class="form-checkbox-wrapper">
+                    <input type="checkbox" class="form-checkbox" id="serverFormDynamicKeyRotation" onchange="handleDynamicKeyRotationChange()">
+                    <span class="form-checkbox-label">启用 Key 轮换</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group" id="dynamicRotationDaysGroup" style="display: none;">
+                <label class="form-label">轮换周期（天）</label>
+                <input type="number" class="form-input" id="serverFormDynamicRotationDays" value="90" min="1" max="365">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeServerForm()">取消</button>
+        <button class="btn btn-primary" onclick="saveServer()">
+          <i class="fa-solid fa-check"></i> 保存
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tool Form Modal -->
+  <div class="modal-overlay" id="toolFormModal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div class="modal-title" id="toolFormTitle">新建 Tool</div>
+        <button class="modal-close" onclick="closeToolForm()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="toolForm">
+          <input type="hidden" id="toolFormId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label-required">所属 Server</label>
+              <select class="form-select" id="toolFormServer" required>
+                <!-- Rendered by JS -->
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-required">Tool 名称</label>
+              <input type="text" class="form-input" id="toolFormName" placeholder="例如：get_user_info" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label form-label-required">显示名称</label>
+              <input type="text" class="form-input" id="toolFormDisplayName" placeholder="例如：获取用户信息" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label form-label-required">分类</label>
+              <select class="form-select" id="toolFormCategory" required>
+                <option value="数据资源">数据资源</option>
+                <option value="数据目录">数据目录</option>
+                <option value="知识检索">知识检索</option>
+                <option value="智能问答">智能问答</option>
+                <option value="审批流程">审批流程</option>
+                <option value="地理信息">地理信息</option>
+                <option value="企业信息">企业信息</option>
+                <option value="文件操作">文件操作</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">描述</label>
+            <textarea class="form-textarea" id="toolFormDescription" placeholder="描述此Tool的功能..." rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label form-label-required">输出 Schema</label>
+            <input type="text" class="form-input" id="toolFormOutputSchema" placeholder="例如：UserInfo" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">输入参数 (JSON格式)</label>
+            <textarea class="form-textarea" id="toolFormInputParams" placeholder='[{"name": "user_id", "type": "string", "required": true, "description": "用户ID"}]' rows="3"></textarea>
+            <div class="form-help">参数格式：name, type, required, description</div>
+          </div>
+
+          <!-- API 适配配置 Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fa-solid fa-link"></i> API 适配配置
+            </div>
+            <div class="form-help" style="margin-bottom: 12px;">
+              将本 Tool 绑定到一个 RESTful API。后台 MCP Gateway 会按此配置把 Tool 调用翻译为 HTTP 请求。
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">HTTP 方法</label>
+                <select class="form-select" id="toolFormMethod">
+                  <option value="GET">GET</option>
+                  <option value="POST">POST</option>
+                  <option value="PUT">PUT</option>
+                  <option value="DELETE">DELETE</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">接口路径</label>
+                <input type="text" class="form-input" id="toolFormPath" placeholder="/api/metadata/list">
+                <div class="form-help">支持 {param} 路径占位符，如 /api/metadata/{metadata_id}</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">参数映射 (JSON格式)</label>
+              <textarea class="form-textarea" id="toolFormParamMapping" placeholder='[{"name": "keyword", "in": "query"}, {"name": "page", "in": "query"}, {"name": "metadata_id", "in": "path"}]' rows="3"></textarea>
+              <div class="form-help">将输入参数映射到请求位置：query / path / header / body</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">响应映射 (JSONPath)</label>
+              <input type="text" class="form-input" id="toolFormResponseMapping" placeholder="$.data.list">
+              <div class="form-help">从上游响应抽取结果，如 $.data.list（列表）或 $.data（详情）</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">分页映射 (JSON格式，可选)</label>
+              <textarea class="form-textarea" id="toolFormPagination" placeholder='{"totalPath": "$.data.total", "pageParam": "page", "pageSizeParam": "page_size"}' rows="2"></textarea>
+              <div class="form-help">列表型 Tool 的分页配置：totalPath / pageParam / pageSizeParam</div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeToolForm()">取消</button>
+        <button class="btn btn-primary" onclick="saveTool()">
+          <i class="fa-solid fa-check"></i> 保存
+        </button>
+      </div>
+    </div>
+  </div>
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/mcp.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'mcp.html' }, '*');
+    }
+  </script>
+</body>
+</html>

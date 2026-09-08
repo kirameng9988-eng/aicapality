@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API 详情 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/open.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-back">
+        <a href="open.html" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-arrow-left"></i> 返回
+        </a>
+      </div>
+    </div>
+
+    <!-- Detail Content -->
+    <div class="detail-content" id="detailContent">
+      <!-- Loading -->
+      <div class="loading-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>加载中...</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script>
+    (async function() {
+      'use strict';
+
+      // Get API ID from URL
+      const params = new URLSearchParams(window.location.search);
+      const apiId = params.get('id');
+
+      if (!apiId) {
+        document.getElementById('detailContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon"><i class="fa-solid fa-exclamation-triangle"></i></div>
+            <div class="empty-state-title">缺少接口ID参数</div>
+            <div class="empty-state-desc">请从 API 列表页面进入</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Get mock data
+      const data = MockData.open;
+      const api = data.api?.apis?.find(a => a.id === apiId);
+
+      if (!api) {
+        document.getElementById('detailContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon"><i class="fa-solid fa-search"></i></div>
+            <div class="empty-state-title">未找到接口</div>
+            <div class="empty-state-desc">接口 ID: ${apiId}</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Update page title
+      const _titleEl = document.getElementById('pageTitle');
+      const _subtitleEl = document.getElementById('pageSubtitle');
+      if (_titleEl) _titleEl.textContent = api.name;
+      if (_subtitleEl) _subtitleEl.textContent = api.description;
+
+      // Generate mock params and examples based on API data
+      const hasParams = api.method === 'POST';
+      const paramsList = hasParams ? [
+        { name: 'text', type: 'string', required: true, desc: '输入文本', example: '测试数据' },
+        { name: 'options', type: 'object', required: false, desc: '可选参数', example: '{}' }
+      ] : [];
+
+      const responseExample = JSON.stringify({
+        success: true,
+        data: {
+          result: '处理完成',
+          confidence: 0.95
+        },
+        requestId: 'req-' + Date.now(),
+        latency: 45
+      }, null, 2);
+
+      const curlExample = `curl -X ${api.method} '${api.url}' \\
+  -H 'Content-Type: application/json' \\
+  -H 'Authorization: Bearer YOUR_TOKEN' \\
+  -d '{"text": "测试数据"}'`;
+
+      const pythonExample = `import requests
+
+url = "${api.url}"
+headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer YOUR_TOKEN"
+}
+data = {
+    "text": "测试数据"
+}
+
+response = requests.${api.method.toLowerCase()}(url, headers=headers, json=data)
+print(response.json())`;
+
+      const javaExample = `import java.net.http.*;
+import java.nio.file.*;
+
+HttpClient client = HttpClient.newHttpClient();
+String requestBody = "{\\"text\\": \\"测试数据\\"}";
+
+HttpRequest request = HttpRequest.newBuilder()
+    .uri(URI.create("${api.url}"))
+    .header("Content-Type", "application/json")
+    .header("Authorization", "Bearer YOUR_TOKEN")
+    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+    .build();
+
+HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());`;
+
+      // Render detail content
+      const content = `
+        <!-- Basic Info Card -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <i class="fa-solid fa-info-circle"></i>
+            <span>基本信息</span>
+          </div>
+          <div class="detail-card-body">
+            <div class="detail-info-grid">
+              <div class="detail-info-item">
+                <div class="detail-info-label">接口名称</div>
+                <div class="detail-info-value">${api.name}</div>
+              </div>
+              <div class="detail-info-item">
+                <div class="detail-info-label">接口状态</div>
+                <div class="detail-info-value">
+                  <span class="status-tag ${api.status}">${statusLabel(api.status)}</span>
+                </div>
+              </div>
+              <div class="detail-info-item full-width">
+                <div class="detail-info-label">接口描述</div>
+                <div class="detail-info-value">${api.description || '-'}</div>
+              </div>
+              <div class="detail-info-item full-width">
+                <div class="detail-info-label">接口地址</div>
+                <div class="detail-info-value">
+                  <div class="detail-endpoint">
+                    <code>${api.url}</code>
+                    <button class="detail-copy-btn" onclick="copyText('${api.url}')">
+                      <i class="fa-solid fa-copy"></i> 复制
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-info-item">
+                <div class="detail-info-label">请求方式</div>
+                <div class="detail-info-value"><span class="method-tag ${api.method.toLowerCase()}">${api.method}</span></div>
+              </div>
+              <div class="detail-info-item">
+                <div class="detail-info-label">认证方式</div>
+                <div class="detail-info-value">${api.auth || '-'}</div>
+              </div>
+              <div class="detail-info-item">
+                <div class="detail-info-label">版本</div>
+                <div class="detail-info-value">${api.version || '-'}</div>
+              </div>
+              <div class="detail-info-item">
+                <div class="detail-info-label">分类</div>
+                <div class="detail-info-value">${api.category || '-'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Params Card -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <i class="fa-solid fa-list"></i>
+            <span>请求参数</span>
+          </div>
+          <div class="detail-card-body">
+            <table class="detail-params-table">
+              <thead>
+                <tr>
+                  <th>参数名</th>
+                  <th>类型</th>
+                  <th>必填</th>
+                  <th>说明</th>
+                  <th>示例</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${paramsList.map(p => `
+                  <tr>
+                    <td><span class="detail-param-name">${p.name}</span>${p.required ? '<span class="detail-param-required">*</span>' : ''}</td>
+                    <td><span class="detail-param-type">${p.type}</span></td>
+                    <td>${p.required ? '是' : '否'}</td>
+                    <td>${p.desc}</td>
+                    <td><span class="detail-param-example">${p.example}</span></td>
+                  </tr>
+                `).join('')}
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--color-text-muted);">无请求参数</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Response Example Card -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <i class="fa-solid fa-file-code"></i>
+            <span>返回示例</span>
+          </div>
+          <div class="detail-card-body">
+            <div class="detail-code-block">
+              <div class="detail-code-header">
+                <span class="detail-code-lang">JSON</span>
+                <button class="detail-code-copy" onclick="copyText(\`${responseExample.replace(/`/g, '\\`')}\`)">
+                  <i class="fa-solid fa-copy"></i> 复制
+                </button>
+              </div>
+              <pre class="detail-code-content">${responseExample}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Examples Card -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <i class="fa-solid fa-code"></i>
+            <span>调用示例</span>
+          </div>
+          <div class="detail-card-body">
+            <div class="code-examples">
+              <div class="code-example-item">
+                <div class="code-example-header">
+                  <span class="code-lang">Curl</span>
+                  <button class="detail-code-copy" onclick="copyText(\`${curlExample.replace(/`/g, '\\`')}\`)">
+                    <i class="fa-solid fa-copy"></i> 复制
+                  </button>
+                </div>
+                <pre class="detail-code-content">${curlExample}</pre>
+              </div>
+              <div class="code-example-item">
+                <div class="code-example-header">
+                  <span class="code-lang">Python</span>
+                  <button class="detail-code-copy" onclick="copyText(\`${pythonExample.replace(/`/g, '\\`')}\`)">
+                    <i class="fa-solid fa-copy"></i> 复制
+                  </button>
+                </div>
+                <pre class="detail-code-content">${pythonExample}</pre>
+              </div>
+              <div class="code-example-item">
+                <div class="code-example-header">
+                  <span class="code-lang">Java</span>
+                  <button class="detail-code-copy" onclick="copyText(\`${javaExample.replace(/`/g, '\\`')}\`)">
+                    <i class="fa-solid fa-copy"></i> 复制
+                  </button>
+                </div>
+                <pre class="detail-code-content">${javaExample}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="detail-actions">
+          <a href="debug.html?type=api&id=${api.id}" class="btn btn-primary" target="_blank">
+            <i class="fa-solid fa-bug"></i> 在线调试
+          </a>
+          <button class="btn btn-secondary" onclick="copyText('${api.url}')">
+            <i class="fa-solid fa-copy"></i> 复制 URL
+          </button>
+        </div>
+      `;
+
+      document.getElementById('detailContent').innerHTML = content;
+
+      // Helper functions
+      function statusLabel(status) {
+        const labels = {
+          online: '在线',
+          testing: '测试中',
+          offline: '停用',
+          reviewing: '审核中',
+          published: '已发布',
+          healthy: '健康',
+          degraded: '降级'
+        };
+        return labels[status] || status;
+      }
+
+      function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          Toast.show('已复制到剪贴板', 'success');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

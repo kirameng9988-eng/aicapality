@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>知识库管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/knowledge.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <!-- 页面内容 -->
+  <div class="app-content" id="app-content" style="height: 100vh; display: flex; flex-direction: column; padding: 0;">
+
+    <!-- Main Layout: Library + Document Manager -->
+    <section class="kb-section-gap" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+      <div class="knowledge-main-layout">
+
+        <!-- ② Knowledge Library (Left Panel) -->
+        <div class="knowledge-library">
+          <div class="library-header">
+            <div class="library-title">
+              <i class="fa-solid fa-folder-open"></i>
+              <span>知识库列表</span>
+              <span id="knowledge-library-count" class="library-count">5 个知识库</span>
+            </div>
+            <div class="library-header-actions">
+              <!-- 知识生命周期：悬浮查看 -->
+              <div class="lifecycle-trigger" id="lifecycle-trigger" tabindex="0">
+                <i class="fa-solid fa-circle-info lifecycle-trigger-icon"></i>
+                <div class="lifecycle-popup" id="lifecycle-popup">
+                  <!-- Rendered by JS -->
+                </div>
+              </div>
+              <!-- 新建知识库 -->
+              <button class="library-add-btn" title="新增知识库" onclick="createKnowledgeBase()">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="library-filters">
+            <div class="library-filter-input">
+              <i class="fa-solid fa-search"></i>
+              <input type="text" id="kb-search-input" placeholder="搜索知识库..." oninput="handleKbSearch()">
+            </div>
+          </div>
+          <div id="knowledge-library-list" class="library-list">
+            <!-- Rendered by JS -->
+          </div>
+          <div id="kb-pagination" class="library-pagination">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- ③ Document Manager (Right Panel) -->
+        <div class="document-manager">
+          <!-- 页签：文档管理 / 知识测试控制台 -->
+          <div class="manager-tabs">
+            <div class="manager-tabs-left">
+              <button class="manager-tab active" id="tab-documents" onclick="switchTab('documents')">
+                <i class="fa-solid fa-file-alt"></i>
+                <span>文档管理</span>
+                <span id="current-kb-label" class="manager-tab-sub">选择知识库</span>
+              </button>
+              <button class="manager-tab" id="tab-test" onclick="switchTab('test')">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <span>知识测试控制台</span>
+              </button>
+            </div>
+            <div class="manager-tabs-right">
+              <button class="btn btn-secondary btn-sm" onclick="importDocument()">
+                <i class="fa-solid fa-upload"></i> 导入文档
+              </button>
+            </div>
+          </div>
+
+          <!-- Pane: 文档管理 -->
+          <div class="manager-tab-pane active" id="pane-documents">
+
+            <!-- 文档列表视图 -->
+            <div id="doc-table-view">
+              <div class="manager-toolbar">
+                <div class="manager-search">
+                  <i class="fa-solid fa-search"></i>
+                  <input type="text" id="doc-search-input" placeholder="搜索文档名称..." oninput="handleDocFilterChange()">
+                </div>
+                <select class="manager-filter-select" id="doc-status-filter" onchange="handleDocFilterChange()">
+                  <option value="">全部状态</option>
+                  <option value="completed">已完成</option>
+                  <option value="processing">处理中</option>
+                  <option value="failed">失败</option>
+                  <option value="pending">等待中</option>
+                </select>
+                <select class="manager-filter-select" id="doc-format-filter" onchange="handleDocFilterChange()">
+                  <option value="">全部格式</option>
+                  <option value="PDF">PDF</option>
+                  <option value="DOCX">DOCX</option>
+                  <option value="XLSX">XLSX</option>
+                  <option value="MD">MD</option>
+                  <option value="HTML">HTML</option>
+                  <option value="JSON">JSON</option>
+                </select>
+                <button class="btn btn-ghost btn-sm" onclick="resetDocFilters()">
+                  <i class="fa-solid fa-rotate-left"></i> 重置
+                </button>
+              </div>
+              <div class="document-table-container">
+                <table class="document-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 40px;">
+                        <input type="checkbox" id="doc-select-all" onchange="toggleAllDocSelect()">
+                      </th>
+                      <th>文档名称</th>
+                      <th>格式</th>
+                      <th>大小</th>
+                      <th>解析状态</th>
+                      <th>Embedding</th>
+                      <th>更新时间</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="document-table-body">
+                    <!-- Rendered by JS -->
+                  </tbody>
+                </table>
+              </div>
+              <div id="batch-doc-actions" class="batch-actions" style="display: none;">
+                <span class="batch-info">已选择 <span id="batch-doc-count">0</span> 个文档</span>
+                <div class="batch-buttons">
+                  <button class="btn btn-ghost btn-sm" onclick="batchReparseDocs()">
+                    <i class="fa-solid fa-rotate-right"></i> 重新解析
+                  </button>
+                  <button class="btn btn-ghost btn-sm" onclick="batchDeleteDocs()">
+                    <i class="fa-solid fa-trash"></i> 删除
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 语义块预览视图（页面形式，可返回） -->
+            <div id="chunk-preview-view" class="chunk-preview-view" style="display: none;">
+              <div class="chunk-preview-header">
+                <button class="btn btn-ghost btn-sm" onclick="backToDocList()">
+                  <i class="fa-solid fa-arrow-left"></i> 返回文档列表
+                </button>
+                <div class="chunk-preview-title" id="chunk-preview-title">
+                  <i class="fa-solid fa-layer-group"></i>
+                  <span>语义块预览</span>
+                </div>
+              </div>
+              <div class="chunk-preview-body">
+                <div id="chunk-preview-list" class="chunk-preview-list">
+                  <!-- Rendered by JS -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Pane: 知识测试控制台 -->
+          <div class="manager-tab-pane" id="pane-test">
+            <div class="rag-test-console">
+              <div class="rag-header">
+                <div class="rag-title">
+                  <i class="fa-solid fa-satellite-dish"></i>
+                  <span>知识测试控制台</span>
+                </div>
+                <span id="rag-kb-label" class="rag-kb-label">针对当前知识库检索测试</span>
+              </div>
+              <div class="rag-content">
+                <div class="rag-input-section">
+                  <div class="rag-input-group">
+                    <label class="rag-input-label">输入问题</label>
+                    <textarea id="rag-question" class="rag-textarea" placeholder="输入您想检索的问题...">公共数据开放平台有哪些安全管理要求？</textarea>
+                  </div>
+                  <div class="rag-controls">
+                    <div class="rag-control-item">
+                      <label>TopK:</label>
+                      <select id="rag-topk" class="rag-select">
+                        <option value="1">1</option>
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                      </select>
+                    </div>
+                    <div class="rag-control-item">
+                      <label>Score阈值:</label>
+                      <input type="number" id="rag-threshold" class="rag-input-item" value="0.7" step="0.1" min="0" max="1">
+                    </div>
+                    <button class="btn btn-primary" onclick="performRAGSearch()">
+                      <i class="fa-solid fa-search"></i> 检索
+                    </button>
+                  </div>
+                </div>
+                <div class="rag-results-section">
+                  <div id="rag-results" class="rag-results">
+                    <!-- RAG results rendered by JS -->
+                  </div>
+                  <div class="rag-answer-section">
+                    <div class="rag-answer-title">
+                      <i class="fa-solid fa-robot"></i> AI回答
+                    </div>
+                    <div id="rag-answer-content" class="rag-answer-content">
+                      <!-- RAG answer rendered by JS -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Drawer for Chunk Detail (右侧抽屉) -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-title" id="drawer-title">语义块详情</div>
+      <button class="drawer-close" id="drawer-close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawer-body">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/knowledge.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'knowledge.html' }, '*');
+    }
+  </script>
+</body>
+</html>

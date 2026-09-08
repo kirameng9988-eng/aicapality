@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Content Card -->
+    <div class="content-card">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-bar-left">
+          <div class="admin-search">
+            <i class="fa-solid fa-search admin-search-icon"></i>
+            <input type="text" id="search-name" placeholder="搜索用户名称...">
+          </div>
+          <div class="admin-select">
+            <select id="search-status">
+              <option value="">全部状态</option>
+              <option value="active">启用</option>
+              <option value="inactive">禁用</option>
+            </select>
+          </div>
+          <div class="admin-select">
+            <select id="search-department">
+              <option value="">全部部门</option>
+              <option value="技术研发部">技术研发部</option>
+              <option value="数据运营部">数据运营部</option>
+              <option value="算法研发部">算法研发部</option>
+              <option value="数据安全部">数据安全部</option>
+              <option value="产品部">产品部</option>
+            </select>
+          </div>
+          <button class="admin-btn admin-btn-secondary" id="btn-search">
+            <i class="fa-solid fa-magnifying-glass"></i> 查询
+          </button>
+          <button class="admin-btn admin-btn-ghost" id="btn-reset">
+            <i class="fa-solid fa-rotate-left"></i> 重置
+          </button>
+        </div>
+        <div class="search-bar-right">
+          <button class="admin-btn admin-btn-primary" id="btn-add">
+            <i class="fa-solid fa-plus"></i> 新增用户
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>用户信息</th>
+              <th>所属部门</th>
+              <th>角色</th>
+              <th>状态</th>
+              <th>最近登录</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="user-table-body">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="admin-pagination">
+        <div class="admin-pagination-info" id="pagination-info">共 0 条记录</div>
+        <div class="admin-pagination-controls" id="pagination-controls">
+          <button class="admin-pagination-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="admin-pagination-btn active">1</button>
+          <button class="admin-pagination-btn" disabled><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Modal -->
+  <div class="admin-modal-overlay" id="user-modal">
+    <div class="admin-modal">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title" id="modal-title">新增用户</h3>
+        <button class="admin-modal-close" id="modal-close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="admin-modal-body">
+        <div class="admin-form-group">
+          <label class="admin-form-label">用户姓名 <span class="required">*</span></label>
+          <input type="text" class="admin-form-input" id="modal-name" placeholder="请输入用户姓名">
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">账号 <span class="required">*</span></label>
+          <input type="text" class="admin-form-input" id="modal-account" placeholder="请输入账号">
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">所属部门</label>
+          <select class="admin-form-select" id="modal-department">
+            <option value="">请选择部门</option>
+            <option value="技术研发部">技术研发部</option>
+            <option value="数据运营部">数据运营部</option>
+            <option value="算法研发部">算法研发部</option>
+            <option value="数据安全部">数据安全部</option>
+            <option value="产品部">产品部</option>
+          </select>
+        </div>
+        <div class="admin-form-group">
+          <label class="admin-form-label">角色</label>
+          <select class="admin-form-select" id="modal-role">
+            <option value="">请选择角色</option>
+            <option value="平台管理员">平台管理员</option>
+            <option value="AI运营管理员">AI运营管理员</option>
+            <option value="AI开发人员">AI开发人员</option>
+            <option value="业务管理员">业务管理员</option>
+            <option value="普通用户">普通用户</option>
+          </select>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button class="admin-btn admin-btn-secondary" id="modal-cancel">取消</button>
+        <button class="admin-btn admin-btn-primary" id="modal-save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script>
+    // Mock Data
+    const MOCK_USERS = [
+      { id: 'user-001', name: '张伟', account: 'zhangwei@aiplatform.com', department: '技术研发部', role: '平台管理员', status: 'active', lastLogin: '2026-06-28 10:25', createTime: '2026-01-01 00:00:00' },
+      { id: 'user-002', name: '李娜', account: 'lina@aiplatform.com', department: '数据运营部', role: 'AI运营管理员', status: 'active', lastLogin: '2026-06-28 09:48', createTime: '2026-01-05 00:00:00' },
+      { id: 'user-003', name: '王强', account: 'wangqiang@aiplatform.com', department: '算法研发部', role: 'AI开发人员', status: 'active', lastLogin: '2026-06-28 08:30', createTime: '2026-01-10 00:00:00' },
+      { id: 'user-004', name: '刘伟', account: 'liuwei@aiplatform.com', department: '技术研发部', role: 'AI开发人员', status: 'active', lastLogin: '2026-06-27 17:20', createTime: '2026-01-15 00:00:00' },
+      { id: 'user-005', name: '赵雪', account: 'zhaoxue@aiplatform.com', department: '数据安全部', role: '业务管理员', status: 'active', lastLogin: '2026-06-27 16:45', createTime: '2026-02-01 00:00:00' },
+      { id: 'user-006', name: '陈晓燕', account: 'chenxiaoyan@aiplatform.com', department: '数据运营部', role: '普通用户', status: 'active', lastLogin: '2026-06-27 15:10', createTime: '2026-02-10 00:00:00' },
+      { id: 'user-007', name: '孙洁', account: 'sunjie@aiplatform.com', department: '产品部', role: '普通用户', status: 'inactive', lastLogin: '2026-06-20 11:30', createTime: '2026-02-15 00:00:00' },
+      { id: 'user-008', name: '周林', account: 'zhoulin@aiplatform.com', department: '技术研发部', role: 'AI开发人员', status: 'active', lastLogin: '2026-06-28 07:50', createTime: '2026-03-01 00:00:00' }
+    ];
+
+    let users = [...MOCK_USERS];
+    let currentEditId = null;
+    const pageSize = 10;
+    let currentPage = 1;
+
+    // Render table
+    function renderTable() {
+      const container = document.getElementById('user-table-body');
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = users.slice(start, end);
+
+      container.innerHTML = pageData.map(user => `
+        <tr>
+          <td>
+            <div class="admin-user-cell">
+              <div class="admin-user-avatar-placeholder">${user.name.charAt(0)}</div>
+              <div>
+                <div class="admin-user-name">${user.name}</div>
+                <div class="admin-user-account">${user.account}</div>
+              </div>
+            </div>
+          </td>
+          <td>${user.department}</td>
+          <td><span class="tag tag-primary">${user.role}</span></td>
+          <td>
+            <span class="admin-status ${user.status === 'active' ? 'admin-status-active' : 'admin-status-inactive'}">
+              <span class="admin-status-dot"></span>
+              ${user.status === 'active' ? '启用' : '禁用'}
+            </span>
+          </td>
+          <td>${user.lastLogin}</td>
+          <td>${user.createTime}</td>
+          <td>
+            <div class="admin-actions">
+              <button class="admin-action-btn" onclick="handleEdit('${user.id}')" title="编辑"><i class="fa-solid fa-pen"></i></button>
+              <button class="admin-action-btn" onclick="handleResetPassword('${user.id}')" title="重置密码"><i class="fa-solid fa-key"></i></button>
+              <button class="admin-action-btn ${user.status === 'active' ? 'admin-action-btn-danger' : ''}" onclick="handleToggleStatus('${user.id}')" title="${user.status === 'active' ? '禁用' : '启用'}">
+                <i class="fa-solid ${user.status === 'active' ? 'fa-ban' : 'fa-check'}"></i>
+              </button>
+              <button class="admin-action-btn admin-action-btn-danger" onclick="handleDelete('${user.id}')" title="删除"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // Update pagination
+      const total = users.length;
+      const totalPages = Math.ceil(total / pageSize);
+      document.getElementById('pagination-info').textContent = `共 ${total} 条记录`;
+
+      const controls = document.getElementById('pagination-controls');
+      let paginationHTML = '';
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `<button class="admin-pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+      }
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+      controls.innerHTML = paginationHTML;
+    }
+
+    function goToPage(page) {
+      const totalPages = Math.ceil(users.length / pageSize);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      renderTable();
+    }
+
+    // Search and filter
+    function handleSearch() {
+      const name = document.getElementById('search-name').value.toLowerCase();
+      const status = document.getElementById('search-status').value;
+      const department = document.getElementById('search-department').value;
+
+      users = MOCK_USERS.filter(user => {
+        const matchName = !name || user.name.toLowerCase().includes(name) || user.account.toLowerCase().includes(name);
+        const matchStatus = !status || user.status === status;
+        const matchDept = !department || user.department === department;
+        return matchName && matchStatus && matchDept;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function handleReset() {
+      document.getElementById('search-name').value = '';
+      document.getElementById('search-status').value = '';
+      document.getElementById('search-department').value = '';
+      users = [...MOCK_USERS];
+      currentPage = 1;
+      renderTable();
+    }
+
+    // CRUD operations
+    function handleAdd() {
+      currentEditId = null;
+      document.getElementById('modal-title').textContent = '新增用户';
+      document.getElementById('modal-name').value = '';
+      document.getElementById('modal-account').value = '';
+      document.getElementById('modal-department').value = '';
+      document.getElementById('modal-role').value = '';
+      document.getElementById('user-modal').classList.add('active');
+    }
+
+    function handleEdit(id) {
+      const user = users.find(u => u.id === id);
+      if (!user) return;
+      currentEditId = id;
+      document.getElementById('modal-title').textContent = '编辑用户';
+      document.getElementById('modal-name').value = user.name;
+      document.getElementById('modal-account').value = user.account;
+      document.getElementById('modal-department').value = user.department;
+      document.getElementById('modal-role').value = user.role;
+      document.getElementById('user-modal').classList.add('active');
+    }
+
+    function handleSave() {
+      const name = document.getElementById('modal-name').value.trim();
+      const account = document.getElementById('modal-account').value.trim();
+      const department = document.getElementById('modal-department').value;
+      const role = document.getElementById('modal-role').value;
+
+      if (!name || !account) {
+        showToast('请填写必填项', 'error');
+        return;
+      }
+
+      if (currentEditId) {
+        // Update
+        const index = users.findIndex(u => u.id === currentEditId);
+        if (index !== -1) {
+          users[index] = { ...users[index], name, account, department, role };
+          showToast('用户更新成功');
+        }
+      } else {
+        // Create
+        const newUser = {
+          id: 'user-' + Date.now(),
+          name,
+          account,
+          department: department || '技术研发部',
+          role: role || '普通用户',
+          status: 'active',
+          lastLogin: '-',
+          createTime: new Date().toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\//g, '-')
+        };
+        users.unshift(newUser);
+        showToast('用户创建成功');
+      }
+
+      closeModal();
+      renderTable();
+    }
+
+    function handleDelete(id) {
+      if (!confirm('确定要删除该用户吗？')) return;
+      users = users.filter(u => u.id !== id);
+      showToast('用户已删除');
+      renderTable();
+    }
+
+    function handleToggleStatus(id) {
+      const user = users.find(u => u.id === id);
+      if (!user) return;
+      user.status = user.status === 'active' ? 'inactive' : 'active';
+      showToast(`用户已${user.status === 'active' ? '启用' : '禁用'}`);
+      renderTable();
+    }
+
+    function handleResetPassword(id) {
+      const user = users.find(u => u.id === id);
+      if (!user) return;
+      showToast(`密码重置链接已发送到 ${user.account}`);
+    }
+
+    function closeModal() {
+      document.getElementById('user-modal').classList.remove('active');
+    }
+
+    function showToast(message, type) {
+      type = type || 'success';
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'admin-toast admin-toast-' + type;
+      toast.innerHTML = '<i class="fa-solid ' + (type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation') + '"></i><span>' + message + '</span>';
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('active'));
+      setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Event bindings
+    document.getElementById('btn-search').addEventListener('click', handleSearch);
+    document.getElementById('btn-reset').addEventListener('click', handleReset);
+    document.getElementById('btn-add').addEventListener('click', handleAdd);
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-save').addEventListener('click', handleSave);
+    document.getElementById('user-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'user-modal') closeModal();
+    });
+
+    // Menu highlight
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'user.html' }, '*');
+    }
+
+    // Init
+    renderTable();
+  </script>
+</body>
+</html>

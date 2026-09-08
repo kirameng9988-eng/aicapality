@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP服务 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/service.css">
+</head>
+<body class="content-page">
+  <!-- ① Status Legend -->
+  <div class="svc-section-gap">
+    <div class="status-legend-bar" id="statusLegend">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <!-- ② Overview KPIs -->
+  <div class="svc-section-gap">
+    <div class="svc-kpi-grid" id="svcKpiGrid">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <!-- ③ Protocol Tabs -->
+  <div class="svc-section-gap">
+    <div class="protocol-tabs">
+      <button class="protocol-tab active" data-tab="mcp">
+        <i class="fa-solid fa-plug"></i> MCP
+        <span class="protocol-tab-badge" id="mcpTabBadge">10</span>
+      </button>
+      <button class="protocol-tab" data-tab="openapi">
+        <i class="fa-solid fa-code"></i> OpenAPI
+        <span class="protocol-tab-badge" id="openapiTabBadge">8</span>
+      </button>
+      <button class="protocol-tab" data-tab="sdk">
+        <i class="fa-solid fa-box"></i> SDK
+        <span class="protocol-tab-badge" id="sdkTabBadge">5</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MCP Panel -->
+  <div class="tab-panel active" id="panel-mcp">
+    <div class="service-table-container">
+      <table class="service-table">
+        <thead>
+          <tr>
+            <th>服务名称</th>
+            <th>版本</th>
+            <th>协议</th>
+            <th>服务地址</th>
+            <th>状态</th>
+            <th>调用次数</th>
+            <th>创建时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="serviceTableBody">
+          <!-- Filled by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OpenAPI Panel -->
+  <div class="tab-panel" id="panel-openapi">
+    <div class="service-table-container">
+      <table class="api-svc-table">
+        <thead>
+          <tr>
+            <th>接口名称</th>
+            <th>URL</th>
+            <th>Method</th>
+            <th>认证方式</th>
+            <th>版本</th>
+            <th>状态</th>
+            <th>调用次数</th>
+          </tr>
+        </thead>
+        <tbody id="openapiTableBody">
+          <!-- Filled by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SDK Panel -->
+  <div class="tab-panel" id="panel-sdk">
+    <div class="sdk-svc-grid" id="sdkSvcGrid">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <!-- ④ Two Column: Trend + Auth -->
+  <div class="svc-section-gap" style="margin-top: var(--space-5);">
+    <div class="two-col-layout">
+      <!-- 7-day Trend -->
+      <div class="trend-section">
+        <div class="trend-header">
+          <div>
+            <div class="trend-title"><i class="fa-solid fa-chart-line" style="color:var(--color-primary);margin-right:6px;"></i>最近7天调用趋势</div>
+            <div class="trend-subtitle">各服务累计调用次数统计</div>
+          </div>
+        </div>
+        <div class="trend-chart-area">
+          <div class="trend-bars" id="trendBars">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Authorization Info -->
+      <div class="auth-section">
+        <div class="auth-header">
+          <div class="auth-title"><i class="fa-solid fa-shield-halved" style="color:var(--color-primary);margin-right:6px;"></i>授权调用方</div>
+        </div>
+        <table class="auth-table">
+          <thead>
+            <tr>
+              <th>调用方</th>
+              <th>调用次数</th>
+              <th>最近调用</th>
+              <th>授权状态</th>
+            </tr>
+          </thead>
+          <tbody id="authTableBody">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <!-- Drawer -->
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-title" id="drawerTitle">服务详情</div>
+      <button class="drawer-close" onclick="closeDrawer()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <!-- Basic Info -->
+      <div class="drawer-section">
+        <div class="drawer-section-title"><i class="fa-solid fa-info-circle"></i>基本信息</div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">服务ID</span>
+            <span class="detail-value mono" id="drawerServiceId">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">能力名称</span>
+            <span class="detail-value" id="drawerCapability">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">版本</span>
+            <span class="detail-value" id="drawerVersion">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">所属分类</span>
+            <span class="detail-value" id="drawerCategory">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">开放协议</span>
+            <span class="detail-value" id="drawerProtocol">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">认证方式</span>
+            <span class="detail-value" id="drawerAuth">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">发布人</span>
+            <span class="detail-value" id="drawerOwner">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">发布时间</span>
+            <span class="detail-value" id="drawerPublished">—</span>
+          </div>
+          <div class="detail-item full-width">
+            <span class="detail-label">MCP Endpoint</span>
+            <a class="detail-value mono" id="drawerEndpoint" href="#" target="_blank">—</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Capabilities -->
+      <div class="drawer-section">
+        <div class="drawer-section-title"><i class="fa-solid fa-cube"></i>支持工具</div>
+        <div style="margin-bottom: var(--space-2); font-size:var(--font-size-xs); color:var(--color-text-muted);" id="drawerTools">—</div>
+        <div class="bindings-grid" id="drawerToolsList">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Bindings -->
+      <div class="drawer-section">
+        <div class="drawer-section-title"><i class="fa-solid fa-link"></i>绑定关系</div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">绑定Prompt</span>
+            <span class="detail-value" id="drawerPrompt">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">绑定模型</span>
+            <span class="detail-value" id="drawerModel">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">绑定知识库</span>
+            <span class="detail-value" id="drawerKnowledge">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Call Example -->
+      <div class="drawer-section">
+        <div class="drawer-section-title"><i class="fa-solid fa-paper-plane"></i>调用示例</div>
+        <pre class="json-block" id="drawerCallExample">—</pre>
+      </div>
+
+      <!-- Response Example -->
+      <div class="drawer-section">
+        <div class="drawer-section-title"><i class="fa-solid fa-reply"></i>返回示例</div>
+        <pre class="json-block" id="drawerResponseExample">—</pre>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" onclick="closeDrawer()">关闭</button>
+      <button class="btn btn-primary" onclick="closeDrawer(); openPlayground(currentDrawerService?.id)">
+        <i class="fa-solid fa-play"></i> 在线测试
+      </button>
+    </div>
+  </div>
+
+  <!-- Playground Modal -->
+  <div class="modal-overlay" id="playgroundModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="playgroundTitle">MCP Playground</div>
+        <button class="modal-close" onclick="closePlayground()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <div class="playground-panel-title">请求参数</div>
+          <div id="playgroundParams">
+            <!-- Filled by JS -->
+          </div>
+          <div style="margin-top: var(--space-3);">
+            <button class="btn btn-primary" id="playgroundRun">
+              <i class="fa-solid fa-play"></i> 发送请求
+            </button>
+            <button class="btn btn-secondary" onclick="document.querySelectorAll('#playgroundParams input').forEach(i => i.value = '')">
+              <i class="fa-solid fa-eraser"></i> 清空
+            </button>
+          </div>
+        </div>
+        <div>
+          <div class="playground-panel-title">响应结果</div>
+          <div class="playground-output" id="playgroundOutput">
+            <!-- Filled by JS -->
+          </div>
+          <div class="playground-metrics">
+            <div class="playground-metric">
+              <span class="playground-metric-label">耗时</span>
+              <span class="playground-metric-value latency" id="playgroundLatency">45ms</span>
+            </div>
+            <div class="playground-metric">
+              <span class="playground-metric-label">Token</span>
+              <span class="playground-metric-value" id="playgroundTokens">600</span>
+            </div>
+            <div class="playground-metric">
+              <span class="playground-metric-label">状态</span>
+              <span class="playground-metric-value success">Success</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePlayground()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/service.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'service.html' }, '*');
+    }
+  </script>
+</body>
+</html>

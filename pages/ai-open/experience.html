@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在线体验 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/market.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body {
+      background: var(--color-bg);
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Experience Page Layout */
+    .exp-page {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* Compact Page Header (inside iframe, below breadcrumb) */
+    .exp-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+
+    .exp-back-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg);
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+
+    .exp-back-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .exp-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .exp-title-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .exp-title-text {
+      min-width: 0;
+    }
+
+    .exp-title-text h1 {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .exp-title-text p {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 1px;
+    }
+
+    /* Main Content: chat area + info sidebar */
+    .exp-main {
+      display: flex;
+      gap: var(--space-4);
+      flex: 1;
+      min-height: 0;
+      padding: var(--space-4);
+      overflow: hidden;
+    }
+
+    /* Chat Section */
+    .exp-chat-section {
+      flex: 1;
+      min-width: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Process / History area */
+    .exp-process-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-4);
+    }
+
+    .exp-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--color-text-muted);
+      text-align: center;
+      padding: var(--space-8);
+    }
+
+    .exp-empty-state i {
+      font-size: 40px;
+      margin-bottom: var(--space-3);
+      opacity: 0.3;
+    }
+
+    .exp-empty-state h3 {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-1);
+    }
+
+    .exp-empty-state p {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+
+    /* Message bubbles */
+    .exp-message {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .exp-message.user {
+      flex-direction: row-reverse;
+    }
+
+    .exp-message-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .exp-message.user .exp-message-avatar {
+      background: var(--color-primary);
+    }
+
+    .exp-message.ai .exp-message-avatar {
+      background: var(--color-text-muted);
+    }
+
+    .exp-message-bubble-wrap {
+      max-width: 80%;
+    }
+
+    .exp-message.user .exp-message-bubble-wrap {
+      text-align: right;
+    }
+
+    .exp-message-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-1);
+    }
+
+    .exp-message-bubble {
+      display: inline-block;
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-lg);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-relaxed);
+      max-width: 100%;
+      word-break: break-word;
+    }
+
+    .exp-message.user .exp-message-bubble {
+      background: var(--color-primary);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .exp-message.ai .exp-message-bubble {
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      border-bottom-left-radius: 4px;
+    }
+
+    /* Stats bar */
+    .exp-stats-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      padding: var(--space-2) var(--space-4);
+      border-top: 1px solid var(--color-border-light);
+      background: var(--color-bg);
+      flex-shrink: 0;
+    }
+
+    .exp-stat-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    .exp-stat-item strong {
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    /* Input Area */
+    .exp-input-area {
+      padding: var(--space-3) var(--space-4);
+      flex-shrink: 0;
+      border-top: 1px solid var(--color-border-light);
+    }
+
+    .exp-input-wrap {
+      display: flex;
+      gap: var(--space-2);
+      align-items: flex-end;
+    }
+
+    .exp-textarea {
+      flex: 1;
+      min-height: 40px;
+      max-height: 100px;
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      font-size: var(--font-size-sm);
+      font-family: inherit;
+      color: var(--color-text-primary);
+      resize: none;
+      transition: all var(--transition-fast);
+      line-height: var(--line-height-normal);
+    }
+
+    .exp-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-light);
+    }
+
+    .exp-textarea::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    .exp-send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: background var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .exp-send-btn:hover {
+      background: var(--color-primary-hover);
+    }
+
+    .exp-send-btn:disabled {
+      background: var(--color-text-muted);
+      cursor: not-allowed;
+    }
+
+    /* Example prompts */
+    .exp-example-prompts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      margin-top: var(--space-2);
+    }
+
+    .exp-example-btn {
+      padding: 3px 10px;
+      font-size: 11px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .exp-example-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    /* Info Sidebar */
+    .exp-info-sidebar {
+      width: 260px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      overflow-y: auto;
+    }
+
+    .exp-info-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-4);
+    }
+
+    .exp-info-card-title {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .exp-info-card-title i {
+      color: var(--color-primary);
+      font-size: 11px;
+    }
+
+    .exp-info-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+
+    .exp-info-meta-item {
+      padding: var(--space-2);
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+    }
+
+    .exp-info-meta-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      margin-bottom: 1px;
+    }
+
+    .exp-info-meta-value {
+      font-size: 11px;
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
+    .exp-info-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+    }
+
+    .exp-info-tag {
+      padding: 1px 6px;
+      font-size: 10px;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      border-radius: var(--radius-sm);
+    }
+
+    .exp-info-desc {
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .exp-info-param {
+      display: flex;
+      gap: var(--space-2);
+      padding: 3px 0;
+      font-size: 11px;
+      align-items: flex-start;
+    }
+
+    .exp-info-param-name {
+      color: var(--color-primary);
+      font-family: var(--font-family-mono);
+      flex-shrink: 0;
+    }
+
+    .exp-info-param-desc {
+      color: var(--color-text-muted);
+    }
+
+    /* Loading indicator */
+    .exp-loading-msg {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      padding: var(--space-2) 0;
+    }
+
+    .exp-loading-msg i {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .exp-main {
+        flex-direction: column;
+      }
+      .exp-info-sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .exp-info-card {
+        flex: 1;
+        min-width: 200px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .exp-info-sidebar {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="exp-page" id="exp-page">
+
+    <!-- Compact Header -->
+    <div class="exp-header">
+      <button class="exp-back-btn" id="exp-back-btn" title="返回">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <div class="exp-title">
+        <div class="exp-title-icon" id="exp-title-icon">
+          <i class="fa-solid fa-cube" id="exp-title-icon-i"></i>
+        </div>
+        <div class="exp-title-text">
+          <h1 id="exp-title-name">加载中...</h1>
+          <p id="exp-title-meta">AI能力在线体验</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main: chat + sidebar -->
+    <div class="exp-main">
+
+      <!-- Chat Section -->
+      <div class="exp-chat-section">
+        <!-- Process/History area -->
+        <div class="exp-process-area" id="exp-process-area">
+          <div class="exp-empty-state" id="exp-empty-state">
+            <i class="fa-solid fa-comments"></i>
+            <h3>开始对话</h3>
+            <p>输入您的问题，体验AI能力效果</p>
+          </div>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="exp-stats-bar" id="exp-stats-bar" style="display:none">
+          <div class="exp-stat-item">
+            <i class="fa-solid fa-microchip"></i>
+            <span><strong id="exp-stat-tokens">0</strong> Tokens</span>
+          </div>
+          <div class="exp-stat-item">
+            <i class="fa-solid fa-clock"></i>
+            <span><strong id="exp-stat-latency">0.00</strong>s</span>
+          </div>
+          <div class="exp-stat-item">
+            <i class="fa-solid fa-message"></i>
+            <span><strong id="exp-stat-rounds">0</strong> 轮对话</span>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="exp-input-area">
+          <div class="exp-input-wrap">
+            <textarea
+              class="exp-textarea"
+              id="exp-input"
+              placeholder="请输入您的问题..."
+              rows="1"
+              onkeydown="Experience.handleKeyDown(event)"
+              oninput="Experience.autoResize(this)"
+            ></textarea>
+            <button class="exp-send-btn" id="exp-send-btn" onclick="Experience.send()">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+          <div class="exp-example-prompts" id="exp-example-prompts">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Sidebar -->
+      <div class="exp-info-sidebar" id="exp-info-sidebar">
+        <!-- Basic Info Card -->
+        <div class="exp-info-card">
+          <div class="exp-info-card-title">
+            <i class="fa-solid fa-info-circle"></i>基本信息
+          </div>
+          <div class="exp-info-meta" id="exp-info-meta">
+            <!-- Populated by JS -->
+          </div>
+          <div class="exp-info-tags" id="exp-info-tags">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Description Card -->
+        <div class="exp-info-card">
+          <div class="exp-info-card-title">
+            <i class="fa-solid fa-file-lines"></i>能力说明
+          </div>
+          <div class="exp-info-desc" id="exp-info-desc">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Input/Output Card -->
+        <div class="exp-info-card">
+          <div class="exp-info-card-title">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>输入输出
+          </div>
+          <div id="exp-info-params">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script>
+    const Experience = {
+      capability: null,
+      data: null,
+      messages: [],
+      rounds: 0,
+      totalTokens: 0,
+      isLoading: false,
+
+      init() {
+        this.loadData();
+      },
+
+      loadData() {
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (!id) {
+          this.showError('无效的能力ID');
+          return;
+        }
+
+        // Agent 即能力: 只允许体验已上架 Agent
+        const agent = (typeof AgentStore !== 'undefined')
+          ? AgentStore.list().find(a => a.id === id && a.status === 'published')
+          : null;
+        if (!agent) {
+          this.showError('未找到该能力');
+          return;
+        }
+        this.capability = {
+          id: agent.id,
+          name: agent.name,
+          description: agent.description || '',
+          category: agent.category || '通用助手',
+          type: 'Agent',
+          version: String(agent.version || 'v1.0').replace(/^v/, ''),
+          provider: agent.creator || '平台',
+          owner: agent.creator || '平台',
+          rating: agent.rating || 4.5,
+          tags: [],
+          icon: 'fa-robot',
+          color: '#4F46E5',
+          calls: agent.calls || agent.usageCount || 0,
+          detail: {}
+        };
+        this.data = (typeof MockData !== 'undefined' && MockData.market) ? MockData.market : {};
+
+        this.render();
+        this.loadExamples();
+      },
+
+      render() {
+        const cap = this.capability;
+        const detail = cap.detail || {};
+
+        // Header
+        document.getElementById('exp-title-icon').style.background = cap.color;
+        document.getElementById('exp-title-icon-i').className = `fa-solid ${cap.icon}`;
+        document.getElementById('exp-title-name').textContent = cap.name;
+        document.getElementById('exp-title-meta').textContent = `${cap.type || 'Prompt'} · ${cap.category} · v${cap.version}`;
+
+        // Back button: navigate iframe back to market
+        const backBtn = document.getElementById('exp-back-btn');
+        backBtn.addEventListener('click', () => {
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'navigate', url: 'pages/ai-open/market.html' }, '*');
+          } else {
+            window.location.href = 'market.html';
+          }
+        });
+
+        // Basic info card
+        document.getElementById('exp-info-meta').innerHTML = `
+          <div class="exp-info-meta-item">
+            <div class="exp-info-meta-label">版本</div>
+            <div class="exp-info-meta-value">v${cap.version}</div>
+          </div>
+          <div class="exp-info-meta-item">
+            <div class="exp-info-meta-label">类型</div>
+            <div class="exp-info-meta-value">${cap.type || 'Prompt'}</div>
+          </div>
+          <div class="exp-info-meta-item">
+            <div class="exp-info-meta-label">提供者</div>
+            <div class="exp-info-meta-value">${cap.provider || cap.owner}</div>
+          </div>
+          <div class="exp-info-meta-item">
+            <div class="exp-info-meta-label">评分</div>
+            <div class="exp-info-meta-value">${cap.rating} ★</div>
+          </div>
+        `;
+
+        // Tags
+        document.getElementById('exp-info-tags').innerHTML = (cap.tags || []).map(tag =>
+          `<span class="exp-info-tag">${tag}</span>`
+        ).join('');
+
+        // Description
+        document.getElementById('exp-info-desc').textContent = cap.description;
+
+        // Params
+        const inputParams = detail.inputParams || [];
+        const outputParams = detail.outputParams || [];
+        let paramsHTML = '';
+        if (inputParams.length) {
+          paramsHTML += `<div style="margin-bottom:var(--space-3)">
+            <div style="font-size:11px;color:var(--color-text-muted);margin-bottom:var(--space-1);font-weight:600;">输入参数</div>`;
+          inputParams.forEach(p => {
+            paramsHTML += `<div style="font-size:11px;color:var(--color-text-secondary);padding:2px 0;">
+              <span style="color:var(--color-primary);font-family:var(--font-family-mono);">${p.name}</span>
+              <span style="color:var(--color-text-muted);"> — ${p.desc}</span>
+            </div>`;
+          });
+          paramsHTML += `</div>`;
+        }
+        if (outputParams.length) {
+          paramsHTML += `<div>
+            <div style="font-size:11px;color:var(--color-text-muted);margin-bottom:var(--space-1);font-weight:600;">输出参数</div>`;
+          outputParams.forEach(p => {
+            paramsHTML += `<div style="font-size:11px;color:var(--color-text-secondary);padding:2px 0;">
+              <span style="color:var(--color-primary);font-family:var(--font-family-mono);">${p.name}</span>
+              <span style="color:var(--color-text-muted);"> — ${p.desc}</span>
+            </div>`;
+          });
+          paramsHTML += `</div>`;
+        }
+        if (!paramsHTML) {
+          paramsHTML = `<div style="font-size:11px;color:var(--color-text-muted);">无参数信息</div>`;
+        }
+        document.getElementById('exp-info-params').innerHTML = paramsHTML;
+      },
+
+      loadExamples() {
+        const examples = this.data.experience?.examples || [
+          '帮我编目销售数据集',
+          '最近一周销售额最高的产品是什么？',
+          '如何申请数据权限？'
+        ];
+        const container = document.getElementById('exp-example-prompts');
+        container.innerHTML = examples.map(ex => `
+          <button class="exp-example-btn" onclick="Experience.fillExample('${ex.replace(/'/g, "\\'")}')">${ex}</button>
+        `).join('');
+      },
+
+      fillExample(text) {
+        const textarea = document.getElementById('exp-input');
+        textarea.value = text;
+        textarea.focus();
+      },
+
+      handleKeyDown(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          this.send();
+        }
+      },
+
+      autoResize(el) {
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+      },
+
+      send() {
+        const textarea = document.getElementById('exp-input');
+        const input = textarea.value.trim();
+        if (!input || this.isLoading) return;
+
+        this.rounds++;
+        this.messages.push({ role: 'user', content: input });
+        textarea.value = '';
+        textarea.style.height = 'auto';
+
+        this.renderMessages();
+        this.simulateAI(input);
+      },
+
+      renderMessages() {
+        const area = document.getElementById('exp-process-area');
+        const empty = document.getElementById('exp-empty-state');
+        const statsBar = document.getElementById('exp-stats-bar');
+
+        if (this.messages.length > 0 && empty) {
+          empty.style.display = 'none';
+          statsBar.style.display = 'flex';
+        }
+
+        let html = '';
+        this.messages.forEach((msg, i) => {
+          if (msg.role === 'user') {
+            html += `
+              <div class="exp-message user">
+                <div class="exp-message-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="exp-message-bubble-wrap">
+                  <div class="exp-message-label">你</div>
+                  <div class="exp-message-bubble">${this.escapeHTML(msg.content)}</div>
+                </div>
+              </div>`;
+          } else {
+            html += `
+              <div class="exp-message ai">
+                <div class="exp-message-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="exp-message-bubble-wrap">
+                  <div class="exp-message-label">${msg.capName || this.capability?.name}</div>
+                  <div class="exp-message-bubble">${msg.content}</div>
+                </div>
+              </div>`;
+          }
+        });
+
+        // Show loading if AI is thinking
+        if (this.isLoading) {
+          html += `
+            <div class="exp-message ai" id="exp-typing-msg">
+              <div class="exp-message-avatar"><i class="fa-solid fa-robot"></i></div>
+              <div class="exp-message-bubble-wrap">
+                <div class="exp-message-label">${this.capability?.name}</div>
+                <div class="exp-loading-msg">
+                  <i class="fa-solid fa-spinner"></i>
+                  正在处理中，请稍候...
+                </div>
+              </div>
+            </div>`;
+        }
+
+        area.innerHTML = html;
+        area.scrollTop = area.scrollHeight;
+      },
+
+      simulateAI(input) {
+        this.isLoading = true;
+        this.renderMessages();
+
+        const sendBtn = document.getElementById('exp-send-btn');
+        sendBtn.disabled = true;
+
+        setTimeout(() => {
+          this.isLoading = false;
+          sendBtn.disabled = false;
+
+          const tokens = Math.floor(Math.random() * 400 + 150);
+          const latency = (Math.random() * 0.8 + 0.1).toFixed(2);
+          this.totalTokens += tokens;
+
+          // Update stats
+          document.getElementById('exp-stat-tokens').textContent = this.totalTokens;
+          document.getElementById('exp-stat-latency').textContent = latency;
+          document.getElementById('exp-stat-rounds').textContent = this.rounds;
+
+          // Mock AI response based on capability
+          const cap = this.capability;
+          let response = '';
+          if (cap.id === 'cap-001' || cap.id === 'cap-002') {
+            response = this.getMockResponse(input, cap);
+          } else {
+            response = this.getGenericResponse(input, cap);
+          }
+
+          this.messages.push({ role: 'ai', content: response, capName: cap.name });
+          this.renderMessages();
+        }, 1500);
+      },
+
+      getMockResponse(input, cap) {
+        if (cap.id === 'cap-001') {
+          return `✅ 数据集识别：销售数据集
+✅ 自动分类：业务数据 > 销售统计
+✅ 生成标签：["销售", "明细", "地区", "收入"]
+
+📊 目录结构已生成：
+/销售数据集/
+  ├── 2024年/
+  │   ├── Q1/
+  │   ├── Q2/
+  │   ├── Q3/
+  │   └── Q4/
+  └── 汇总/
+
+💡 建议：检测到 ${Math.floor(Math.random() * 100 + 50)} 条重复记录，是否需要清理？`;
+        }
+        return `根据您的输入「${input}」，系统已完成分析处理：
+
+📋 分析结果：
+- 识别关键词：${input.substring(0, 10)}...
+- 匹配分类：${cap.category}
+- 置信度：${(Math.random() * 0.2 + 0.8).toFixed(2)}
+
+🔍 详细信息已生成，请查看右侧面板。`;
+      },
+
+      getGenericResponse(input, cap) {
+        return `已收到您的输入：「${input}」
+
+✅ 处理完成
+
+📊 执行结果：
+- 能力：${cap.name}
+- 类型：${cap.type || 'Prompt'}
+- 处理状态：成功
+
+💡 提示：这是模拟响应，实际使用时请通过正式环境测试。`;
+      },
+
+      escapeHTML(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      },
+
+      showError(msg) {
+        document.getElementById('exp-title-name').textContent = '加载失败';
+        document.getElementById('exp-title-meta').textContent = msg;
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      Experience.init();
+      // Note: breadcrumb and navigation are already set by Market.openExperiencePage()
+      // before the iframe navigates — no need to postMessage back to parent here
+    });
+  </script>
+</body>
+</html>

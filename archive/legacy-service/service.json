@@ -1,0 +1,570 @@
+{
+  "overview": {
+    "publishedServices": 28,
+    "onlineServices": 26,
+    "todayCalls": 1268,
+    "totalCalls": 12860,
+    "avgResponseTime": "186ms",
+    "successRate": "99.6%"
+  },
+  "statusLegend": {
+    "online": {
+      "color": "#10B981",
+      "label": "在线",
+      "bg": "#ECFDF5"
+    },
+    "maintenance": {
+      "color": "#F59E0B",
+      "label": "维护",
+      "bg": "#FFFBEB"
+    },
+    "offline": {
+      "color": "#94A3B8",
+      "label": "离线",
+      "bg": "#F1F5F9"
+    },
+    "error": {
+      "color": "#EF4444",
+      "label": "异常",
+      "bg": "#FEF2F2"
+    }
+  },
+  "serviceList": [
+    {
+      "id": "svc-001",
+      "name": "智能编目服务",
+      "capabilityName": "智能编目",
+      "version": "v2.1.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/smart-catalog",
+      "status": "online",
+      "calls": 2890,
+      "createdAt": "2026-06-15",
+      "authType": "API Key",
+      "owner": "张明",
+      "publishedAt": "2026-06-20 10:00",
+      "category": "数据治理",
+      "tools": 5,
+      "description": "基于大模型自动对数据集进行分类、标签标注和目录编制",
+      "toolsList": [
+        "智能分类",
+        "标签生成",
+        "目录编制",
+        "质量检测",
+        "元数据提取"
+      ],
+      "boundPrompt": "智能编目Prompt v3",
+      "boundModel": "GPT-4o",
+      "boundKnowledge": "政企数据标准库",
+      "callExample": "{\n  \"method\": \"smart_catalog\",\n  \"params\": {\n    \"text\": \"数据集描述内容\",\n    \"category\": \"政务数据\"\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"result\": \"智能分类完成，共处理 128 条数据记录\",\n    \"tags\": [\"政务数据\", \"公共数据\", \"高价值数据集\"],\n    \"catalogLevel\": 2,\n    \"confidence\": 0.94\n  },\n  \"latency\": \"45ms\"\n}"
+    },
+    {
+      "id": "svc-002",
+      "name": "运营助手服务",
+      "capabilityName": "运营助手",
+      "version": "v1.5.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/ops-assistant",
+      "status": "online",
+      "calls": 2156,
+      "createdAt": "2026-06-10",
+      "authType": "Bearer Token",
+      "owner": "王强",
+      "publishedAt": "2026-06-18 09:00",
+      "category": "运营支持",
+      "tools": 4,
+      "description": "辅助数据运营人员进行日常数据质量监控和问题诊断",
+      "toolsList": [
+        "质量检测",
+        "异常诊断",
+        "趋势分析",
+        "报告生成"
+      ],
+      "boundPrompt": "运营诊断Prompt v2",
+      "boundModel": "Qwen-Max",
+      "boundKnowledge": "运营知识库",
+      "callExample": "{\n  \"method\": \"ops_diagnosis\",\n  \"params\": {\n    \"metric\": \"数据完整率\",\n    \"period\": \"7d\"\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"metric\": \"数据完整率\",\n    \"value\": \"98.5%\",\n    \"trend\": \"上升\",\n    \"issues\": []\n  },\n  \"latency\": \"120ms\"\n}"
+    },
+    {
+      "id": "svc-003",
+      "name": "找数寻源服务",
+      "capabilityName": "找数寻源",
+      "version": "v1.8.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/data-search",
+      "status": "online",
+      "calls": 1923,
+      "createdAt": "2026-06-08",
+      "authType": "OAuth2.0",
+      "owner": "李娜",
+      "publishedAt": "2026-06-16 14:00",
+      "category": "数据检索",
+      "tools": 6,
+      "description": "根据自然语言描述快速定位目标数据资产及其来源",
+      "toolsList": [
+        "语义检索",
+        "血缘追踪",
+        "来源定位",
+        "关联分析",
+        "结果排序",
+        "导出"
+      ],
+      "boundPrompt": "找数寻源Prompt v2",
+      "boundModel": "Claude-3.5",
+      "boundKnowledge": "数据资产目录库",
+      "callExample": "{\n  \"method\": \"data_search\",\n  \"params\": {\n    \"query\": \"最近一周销售额最高的产品\",\n    \"top_k\": 5\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"results\": [\n      {\n        \"name\": \"销售明细表\",\n        \"source\": \"数据仓库\",\n        \"confidence\": 0.95\n      }\n    ],\n    \"total\": 12\n  },\n  \"latency\": \"230ms\"\n}"
+    },
+    {
+      "id": "svc-004",
+      "name": "企业核验服务",
+      "capabilityName": "企业核验",
+      "version": "v1.0.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/enterprise-verify",
+      "status": "maintenance",
+      "calls": 856,
+      "createdAt": "2026-06-01",
+      "authType": "API Key",
+      "owner": "赵雪",
+      "publishedAt": "2026-06-12 11:00",
+      "category": "数据安全",
+      "tools": 3,
+      "description": "对企业工商信息进行自动核验和信用评估",
+      "toolsList": [
+        "工商查询",
+        "信用评估",
+        "风险预警"
+      ],
+      "boundPrompt": "企业核验Prompt v1",
+      "boundModel": "ERNIE-4",
+      "boundKnowledge": "企业信息数据库",
+      "callExample": "{\n  \"method\": \"enterprise_verify\",\n  \"params\": {\n    \"name\": \"示例科技有限公司\",\n    \"credit_code\": \"91110000XXXXXXXX\"\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"name\": \"示例科技有限公司\",\n    \"verified\": true,\n    \"credit_level\": \"A级\",\n    \"risk_score\": 15\n  },\n  \"latency\": \"380ms\"\n}"
+    },
+    {
+      "id": "svc-005",
+      "name": "数据画像服务",
+      "capabilityName": "数据画像",
+      "version": "v0.9.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/data-profile",
+      "status": "online",
+      "calls": 1342,
+      "createdAt": "2026-06-18",
+      "authType": "Bearer Token",
+      "owner": "陈晓燕",
+      "publishedAt": "2026-06-22 16:00",
+      "category": "数据治理",
+      "tools": 4,
+      "description": "自动生成数据集的属性统计和特征画像",
+      "toolsList": [
+        "统计分析",
+        "分布可视化",
+        "质量评估",
+        "报告生成"
+      ],
+      "boundPrompt": "数据画像Prompt v1",
+      "boundModel": "GPT-4o",
+      "boundKnowledge": "数据统计库",
+      "callExample": "{\n  \"method\": \"data_profile\",\n  \"params\": {\n    \"dataset_id\": \"ds-001\",\n    \"depth\": \"detailed\"\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"dataset_id\": \"ds-001\",\n    \"record_count\": 1250000,\n    \"null_rate\": \"0.3%\",\n    \"duplicate_rate\": \"1.2%\"\n  },\n  \"latency\": \"95ms\"\n}"
+    },
+    {
+      "id": "svc-006",
+      "name": "知识问答服务",
+      "capabilityName": "知识问答",
+      "version": "v2.2.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/kb-qa",
+      "status": "online",
+      "calls": 3421,
+      "createdAt": "2026-05-20",
+      "authType": "OAuth2.0",
+      "owner": "王强",
+      "publishedAt": "2026-06-05 09:30",
+      "category": "运营支持",
+      "tools": 2,
+      "description": "基于知识库的智能问答系统",
+      "toolsList": [
+        "知识检索",
+        "RAG问答"
+      ],
+      "boundPrompt": "RAG问答Prompt v3",
+      "boundModel": "GPT-4o",
+      "boundKnowledge": "政企数据标准库/运营知识库",
+      "callExample": "{\n  \"method\": \"rag_answer\",\n  \"params\": {\n    \"question\": \"公共数据开放平台有哪些安全管理要求？\",\n    \"top_k\": 3\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"answer\": \"根据检索结果，公共数据开放平台的安全管理要求主要包括：统一身份认证、OAuth2.0/JWT令牌、HTTPS加密传输等。\",\n    \"sources\": [\"GB_T 35678-2017\", \"政务数据共享规范\"]\n  },\n  \"latency\": \"850ms\"\n}"
+    },
+    {
+      "id": "svc-007",
+      "name": "数据脱敏服务",
+      "capabilityName": "数据脱敏",
+      "version": "v1.2.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/data-mask",
+      "status": "online",
+      "calls": 987,
+      "createdAt": "2026-06-05",
+      "authType": "API Key",
+      "owner": "赵雪",
+      "publishedAt": "2026-06-19 14:00",
+      "category": "数据安全",
+      "tools": 5,
+      "description": "对敏感数据进行自动识别和脱敏处理",
+      "toolsList": [
+        "敏感识别",
+        "脱敏规则",
+        "批量脱敏",
+        "脱敏验证",
+        "日志记录"
+      ],
+      "boundPrompt": "数据脱敏Prompt v1",
+      "boundModel": "ERNIE-4",
+      "boundKnowledge": "脱敏规则库",
+      "callExample": "{\n  \"method\": \"data_mask\",\n  \"params\": {\n    \"text\": \"张三身份证号：110101199001011234\",\n    \"rules\": [\"身份证\", \"手机号\"]\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"result\": \"张三身份证号：11010119********34\",\n    \"masked_count\": 1,\n    \"rule_applied\": \"身份证号\"\n  },\n  \"latency\": \"32ms\"\n}"
+    },
+    {
+      "id": "svc-008",
+      "name": "接口测试服务",
+      "capabilityName": "接口测试",
+      "version": "v0.8.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/api-test",
+      "status": "offline",
+      "calls": 0,
+      "createdAt": "2026-06-25",
+      "authType": "Bearer Token",
+      "owner": "刘伟",
+      "publishedAt": "—",
+      "category": "开发支持",
+      "tools": 3,
+      "description": "自动化接口测试用例生成与执行",
+      "toolsList": [
+        "用例生成",
+        "用例执行",
+        "报告输出"
+      ],
+      "boundPrompt": "接口测试Prompt v1",
+      "boundModel": "GPT-4o",
+      "boundKnowledge": "API文档库",
+      "callExample": "{\n  \"method\": \"api_test\",\n  \"params\": {\n    \"api_spec\": \"openapi.json\",\n    \"test_type\": \"integration\"\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"test_cases\": 24,\n    \"passed\": 22,\n    \"failed\": 2,\n    \"coverage\": \"85%\"\n  },\n  \"latency\": \"3200ms\"\n}"
+    },
+    {
+      "id": "svc-009",
+      "name": "开发助手服务",
+      "capabilityName": "开发助手",
+      "version": "v2.0.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/dev-assistant",
+      "status": "online",
+      "calls": 1654,
+      "createdAt": "2026-06-12",
+      "authType": "OAuth2.0",
+      "owner": "刘伟",
+      "publishedAt": "2026-06-22 11:20",
+      "category": "开发支持",
+      "tools": 4,
+      "description": "辅助开发人员完成数据接口文档生成和示例代码编写",
+      "toolsList": [
+        "文档生成",
+        "代码生成",
+        "接口验证",
+        "示例输出"
+      ],
+      "boundPrompt": "开发助手Prompt v4",
+      "boundModel": "GPT-4o",
+      "boundKnowledge": "API文档库",
+      "callExample": "{\n  \"method\": \"generate_doc\",\n  \"params\": {\n    \"api_name\": \"用户查询接口\",\n    \"language\": \"Python\"\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"doc\": \"# 用户查询接口\\n\\n## 请求参数\\n- user_id: string\\n\\n## 返回示例\\n{...}\",\n    \"code\": \"def get_user(user_id):\\n    pass\"\n  },\n  \"latency\": \"420ms\"\n}"
+    },
+    {
+      "id": "svc-010",
+      "name": "指标预测服务",
+      "capabilityName": "指标预测",
+      "version": "v1.0.0",
+      "protocol": "MCP",
+      "endpoint": "https://api.platform.com/mcp/metric-forecast",
+      "status": "online",
+      "calls": 631,
+      "createdAt": "2026-06-08",
+      "authType": "API Key",
+      "owner": "陈晓燕",
+      "publishedAt": "2026-06-20 10:00",
+      "category": "数据治理",
+      "tools": 2,
+      "description": "基于时序模型预测关键业务指标趋势",
+      "toolsList": [
+        "趋势预测",
+        "异常预警"
+      ],
+      "boundPrompt": "指标预测Prompt v1",
+      "boundModel": "Qwen-Max",
+      "boundKnowledge": "时序数据库",
+      "callExample": "{\n  \"method\": \"metric_forecast\",\n  \"params\": {\n    \"metric\": \"日活用户\",\n    \"period\": \"7d\"\n  }\n}",
+      "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"metric\": \"日活用户\",\n    \"forecast\": [12500, 12800, 13100],\n    \"trend\": \"上升\",\n    \"confidence\": 0.89\n  },\n  \"latency\": \"560ms\"\n}"
+    }
+  ],
+  "protocolTabs": {
+    "current": "mcp",
+    "tabs": [
+      {
+        "id": "mcp",
+        "label": "MCP",
+        "count": 10,
+        "active": true
+      },
+      {
+        "id": "openapi",
+        "label": "OpenAPI",
+        "count": 8,
+        "active": false
+      },
+      {
+        "id": "sdk",
+        "label": "SDK",
+        "count": 5,
+        "active": false
+      }
+    ]
+  },
+  "openapiList": [
+    {
+      "id": "oa-001",
+      "name": "智能编目API",
+      "url": "https://api.platform.com/v1/capabilities/smart-catalog",
+      "method": "POST",
+      "auth": "Bearer Token",
+      "version": "v2.1.0",
+      "status": "online",
+      "calls": 2156
+    },
+    {
+      "id": "oa-002",
+      "name": "找数寻源API",
+      "url": "https://api.platform.com/v1/capabilities/data-search",
+      "method": "POST",
+      "auth": "OAuth2.0",
+      "version": "v1.8.0",
+      "status": "online",
+      "calls": 1890
+    },
+    {
+      "id": "oa-003",
+      "name": "运营助手API",
+      "url": "https://api.platform.com/v1/capabilities/ops-assistant",
+      "method": "POST",
+      "auth": "API Key",
+      "version": "v1.5.0",
+      "status": "online",
+      "calls": 1432
+    },
+    {
+      "id": "oa-004",
+      "name": "知识问答API",
+      "url": "https://api.platform.com/v1/capabilities/kb-qa",
+      "method": "POST",
+      "auth": "OAuth2.0",
+      "version": "v2.2.0",
+      "status": "online",
+      "calls": 2876
+    },
+    {
+      "id": "oa-005",
+      "name": "数据脱敏API",
+      "url": "https://api.platform.com/v1/capabilities/data-mask",
+      "method": "POST",
+      "auth": "API Key",
+      "version": "v1.2.0",
+      "status": "online",
+      "calls": 756
+    },
+    {
+      "id": "oa-006",
+      "name": "开发助手API",
+      "url": "https://api.platform.com/v1/capabilities/dev-assistant",
+      "method": "POST",
+      "auth": "OAuth2.0",
+      "version": "v2.0.0",
+      "status": "online",
+      "calls": 1234
+    },
+    {
+      "id": "oa-007",
+      "name": "企业核验API",
+      "url": "https://api.platform.com/v1/capabilities/enterprise-verify",
+      "method": "GET",
+      "auth": "API Key",
+      "version": "v1.0.0",
+      "status": "maintenance",
+      "calls": 432
+    },
+    {
+      "id": "oa-008",
+      "name": "指标预测API",
+      "url": "https://api.platform.com/v1/capabilities/metric-forecast",
+      "method": "POST",
+      "auth": "Bearer Token",
+      "version": "v1.0.0",
+      "status": "online",
+      "calls": 398
+    }
+  ],
+  "sdkList": [
+    {
+      "language": "Python",
+      "version": "v2.1.0",
+      "downloads": 3421,
+      "docUrl": "#",
+      "exampleCode": "from ai_platform import AIClient\n\nclient = AIClient(api_key='your-key')\nresult = client.invoke('智能编目', text='数据集描述')"
+    },
+    {
+      "language": "Java",
+      "version": "v2.1.0",
+      "downloads": 1890,
+      "docUrl": "#",
+      "exampleCode": "AIClient client = new AIClient('your-key');\nCapabilityResult r = client.invoke('智能编目', params);"
+    },
+    {
+      "language": "Go",
+      "version": "v1.8.0",
+      "downloads": 876,
+      "docUrl": "#",
+      "exampleCode": "client := ai.NewClient('your-key')\nresult, _ := client.Invoke('智能编目', params)"
+    },
+    {
+      "language": "Node.js",
+      "version": "v2.0.0",
+      "downloads": 2134,
+      "docUrl": "#",
+      "exampleCode": "const client = new AIClient({ apiKey: 'your-key' })\nconst result = await client.invoke('智能编目', params)"
+    },
+    {
+      "language": "C#",
+      "version": "v1.5.0",
+      "downloads": 654,
+      "docUrl": "#",
+      "exampleCode": "var client = new AIClient('your-key');\nvar result = await client.InvokeAsync('智能编目', params);"
+    }
+  ],
+  "trend": {
+    "days": [
+      "06-22",
+      "06-23",
+      "06-24",
+      "06-25",
+      "06-26",
+      "06-27",
+      "06-28"
+    ],
+    "calls": [
+      980,
+      1120,
+      1056,
+      1234,
+      1189,
+      1342,
+      1268
+    ],
+    "labels": [
+      "周一",
+      "周二",
+      "周三",
+      "周四",
+      "周五",
+      "周六",
+      "周日"
+    ]
+  },
+  "clients": [
+    {
+      "name": "公共数据门户",
+      "calls": 3420,
+      "lastCall": "2026-06-28 10:25",
+      "authStatus": "正常"
+    },
+    {
+      "name": "企业数据控制台",
+      "calls": 2890,
+      "lastCall": "2026-06-28 10:20",
+      "authStatus": "正常"
+    },
+    {
+      "name": "运营监控大屏",
+      "calls": 2156,
+      "lastCall": "2026-06-28 09:45",
+      "authStatus": "正常"
+    },
+    {
+      "name": "数据治理平台",
+      "calls": 1890,
+      "lastCall": "2026-06-28 09:30",
+      "authStatus": "正常"
+    },
+    {
+      "name": "开发测试工具",
+      "calls": 1234,
+      "lastCall": "2026-06-27 17:00",
+      "authStatus": "正常"
+    },
+    {
+      "name": "政务数据交换平台",
+      "calls": 870,
+      "lastCall": "2026-06-27 15:00",
+      "authStatus": "待续期"
+    },
+    {
+      "name": "CRM系统",
+      "calls": 432,
+      "lastCall": "2026-06-25 11:00",
+      "authStatus": "正常"
+    },
+    {
+      "name": "财务核算系统",
+      "calls": 320,
+      "lastCall": "2026-06-24 16:00",
+      "authStatus": "暂停"
+    }
+  ],
+  "playground": {
+    "selectedService": "svc-001",
+    "params": [
+      {
+        "name": "text",
+        "label": "数据集描述",
+        "type": "string",
+        "required": true,
+        "value": "数据集描述内容"
+      },
+      {
+        "name": "category",
+        "label": "分类",
+        "type": "string",
+        "required": false,
+        "value": "政务数据"
+      }
+    ],
+    "mockResponse": {
+      "success": true,
+      "data": {
+        "result": "智能分类完成，共处理 128 条数据记录。",
+        "tags": [
+          "政务数据",
+          "公共数据",
+          "高价值数据集"
+        ],
+        "catalogLevel": 2,
+        "confidence": 0.94
+      },
+      "latency": 45,
+      "tokens": {
+        "input": 320,
+        "output": 280
+      }
+    }
+  }
+}

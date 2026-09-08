@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI能力管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/agent.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <div class="ag-page">
+
+      <!-- 页面头 -->
+      <div class="ag-page-head">
+        <div class="ag-page-head-title">
+          <div>
+            <h1 class="ag-page-title">AI能力管理</h1>
+            <p class="ag-page-sub">管理平台全部AI能力，构建可对外服务的智能体。</p>
+          </div>
+        </div>
+        <div class="ag-page-head-actions">
+          <button class="btn btn-primary" id="ag-create-btn">
+            <i class="fa-solid fa-plus"></i> 创建Agent
+          </button>
+        </div>
+      </div>
+
+      <!-- 产品定位引导：Agent = 岗位定义 + 能力引用 + 发布 -->
+      <div class="ag-flow-line">
+        <span class="ag-flow-item"><i class="fa-solid fa-user-tie"></i>岗位定义</span>
+        <i class="fa-solid fa-angle-right ag-flow-arrow"></i>
+        <span class="ag-flow-item"><i class="fa-solid fa-puzzle-piece"></i>能力引用</span>
+        <i class="fa-solid fa-angle-right ag-flow-arrow"></i>
+        <span class="ag-flow-item"><i class="fa-solid fa-sliders"></i>岗位细化</span>
+        <i class="fa-solid fa-angle-right ag-flow-arrow"></i>
+        <span class="ag-flow-item"><i class="fa-solid fa-flask-vial"></i>测试</span>
+        <i class="fa-solid fa-angle-right ag-flow-arrow"></i>
+        <span class="ag-flow-item"><i class="fa-solid fa-rocket"></i>发布</span>
+        <span class="ag-flow-tip">Agent 是面向特定岗位的智能执行主体：先定义一个岗位，再赋予它能力。</span>
+      </div>
+
+      <!-- 工具栏：搜索 / 分类 / 状态 -->
+      <div class="ag-toolbar">
+        <div class="ag-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="ag-search" placeholder="搜索Agent名称 / 岗位名称 / 岗位描述" autocomplete="off">
+        </div>
+        <select class="ag-filter-select" id="ag-category-filter">
+          <option value="">全部岗位</option>
+          <option value="数据治理">数据治理</option>
+          <option value="数据分析">数据分析</option>
+          <option value="数据运营">数据运营</option>
+          <option value="业务服务">业务服务</option>
+          <option value="通用助手">通用助手</option>
+        </select>
+        <select class="ag-filter-select" id="ag-status-filter">
+          <option value="">全部状态</option>
+          <option value="draft">草稿</option>
+          <option value="enabled">已启用</option>
+          <option value="submitted">待审核</option>
+          <option value="published">已上架</option>
+          <option value="stopped">已停用</option>
+        </select>
+        <div class="ag-count" id="ag-count-info"></div>
+      </div>
+
+      <!-- 卡片网格 -->
+      <div class="ag-grid" id="agent-card-grid">
+        <!-- 由 agent.js 渲染 -->
+      </div>
+
+      <!-- 空状态 -->
+      <div class="ag-empty" id="ag-list-empty" style="display:none;">
+        <div class="ag-empty-icon"><i class="fa-regular fa-folder-open"></i></div>
+        <div class="ag-empty-title"></div>
+        <div class="ag-empty-desc"></div>
+      </div>
+
+    </div><!-- /.ag-page -->
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script>
+    // 若父页面存在则通知已加载（高亮菜单）
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'agent.html' }, '*');
+      window.parent.postMessage({ type: 'contentLoaded', url: 'agent.html' }, '*');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      AgentListPage.init();
+    });
+  </script>
+</body>
+</html>

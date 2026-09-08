@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日志管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Content Card -->
+    <div class="content-card">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <div class="search-bar-left">
+          <div class="admin-select">
+            <select id="search-type">
+              <option value="">全部类型</option>
+              <option value="operation">操作日志</option>
+              <option value="login">登录日志</option>
+              <option value="publish">发布日志</option>
+              <option value="invocation">调用日志</option>
+              <option value="system">系统日志</option>
+            </select>
+          </div>
+          <div class="admin-search">
+            <i class="fa-solid fa-search admin-search-icon"></i>
+            <input type="text" id="search-user" placeholder="搜索操作人...">
+          </div>
+          <div class="date-range">
+            <input type="date" id="search-start" class="date-input">
+            <span class="date-separator">至</span>
+            <input type="date" id="search-end" class="date-input">
+          </div>
+          <button class="admin-btn admin-btn-secondary" id="btn-search">
+            <i class="fa-solid fa-magnifying-glass"></i> 查询
+          </button>
+          <button class="admin-btn admin-btn-ghost" id="btn-reset">
+            <i class="fa-solid fa-rotate-left"></i> 重置
+          </button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="admin-table-wrapper">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>模块</th>
+              <th>操作类型</th>
+              <th>操作人</th>
+              <th>IP地址</th>
+              <th>结果</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="log-table-body">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="admin-pagination">
+        <div class="admin-pagination-info" id="pagination-info">共 0 条记录</div>
+        <div class="admin-pagination-controls" id="pagination-controls">
+          <button class="admin-pagination-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="admin-pagination-btn active">1</button>
+          <button class="admin-pagination-btn" disabled><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Drawer -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+  <div class="drawer drawer-right" id="detail-drawer">
+    <div class="drawer-header">
+      <h3 class="drawer-title">日志详情</h3>
+      <button class="drawer-close" id="drawer-close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body" id="drawer-body">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script>
+    // Mock Data - combined logs
+    const MOCK_LOGS = [
+      { id: 'log-001', time: '2026-06-28 10:25:38', type: 'operation', module: '用户管理', action: '编辑用户', user: '张伟', ip: '192.168.1.100', result: '成功', detail: '修改用户 李娜 的角色为AI运营管理员' },
+      { id: 'log-002', time: '2026-06-28 10:18:22', type: 'operation', module: '系统配置', action: '修改配置', user: '张伟', ip: '192.168.1.100', result: '成功', detail: '修改平台名称为 AI能力开放平台' },
+      { id: 'log-003', time: '2026-06-28 09:45:11', type: 'operation', module: '能力发布', action: '发布能力', user: '李娜', ip: '192.168.1.105', result: '成功', detail: '发布能力 智能编目 v2.1' },
+      { id: 'log-004', time: '2026-06-28 09:30:05', type: 'operation', module: 'MCP管理', action: '添加服务', user: '刘伟', ip: '192.168.1.108', result: '成功', detail: '添加MCP服务 文件系统-MCP' },
+      { id: 'log-005', time: '2026-06-28 09:15:33', type: 'operation', module: '知识库', action: '更新知识库', user: '王强', ip: '192.168.1.103', result: '成功', detail: '更新知识库 政企数据标准库' },
+      { id: 'log-006', time: '2026-06-28 10:25:10', type: 'login', module: '登录', action: '用户登录', user: '张伟', ip: '192.168.1.100', result: '成功', detail: 'Chrome 125.0' },
+      { id: 'log-007', time: '2026-06-28 09:47:30', type: 'login', module: '登录', action: '用户登录', user: '李娜', ip: '192.168.1.105', result: '成功', detail: 'Edge 125.0' },
+      { id: 'log-008', time: '2026-06-27 14:30:15', type: 'login', module: '登录', action: '用户登录', user: '孙洁', ip: '10.0.0.50', result: '失败', detail: '密码错误' },
+      { id: 'log-009', time: '2026-06-28 09:45:11', type: 'publish', module: '发布管理', action: '发布能力', user: '李娜', ip: '192.168.1.105', result: '成功', detail: '智能编目 v2.1.0，耗时 2分30秒' },
+      { id: 'log-010', time: '2026-06-27 14:30:22', type: 'publish', module: '发布管理', action: '发布能力', user: '刘伟', ip: '192.168.1.108', result: '成功', detail: '开发助手 v2.0.0，耗时 3分15秒' },
+      { id: 'log-011', time: '2026-06-28 10:25:30', type: 'invocation', module: '能力调用', action: '调用能力', user: '陈晓燕', ip: '192.168.1.115', result: '成功', detail: '智能编目，Token: 2840，延迟: 185ms' },
+      { id: 'log-012', time: '2026-06-28 10:24:18', type: 'invocation', module: '能力调用', action: '调用能力', user: '刘伟', ip: '192.168.1.108', result: 'success', detail: '找数寻源，Token: 1920，延迟: 320ms' },
+      { id: 'log-013', time: '2026-06-28 10:20:12', type: 'invocation', module: '能力调用', action: '调用能力', user: '李娜', ip: '192.168.1.105', result: 'failed', detail: '数据脱敏，数据格式不支持' },
+      { id: 'log-014', time: '2026-06-28 10:00:00', type: 'system', module: '系统', action: '健康检查', user: '系统', ip: '-', result: '成功', detail: '所有服务运行正常' },
+      { id: 'log-015', time: '2026-06-28 09:00:00', type: 'system', module: '调度', action: '定时任务', user: '系统', ip: '-', result: '成功', detail: '清理过期会话 123 条' },
+      { id: 'log-016', time: '2026-06-28 08:30:15', type: 'system', module: '监控', action: '告警', user: '系统', ip: '-', result: '警告', detail: 'API调用量 8500/分钟，阈值 10000/分钟' },
+      { id: 'log-017', time: '2026-06-27 23:45:00', type: 'system', module: '监控', action: '错误', user: '系统', ip: '-', result: '错误', detail: 'GPT-4o 服务响应超过 60秒，已自动重试' }
+    ];
+
+    let logs = [...MOCK_LOGS];
+    const pageSize = 10;
+    let currentPage = 1;
+
+    const typeMap = {
+      'operation': '操作日志',
+      'login': '登录日志',
+      'publish': '发布日志',
+      'invocation': '调用日志',
+      'system': '系统日志'
+    };
+
+    // Render table
+    function renderTable() {
+      const container = document.getElementById('log-table-body');
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = logs.slice(start, end);
+
+      container.innerHTML = pageData.map(log => `
+        <tr>
+          <td class="log-time">${log.time}</td>
+          <td>${log.module}</td>
+          <td>${log.action}</td>
+          <td>${log.user}</td>
+          <td class="log-ip">${log.ip}</td>
+          <td>
+            <span class="tag ${log.result === '成功' || log.result === 'success' ? 'tag-success' : (log.result === '失败' || log.result === 'failed' ? 'tag-danger' : 'tag-warning')}">
+              ${log.result}
+            </span>
+          </td>
+          <td>
+            <button class="admin-action-btn" onclick="handleDetail('${log.id}')" title="查看详情">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Update pagination
+      const total = logs.length;
+      const totalPages = Math.ceil(total / pageSize);
+      document.getElementById('pagination-info').textContent = `共 ${total} 条记录`;
+
+      const controls = document.getElementById('pagination-controls');
+      let paginationHTML = '';
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        paginationHTML += `<button class="admin-pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+      }
+      paginationHTML += `<button class="admin-pagination-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+      controls.innerHTML = paginationHTML;
+    }
+
+    function goToPage(page) {
+      const totalPages = Math.ceil(logs.length / pageSize);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      renderTable();
+    }
+
+    // Search and filter
+    function handleSearch() {
+      const type = document.getElementById('search-type').value;
+      const user = document.getElementById('search-user').value.toLowerCase();
+      const startDate = document.getElementById('search-start').value;
+      const endDate = document.getElementById('search-end').value;
+
+      logs = MOCK_LOGS.filter(log => {
+        const matchType = !type || log.type === type;
+        const matchUser = !user || log.user.toLowerCase().includes(user);
+        const matchStart = !startDate || log.time >= startDate;
+        const matchEnd = !endDate || log.time <= endDate + ' 23:59:59';
+        return matchType && matchUser && matchStart && matchEnd;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function handleReset() {
+      document.getElementById('search-type').value = '';
+      document.getElementById('search-user').value = '';
+      document.getElementById('search-start').value = '';
+      document.getElementById('search-end').value = '';
+      logs = [...MOCK_LOGS];
+      currentPage = 1;
+      renderTable();
+    }
+
+    // Detail drawer
+    function handleDetail(id) {
+      const log = logs.find(l => l.id === id);
+      if (!log) return;
+
+      const body = document.getElementById('drawer-body');
+      body.innerHTML = `
+        <div class="detail-item">
+          <div class="detail-label">日志ID</div>
+          <div class="detail-value">${log.id}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">时间</div>
+          <div class="detail-value">${log.time}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">日志类型</div>
+          <div class="detail-value">${typeMap[log.type] || log.type}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">模块</div>
+          <div class="detail-value">${log.module}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">操作类型</div>
+          <div class="detail-value">${log.action}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">操作人</div>
+          <div class="detail-value">${log.user}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">IP地址</div>
+          <div class="detail-value">${log.ip}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">结果</div>
+          <div class="detail-value">
+            <span class="tag ${log.result === '成功' || log.result === 'success' ? 'tag-success' : (log.result === '失败' || log.result === 'failed' ? 'tag-danger' : 'tag-warning')}">
+              ${log.result}
+            </span>
+          </div>
+        </div>
+        <div class="detail-item detail-item-full">
+          <div class="detail-label">详细描述</div>
+          <div class="detail-value">${log.detail}</div>
+        </div>
+      `;
+
+      openDrawer();
+    }
+
+    function openDrawer() {
+      document.getElementById('drawer-overlay').classList.add('active');
+      document.getElementById('detail-drawer').classList.add('active');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer-overlay').classList.remove('active');
+      document.getElementById('detail-drawer').classList.remove('active');
+    }
+
+    // Event bindings
+    document.getElementById('btn-search').addEventListener('click', handleSearch);
+    document.getElementById('btn-reset').addEventListener('click', handleReset);
+    document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+    document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
+
+    // Menu highlight
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'logs.html' }, '*');
+    }
+
+    // Init
+    renderTable();
+  </script>
+
+  <style>
+    .search-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .search-bar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+    .search-bar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .date-range {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .date-input {
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--font-size-sm);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      width: 130px;
+    }
+    .date-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    .date-separator {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+    }
+    .log-time {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+    }
+    .log-ip {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+    }
+
+    /* Drawer */
+    .drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: var(--z-modal);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-normal);
+    }
+    .drawer-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 480px;
+      max-width: 100%;
+      background: var(--color-surface);
+      box-shadow: var(--shadow-2xl);
+      z-index: calc(var(--z-modal) + 1);
+      transform: translateX(100%);
+      transition: transform var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-right.active {
+      transform: translateX(0);
+    }
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .drawer-title {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+    .drawer-close {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+    .drawer-close:hover {
+      background: var(--color-bg-alt);
+      color: var(--color-text-primary);
+    }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-6);
+    }
+    .detail-item {
+      display: flex;
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      width: 100px;
+      flex-shrink: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+    .detail-value {
+      flex: 1;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+    }
+    .detail-item-full {
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .detail-item-full .detail-label {
+      width: auto;
+    }
+  </style>
+</body>
+</html>

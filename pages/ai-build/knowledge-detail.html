@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>知识库详情 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/knowledge.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+    }
+
+    .stat-item {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-4);
+      text-align: center;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto var(--space-3);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .stat-icon.blue { background: #EEF2FF; color: #4F46E5; }
+    .stat-icon.cyan { background: #ECFEFF; color: #06B6D4; }
+    .stat-icon.purple { background: #F5F3FF; color: #8B5CF6; }
+    .stat-icon.green { background: #ECFDF5; color: #10B981; }
+
+    .stat-value {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-primary);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: var(--space-1);
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+    }
+
+    .config-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      background: var(--color-bg);
+      border-radius: var(--radius-lg);
+    }
+
+    .config-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .config-icon.primary { background: var(--color-primary-light); color: var(--color-primary); }
+    .config-icon.cyan { background: #ECFEFF; color: #06B6D4; }
+    .config-icon.purple { background: #F5F3FF; color: #8B5CF6; }
+
+    .config-content {
+      flex: 1;
+    }
+
+    .config-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-bottom: 2px;
+    }
+
+    .config-value {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
+    .related-cap-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .related-cap-item {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .related-cap-item:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    .related-cap-item i {
+      color: var(--color-primary);
+      font-size: 12px;
+    }
+
+    .doc-row-select {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <!-- Page Header -->
+    <div class="page-header" style="margin-bottom: var(--space-5);">
+      <div style="display: flex; align-items: center; gap: var(--space-3);">
+        <a href="knowledge.html" class="btn btn-ghost btn-sm" style="padding: var(--space-2);">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div style="display: flex; gap: var(--space-3); margin-left: auto;">
+          <a href="#" id="edit-btn" class="btn btn-secondary">
+            <i class="fa-solid fa-pen"></i>
+            编辑知识库
+          </a>
+          <a href="#" id="upload-btn" class="btn btn-primary">
+            <i class="fa-solid fa-upload"></i>
+            上传文档
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="empty-state" style="padding: 60px;">
+      <div class="empty-state-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      <div class="empty-state-title">加载中...</div>
+      <div class="empty-state-desc">正在获取知识库信息</div>
+    </div>
+
+    <!-- Content -->
+    <div id="content" style="display: none;">
+      <!-- Stats Overview -->
+      <div class="stat-grid" style="margin-bottom: var(--space-5);">
+        <div class="stat-item">
+          <div class="stat-icon blue"><i class="fa-solid fa-file-alt"></i></div>
+          <div class="stat-value" id="stat-docs">-</div>
+          <div class="stat-label">文档数量</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon cyan"><i class="fa-solid fa-layer-group"></i></div>
+          <div class="stat-value" id="stat-chunks">-</div>
+          <div class="stat-label">Chunk数量</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon purple"><i class="fa-solid fa-database"></i></div>
+          <div class="stat-value" id="stat-size">-</div>
+          <div class="stat-label">数据规模</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon green"><i class="fa-solid fa-brain"></i></div>
+          <div class="stat-value" id="stat-embedding">-</div>
+          <div class="stat-label">Embedding完成率</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); margin-bottom: var(--space-5);">
+        <!-- Config Info -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-gear" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+              配置信息
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="config-grid">
+              <div class="config-item">
+                <div class="config-icon primary"><i class="fa-solid fa-building"></i></div>
+                <div class="config-content">
+                  <div class="config-label">所属部门</div>
+                  <div class="config-value" id="cfg-business">-</div>
+                </div>
+              </div>
+              <div class="config-item">
+                <div class="config-icon cyan"><i class="fa-solid fa-tag"></i></div>
+                <div class="config-content">
+                  <div class="config-label">知识库类型</div>
+                  <div class="config-value" id="cfg-type">-</div>
+                </div>
+              </div>
+              <div class="config-item">
+                <div class="config-icon purple"><i class="fa-solid fa-brain"></i></div>
+                <div class="config-content">
+                  <div class="config-label">Embedding模型</div>
+                  <div class="config-value" id="cfg-embedding">-</div>
+                </div>
+              </div>
+              <div class="config-item">
+                <div class="config-icon cyan"><i class="fa-solid fa-user"></i></div>
+                <div class="config-content">
+                  <div class="config-label">负责人</div>
+                  <div class="config-value" id="cfg-owner">-</div>
+                </div>
+              </div>
+              <div class="config-item">
+                <div class="config-icon purple"><i class="fa-solid fa-clock"></i></div>
+                <div class="config-content">
+                  <div class="config-label">最后同步</div>
+                  <div class="config-value" id="cfg-sync">-</div>
+                </div>
+              </div>
+              <div class="config-item">
+                <div class="config-icon primary"><i class="fa-solid fa-check-circle"></i></div>
+                <div class="config-content">
+                  <div class="config-label">状态</div>
+                  <div class="config-value" id="cfg-status">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: var(--space-4);">
+              <div class="config-label" style="margin-bottom: var(--space-2);">知识库描述</div>
+              <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary); padding: var(--space-3); background: var(--color-bg); border-radius: var(--radius-md);" id="cfg-desc">
+                暂无描述
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related Capabilities -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-link" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+              关联的AI能力
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="related-cap-list" id="related-caps">
+              <span style="color: var(--color-text-muted); font-size: var(--font-size-sm);">暂无关联能力</span>
+            </div>
+
+            <div style="margin-top: var(--space-5);">
+              <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-3);">
+                Embedding 分块策略
+              </div>
+              <div style="display: flex; gap: var(--space-4); font-size: var(--font-size-sm);">
+                <div>
+                  <span style="color: var(--color-text-muted);">Chunk大小：</span>
+                  <span style="font-weight: var(--font-weight-medium); color: var(--color-text-primary);" id="cfg-chunk-size">500</span>
+                  <span style="color: var(--color-text-muted);">字符</span>
+                </div>
+                <div>
+                  <span style="color: var(--color-text-muted);">重叠大小：</span>
+                  <span style="font-weight: var(--font-weight-medium); color: var(--color-text-primary);" id="cfg-chunk-overlap">50</span>
+                  <span style="color: var(--color-text-muted);">字符</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Document List -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fa-solid fa-file-alt" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+            文档列表 (<span id="doc-count">0</span>)
+          </div>
+          <div style="display: flex; gap: var(--space-3);">
+            <div class="search-box" style="min-width: 200px;">
+              <i class="fa-solid fa-search search-box-icon"></i>
+              <input type="text" class="search-box-input" id="doc-search" placeholder="搜索文档名称..." oninput="filterDocuments()">
+            </div>
+            <select class="form-select form-select-sm" id="doc-status-filter" onchange="filterDocuments()" style="width: 120px;">
+              <option value="">全部状态</option>
+              <option value="completed">已完成</option>
+              <option value="processing">处理中</option>
+              <option value="failed">失败</option>
+              <option value="pending">等待中</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width: 40px;">
+                  <input type="checkbox" class="form-checkbox" id="select-all" onchange="toggleSelectAll()">
+                </th>
+                <th>文档名称</th>
+                <th>格式</th>
+                <th>大小</th>
+                <th>解析状态</th>
+                <th>Chunk数</th>
+                <th>Embedding</th>
+                <th>更新时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="doc-table-body">
+            </tbody>
+          </table>
+        </div>
+        <div id="batch-actions" class="card-footer" style="display: none; align-items: center; gap: var(--space-3);">
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-muted);">
+            已选择 <span id="selected-count">0</span> 个文档
+          </span>
+          <div style="margin-left: auto; display: flex; gap: var(--space-2);">
+            <button class="btn btn-secondary btn-sm" onclick="batchReparse()">
+              <i class="fa-solid fa-rotate-right"></i>
+              批量重新解析
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="batchDelete()">
+              <i class="fa-solid fa-trash"></i>
+              批量删除
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Not Found State -->
+    <div id="not-found-state" class="empty-state" style="padding: 60px; display: none;">
+      <div class="empty-state-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="empty-state-title">知识库不存在</div>
+      <div class="empty-state-desc">无法找到指定的知识库，请检查链接是否正确</div>
+      <div style="margin-top: var(--space-4);">
+        <a href="knowledge.html" class="btn btn-primary">
+          <i class="fa-solid fa-arrow-left"></i>
+          返回知识库列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script>
+    let currentKb = null;
+    let allDocuments = [];
+    let selectedDocIds = new Set();
+
+    // Get KB ID from URL
+    function getKbId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    // Load KB data
+    async function loadKnowledgeBase() {
+      const kbId = getKbId();
+
+      if (!kbId) {
+        showNotFound();
+        return;
+      }
+
+      const data = await loadMockData('knowledge');
+      if (!data) {
+        showNotFound();
+        return;
+      }
+
+      const kb = data.knowledgeBases.find(k => k.id === kbId);
+      if (!kb) {
+        showNotFound();
+        return;
+      }
+
+      const docs = data.documents.filter(d => d.kbId === kbId);
+
+      currentKb = kb;
+      allDocuments = docs;
+
+      // Update page
+      const _tEl = document.getElementById('page-title');
+      const _sEl = document.getElementById('page-subtitle');
+      if (_tEl) _tEl.textContent = kb.name;
+      if (_sEl) _sEl.textContent = '查看知识库 "' + kb.name + '" 的详细信息';
+
+      // Update action buttons
+      document.getElementById('edit-btn').href = 'knowledge-edit.html?id=' + kbId;
+      document.getElementById('upload-btn').href = 'document-upload.html?kb=' + kbId;
+
+      // Stats
+      document.getElementById('stat-docs').textContent = kb.docCount;
+      document.getElementById('stat-chunks').textContent = formatNumber(kb.chunkCount);
+      document.getElementById('stat-size').textContent = kb.size;
+      document.getElementById('stat-embedding').textContent = kb.embeddingRate + '%';
+
+      // Config
+      document.getElementById('cfg-business').textContent = kb.business;
+      document.getElementById('cfg-type').textContent = kb.type;
+      document.getElementById('cfg-embedding').textContent = kb.embeddingModel;
+      document.getElementById('cfg-owner').textContent = kb.owner || '-';
+      document.getElementById('cfg-sync').textContent = kb.lastSync;
+      document.getElementById('cfg-status').innerHTML = kb.status === 'active'
+        ? '<span style="color: #059669;">● 启用</span>'
+        : '<span style="color: #64748B;">● 禁用</span>';
+      document.getElementById('cfg-desc').textContent = kb.description || '暂无描述';
+
+      // Related capabilities (mock data)
+      const relatedCaps = [
+        { name: '智能编目', type: 'Agent' },
+        { name: '找数寻源', type: 'Agent' },
+        { name: '知识问答', type: 'Knowledge' }
+      ];
+      document.getElementById('related-caps').innerHTML = relatedCaps.map(cap => `
+        <span class="related-cap-item">
+          <i class="fa-solid ${getTypeIcon(cap.type)}"></i>
+          ${cap.name}
+        </span>
+      `).join('');
+
+      // Render document list
+      renderDocumentList(docs);
+
+      // Show content
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+
+    // Get type icon
+    function getTypeIcon(type) {
+      const map = {
+        'Prompt': 'fa-terminal',
+        'Agent': 'fa-robot',
+        'Knowledge': 'fa-book',
+        'Model': 'fa-microchip',
+        'MCP': 'fa-plug'
+      };
+      return map[type] || 'fa-cube';
+    }
+
+    // Format number
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // Render document list
+    function renderDocumentList(docs) {
+      const tbody = document.getElementById('doc-table-body');
+      const countEl = document.getElementById('doc-count');
+
+      countEl.textContent = docs.length;
+
+      if (docs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty-state" style="padding: 40px;">
+              <div class="empty-state-icon"><i class="fa-solid fa-folder-open"></i></div>
+              <div class="empty-state-title">暂无文档</div>
+              <div class="empty-state-desc">该知识库下没有文档，<a href="document-upload.html?kb=${getKbId()}" style="color: var(--color-primary);">立即上传</a></div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = docs.map(doc => `
+        <tr>
+          <td>
+            <input type="checkbox" class="form-checkbox doc-checkbox"
+                   value="${doc.id}"
+                   ${selectedDocIds.has(doc.id) ? 'checked' : ''}
+                   onchange="toggleDocSelect('${doc.id}')">
+          </td>
+          <td>
+            <a href="document-edit.html?id=${doc.id}" style="color: var(--color-text-primary); font-weight: var(--font-weight-medium);">
+              ${doc.name}
+            </a>
+          </td>
+          <td><span class="document-format ${doc.format.toLowerCase()}">${doc.format}</span></td>
+          <td>${doc.size}</td>
+          <td><span class="status-tag ${doc.parseStatus}">${getParseStatusText(doc.parseStatus)}</span></td>
+          <td>${doc.chunkCount}</td>
+          <td><span class="status-tag ${doc.embeddingStatus}">${getEmbeddingStatusText(doc.embeddingStatus)}</span></td>
+          <td>${doc.updatedAt}</td>
+          <td>
+            <div class="table-operations">
+              <a href="document-edit.html?id=${doc.id}" class="btn btn-ghost btn-sm" title="编辑">
+                <i class="fa-solid fa-pen"></i>
+              </a>
+              <button class="btn btn-ghost btn-sm" onclick="reparseDoc('${doc.id}')" title="重新解析">
+                <i class="fa-solid fa-rotate-right"></i>
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="deleteDoc('${doc.id}')" title="删除">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Get parse status text
+    function getParseStatusText(status) {
+      const map = { 'completed': '已完成', 'processing': '处理中', 'failed': '失败', 'pending': '等待中' };
+      return map[status] || status;
+    }
+
+    // Get embedding status text
+    function getEmbeddingStatusText(status) {
+      const map = { 'completed': '已完成', 'processing': '处理中', 'failed': '失败', 'pending': '等待中' };
+      return map[status] || status;
+    }
+
+    // Filter documents
+    function filterDocuments() {
+      const keyword = document.getElementById('doc-search').value.toLowerCase();
+      const status = document.getElementById('doc-status-filter').value;
+
+      let filtered = allDocuments.filter(doc => {
+        if (keyword && !doc.name.toLowerCase().includes(keyword)) return false;
+        if (status && doc.parseStatus !== status) return false;
+        return true;
+      });
+
+      renderDocumentList(filtered);
+    }
+
+    // Toggle select all
+    function toggleSelectAll() {
+      const checked = document.getElementById('select-all').checked;
+      document.querySelectorAll('.doc-checkbox').forEach(cb => {
+        cb.checked = checked;
+        if (checked) {
+          selectedDocIds.add(cb.value);
+        } else {
+          selectedDocIds.clear();
+        }
+      });
+      updateBatchActions();
+    }
+
+    // Toggle doc select
+    function toggleDocSelect(docId) {
+      if (selectedDocIds.has(docId)) {
+        selectedDocIds.delete(docId);
+      } else {
+        selectedDocIds.add(docId);
+      }
+      updateBatchActions();
+    }
+
+    // Update batch actions visibility
+    function updateBatchActions() {
+      const batchActions = document.getElementById('batch-actions');
+      const countEl = document.getElementById('selected-count');
+
+      if (selectedDocIds.size > 0) {
+        batchActions.style.display = 'flex';
+        countEl.textContent = selectedDocIds.size;
+      } else {
+        batchActions.style.display = 'none';
+      }
+    }
+
+    // Reparse document
+    function reparseDoc(docId) {
+      const doc = allDocuments.find(d => d.id === docId);
+      if (!doc) return;
+
+      doc.parseStatus = 'processing';
+      doc.embeddingStatus = 'pending';
+      renderDocumentList(allDocuments.filter(d => d.kbId === currentKb.id));
+      Toast.success('文档重新解析任务已提交');
+    }
+
+    // Delete document
+    function deleteDoc(docId) {
+      const doc = allDocuments.find(d => d.id === docId);
+      if (!doc) return;
+
+      if (confirm('确定要删除文档「' + doc.name + '」吗？')) {
+        allDocuments = allDocuments.filter(d => d.id !== docId);
+        selectedDocIds.delete(docId);
+        if (currentKb) {
+          renderDocumentList(allDocuments);
+          updateBatchActions();
+        }
+        Toast.success('已删除文档：' + doc.name);
+      }
+    }
+
+    // Batch reparse
+    function batchReparse() {
+      if (selectedDocIds.size === 0) return;
+
+      allDocuments.forEach(doc => {
+        if (selectedDocIds.has(doc.id)) {
+          doc.parseStatus = 'processing';
+          doc.embeddingStatus = 'pending';
+        }
+      });
+
+      if (currentKb) {
+        renderDocumentList(allDocuments);
+      }
+
+      Toast.success('已提交 ' + selectedDocIds.size + ' 个文档的重新解析任务');
+      selectedDocIds.clear();
+      updateBatchActions();
+    }
+
+    // Batch delete
+    function batchDelete() {
+      if (selectedDocIds.size === 0) return;
+
+      if (confirm('确定要删除选中的 ' + selectedDocIds.size + ' 个文档吗？此操作不可恢复。')) {
+        const count = selectedDocIds.size;
+        allDocuments = allDocuments.filter(d => !selectedDocIds.has(d.id));
+        selectedDocIds.clear();
+
+        if (currentKb) {
+          renderDocumentList(allDocuments);
+          updateBatchActions();
+        }
+
+        Toast.success('已删除 ' + count + ' 个文档');
+      }
+    }
+
+    // Show not found state
+    function showNotFound() {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('not-found-state').style.display = 'flex';
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadKnowledgeBase);
+
+    // Notify parent
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'knowledge-detail.html' }, '*');
+    }
+  </script>
+</body>
+</html>

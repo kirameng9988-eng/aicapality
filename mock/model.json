@@ -1,0 +1,632 @@
+{
+  "overview": {
+    "totalModels": 23,
+    "onlineModels": 19,
+    "providerCount": 8,
+    "totalCalls": 1284560,
+    "todayTokenConsumption": 45678920,
+    "avgResponseTime": 187
+  },
+  "providers": [
+    {
+      "id": "provider-openai",
+      "name": "OpenAI",
+      "logo": "🧠",
+      "status": "active",
+      "modelsCount": 4,
+      "description": "OpenAI GPT系列模型"
+    },
+    {
+      "id": "provider-alibaba",
+      "name": "阿里百炼",
+      "logo": "🐉",
+      "status": "active",
+      "modelsCount": 5,
+      "description": "阿里云通义千问系列"
+    },
+    {
+      "id": "provider-deepseek",
+      "name": "DeepSeek",
+      "logo": "🔮",
+      "status": "active",
+      "modelsCount": 3,
+      "description": "深度求索大模型"
+    },
+    {
+      "id": "provider-zhipu",
+      "name": "智谱AI",
+      "logo": "💎",
+      "status": "active",
+      "modelsCount": 3,
+      "description": "智谱清言大模型"
+    },
+    {
+      "id": "provider-baidu",
+      "name": "百度千帆",
+      "logo": "🌊",
+      "status": "active",
+      "modelsCount": 4,
+      "description": "百度文心大模型"
+    },
+    {
+      "id": "provider-moonshot",
+      "name": "Moonshot",
+      "logo": "🌙",
+      "status": "active",
+      "modelsCount": 2,
+      "description": "Moonshot AI大模型"
+    },
+    {
+      "id": "provider-minimax",
+      "name": "MiniMax",
+      "logo": "🎯",
+      "status": "active",
+      "modelsCount": 2,
+      "description": "MiniMax海螺大模型"
+    },
+    {
+      "id": "provider-custom",
+      "name": "自定义供应商",
+      "logo": "🔧",
+      "status": "active",
+      "modelsCount": 1,
+      "description": "用户自定义模型供应商"
+    }
+  ],
+  "models": [
+    {
+      "id": "model-001",
+      "name": "GPT-4o",
+      "provider": "OpenAI",
+      "providerId": "provider-openai",
+      "type": "多模态",
+      "contextWindow": "128K",
+      "maxTokens": 4096,
+      "status": "active",
+      "isDefault": true,
+      "updatedAt": "2026-06-20",
+      "calls": 482300,
+      "avgLatency": 185,
+      "cost": 0.015,
+      "description": "OpenAI 最新多模态大模型，支持文本和图像理解",
+      "capabilities": [
+        "vision",
+        "function_calling",
+        "json_mode",
+        "streaming"
+      ],
+      "pricing": {
+        "input": 2.5,
+        "output": 10
+      },
+      "series": "GPT-4",
+      "version": "o"
+    },
+    {
+      "id": "model-002",
+      "name": "GPT-4o-Mini",
+      "provider": "OpenAI",
+      "providerId": "provider-openai",
+      "type": "大语言模型",
+      "contextWindow": "128K",
+      "maxTokens": 4096,
+      "status": "active",
+      "isDefault": false,
+      "updatedAt": "2026-06-18",
+      "calls": 324100,
+      "avgLatency": 120,
+      "cost": 0.008,
+      "description": "GPT-4o轻量版，高性价比",
+      "capabilities": [
+        "function_calling",
+        "json_mode",
+        "streaming"
+      ],
+      "pricing": {
+        "input": 0.15,
+        "output": 0.6
+      },
+      "series": "GPT-4",
+      "version": "o-Mini"
+    },
+    {
+      "id": "model-005",
+      "name": "Qwen-Max",
+      "provider": "阿里百炼",
+      "providerId": "provider-alibaba",
+      "type": "大语言模型",
+      "contextWindow": "100K",
+      "maxTokens": 8192,
+      "status": "active",
+      "isDefault": true,
+      "updatedAt": "2026-06-22",
+      "calls": 281000,
+      "avgLatency": 195,
+      "cost": 0.008,
+      "description": "阿里云通义千问旗舰模型，中文理解能力强",
+      "capabilities": [
+        "function_calling",
+        "json_mode",
+        "streaming",
+        "mcp"
+      ],
+      "pricing": {
+        "input": 0.04,
+        "output": 0.12
+      },
+      "series": "Qwen",
+      "version": "Max"
+    },
+    {
+      "id": "model-006",
+      "name": "Qwen-Plus",
+      "provider": "阿里百炼",
+      "providerId": "provider-alibaba",
+      "type": "大语言模型",
+      "contextWindow": "100K",
+      "maxTokens": 4096,
+      "status": "active",
+      "isDefault": false,
+      "updatedAt": "2026-06-20",
+      "calls": 198300,
+      "avgLatency": 150,
+      "cost": 0.004,
+      "description": "通义千问Plus版本，高性价比",
+      "capabilities": [
+        "function_calling",
+        "json_mode",
+        "streaming"
+      ],
+      "pricing": {
+        "input": 0.004,
+        "output": 0.012
+      },
+      "series": "Qwen",
+      "version": "Plus"
+    },
+    {
+      "id": "model-007",
+      "name": "ERNIE-4-Turbo",
+      "provider": "百度千帆",
+      "providerId": "provider-baidu",
+      "type": "大语言模型",
+      "contextWindow": "128K",
+      "maxTokens": 4096,
+      "status": "active",
+      "isDefault": true,
+      "updatedAt": "2026-06-19",
+      "calls": 166440,
+      "avgLatency": 210,
+      "cost": 0.01,
+      "description": "百度文心大模型4.0，政企场景适配度高",
+      "capabilities": [
+        "function_calling",
+        "json_mode",
+        "streaming"
+      ],
+      "pricing": {
+        "input": 0.02,
+        "output": 0.06
+      },
+      "series": "ERNIE-4",
+      "version": "Turbo"
+    },
+    {
+      "id": "model-008",
+      "name": "ERNIE-Speed",
+      "provider": "百度千帆",
+      "providerId": "provider-baidu",
+      "type": "大语言模型",
+      "contextWindow": "128K",
+      "maxTokens": 2048,
+      "status": "active",
+      "isDefault": false,
+      "updatedAt": "2026-06-18",
+      "calls": 98450,
+      "avgLatency": 120,
+      "cost": 0.006,
+      "description": "百度高速推理模型",
+      "capabilities": [
+        "streaming"
+      ],
+      "pricing": {
+        "input": 0.008,
+        "output": 0.02
+      },
+      "series": "ERNIE",
+      "version": "Speed"
+    },
+    {
+      "id": "model-009",
+      "name": "DeepSeek-V2.5",
+      "provider": "DeepSeek",
+      "providerId": "provider-deepseek",
+      "type": "大语言模型",
+      "contextWindow": "128K",
+      "maxTokens": 8192,
+      "status": "active",
+      "isDefault": true,
+      "updatedAt": "2026-06-21",
+      "calls": 245600,
+      "avgLatency": 160,
+      "cost": 0.005,
+      "description": "深度求索开源大模型，性价比极高",
+      "capabilities": [
+        "function_calling",
+        "json_mode",
+        "streaming",
+        "mcp"
+      ],
+      "pricing": {
+        "input": 0.001,
+        "output": 0.002
+      },
+      "series": "DeepSeek",
+      "version": "V2.5"
+    },
+    {
+      "id": "model-010",
+      "name": "GLM-4-Plus",
+      "provider": "智谱AI",
+      "providerId": "provider-zhipu",
+      "type": "大语言模型",
+      "contextWindow": "128K",
+      "maxTokens": 4096,
+      "status": "active",
+      "isDefault": true,
+      "updatedAt": "2026-06-20",
+      "calls": 178900,
+      "avgLatency": 180,
+      "cost": 0.007,
+      "description": "智谱清言旗舰模型",
+      "capabilities": [
+        "function_calling",
+        "json_mode",
+        "streaming"
+      ],
+      "pricing": {
+        "input": 0.01,
+        "output": 0.01
+      },
+      "series": "GLM-4",
+      "version": "Plus"
+    },
+    {
+      "id": "model-012",
+      "name": "k1.5",
+      "provider": "Moonshot",
+      "providerId": "provider-moonshot",
+      "type": "大语言模型",
+      "contextWindow": "128K",
+      "maxTokens": 16385,
+      "status": "active",
+      "isDefault": true,
+      "updatedAt": "2026-06-20",
+      "calls": 156300,
+      "avgLatency": 175,
+      "cost": 0.006,
+      "description": "Moonshot AI 大模型，长上下文优秀",
+      "capabilities": [
+        "function_calling",
+        "json_mode",
+        "streaming"
+      ],
+      "pricing": {
+        "input": 0.003,
+        "output": 0.006
+      },
+      "series": "Moonshot",
+      "version": "k1.5"
+    },
+    {
+      "id": "model-013",
+      "name": "abab6.5s",
+      "provider": "MiniMax",
+      "providerId": "provider-minimax",
+      "type": "大语言模型",
+      "contextWindow": "100K",
+      "maxTokens": 8192,
+      "status": "active",
+      "isDefault": true,
+      "updatedAt": "2026-06-18",
+      "calls": 89200,
+      "avgLatency": 140,
+      "cost": 0.005,
+      "description": "MiniMax 海螺大模型",
+      "capabilities": [
+        "function_calling",
+        "streaming"
+      ],
+      "pricing": {
+        "input": 0.001,
+        "output": 0.002
+      },
+      "series": "MiniMax",
+      "version": "abab6.5s"
+    },
+    {
+      "id": "model-016",
+      "name": "custom-llm-v1",
+      "provider": "自定义供应商",
+      "providerId": "provider-custom",
+      "type": "大语言模型",
+      "contextWindow": "32K",
+      "maxTokens": 2048,
+      "status": "inactive",
+      "isDefault": false,
+      "updatedAt": "2026-06-01",
+      "calls": 0,
+      "avgLatency": 0,
+      "cost": 0.003,
+      "description": "用户自定义LLM模型（当前未启用）",
+      "capabilities": [
+        "streaming"
+      ],
+      "pricing": {
+        "input": 0.001,
+        "output": 0.002
+      },
+      "series": "Custom",
+      "version": "v1"
+    }
+  ],
+  "parameters": {
+    "temperature": {
+      "label": "Temperature",
+      "value": 0.7,
+      "min": 0,
+      "max": 2,
+      "step": 0.1,
+      "description": "控制输出随机性。值越低输出越确定、保守；值越高越发散、有创意，但可能偏离主题。"
+    },
+    "top_p": {
+      "label": "Top P",
+      "value": 1,
+      "min": 0,
+      "max": 1,
+      "step": 0.05,
+      "description": "核采样。值越小只从高概率token中采样，输出更聚焦保守；值越大候选范围越广，输出更多样。"
+    },
+    "top_k": {
+      "label": "Top K",
+      "value": 50,
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "description": "每步仅从概率最高的K个token中采样。K越小输出越确定；K越大多样性越高。"
+    },
+    "presence_penalty": {
+      "label": "Presence Penalty",
+      "value": 0,
+      "min": -2,
+      "max": 2,
+      "step": 0.1,
+      "description": "话题新鲜度惩罚。值越大模型越倾向引入新话题、减少重复主题；负值则相反。"
+    },
+    "frequency_penalty": {
+      "label": "Frequency Penalty",
+      "value": 0,
+      "min": -2,
+      "max": 2,
+      "step": 0.1,
+      "description": "词频惩罚。值越大越减少重复用词；负值则增加重复。"
+    },
+    "max_tokens": {
+      "label": "Max Tokens",
+      "value": 2048,
+      "min": 1,
+      "max": 32000,
+      "step": 1,
+      "description": "生成最大token数。值越大回答越长但耗时和成本越高；值过小可能截断回答。"
+    },
+    "seed": {
+      "label": "Seed",
+      "value": null,
+      "min": 0,
+      "max": 4294967295,
+      "step": 1,
+      "description": "随机种子，用于可复现输出。（留空则随机）"
+    },
+    "json_mode": {
+      "label": "JSON Mode",
+      "value": false,
+      "description": "开启后强制模型输出合法JSON，适合结构化数据提取，可能略降创造性。"
+    },
+    "streaming": {
+      "label": "Streaming",
+      "value": true,
+      "description": "开启后边生成边返回，首字延迟低、体验更流畅；关闭则等全部生成后一次性返回。"
+    }
+  },
+  "playground": {
+    "systemPrompt": "你是一个专业的AI助手，擅长回答各类问题，提供有用、准确的信息。",
+    "userPrompt": "",
+    "selectedModel": "model-001",
+    "response": "Model Hub Playground 支持在线测试模型能力。您可以输入Prompt，选择不同的模型，调整参数，然后点击运行按钮进行测试。\n\n响应将显示回答内容、耗时、Token消耗以及预估成本。所有调用均为Mock数据。",
+    "responseTime": 1250,
+    "tokens": {
+      "prompt": 128,
+      "completion": 256,
+      "total": 384
+    },
+    "cost": 0.0032
+  },
+  "analytics": {
+    "today": {
+      "calls": 12845,
+      "tokens": 45678920,
+      "avgLatency": 187,
+      "successRate": 99.2,
+      "cost": 128.56
+    },
+    "trend7Days": [
+      {
+        "date": "2026-06-22",
+        "calls": 11200,
+        "tokens": 38234500,
+        "cost": 108.2
+      },
+      {
+        "date": "2026-06-23",
+        "calls": 12450,
+        "tokens": 42567800,
+        "cost": 118.5
+      },
+      {
+        "date": "2026-06-24",
+        "calls": 11890,
+        "tokens": 39876500,
+        "cost": 112.3
+      },
+      {
+        "date": "2026-06-25",
+        "calls": 13200,
+        "tokens": 45678900,
+        "cost": 135.8
+      },
+      {
+        "date": "2026-06-26",
+        "calls": 14560,
+        "tokens": 51234600,
+        "cost": 148.9
+      },
+      {
+        "date": "2026-06-27",
+        "calls": 13890,
+        "tokens": 48901200,
+        "cost": 142.1
+      },
+      {
+        "date": "2026-06-28",
+        "calls": 12845,
+        "tokens": 45678920,
+        "cost": 128.56
+      }
+    ],
+    "topModels": [
+      {
+        "modelId": "model-001",
+        "modelName": "GPT-4o",
+        "calls": 482300,
+        "percentage": 47.8
+      },
+      {
+        "modelId": "model-005",
+        "modelName": "Qwen-Max",
+        "calls": 281000,
+        "percentage": 27.9
+      },
+      {
+        "modelId": "model-009",
+        "modelName": "DeepSeek-V2.5",
+        "calls": 245600,
+        "percentage": 24.3
+      }
+    ],
+    "tokenTrend": [
+      {
+        "date": "2026-06-22",
+        "input": 28000000,
+        "output": 10234500
+      },
+      {
+        "date": "2026-06-23",
+        "input": 31200000,
+        "output": 11367800
+      },
+      {
+        "date": "2026-06-24",
+        "input": 29500000,
+        "output": 10376500
+      },
+      {
+        "date": "2026-06-25",
+        "input": 33500000,
+        "output": 12178900
+      },
+      {
+        "date": "2026-06-26",
+        "input": 37500000,
+        "output": 13734600
+      },
+      {
+        "date": "2026-06-27",
+        "input": 35800000,
+        "output": 13101200
+      },
+      {
+        "date": "2026-06-28",
+        "input": 33400000,
+        "output": 12278920
+      }
+    ]
+  },
+  "relations": [
+    {
+      "modelId": "model-001",
+      "modelName": "GPT-4o",
+      "relations": [
+        {
+          "type": "capability",
+          "id": "cap-001",
+          "name": "智能问答",
+          "count": 5
+        },
+        {
+          "type": "prompt",
+          "id": "prompt-001",
+          "name": "通用助手Prompt",
+          "count": 12
+        },
+        {
+          "type": "mcp",
+          "id": "mcp-001",
+          "name": "Web Search",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "modelId": "model-009",
+      "modelName": "DeepSeek-V2.5",
+      "relations": [
+        {
+          "type": "capability",
+          "id": "cap-002",
+          "name": "代码生成",
+          "count": 8
+        },
+        {
+          "type": "prompt",
+          "id": "prompt-002",
+          "name": "代码助手Prompt",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "modelId": "model-005",
+      "modelName": "Qwen-Max",
+      "relations": [
+        {
+          "type": "capability",
+          "id": "cap-003",
+          "name": "中文理解",
+          "count": 10
+        },
+        {
+          "type": "prompt",
+          "id": "prompt-003",
+          "name": "中文写作Prompt",
+          "count": 15
+        },
+        {
+          "type": "mcp",
+          "id": "mcp-002",
+          "name": "Document Parser",
+          "count": 3
+        }
+      ]
+    }
+  ]
+}

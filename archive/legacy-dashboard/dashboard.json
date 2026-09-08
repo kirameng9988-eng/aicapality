@@ -1,0 +1,82 @@
+{
+  "kpi": {
+    "totalCapabilities": { "value": 48, "trend": "up", "change": 12.5 },
+    "activeCapabilities": { "value": 42, "trend": "up", "change": 8.3 },
+    "totalCalls": { "value": 128394, "trend": "up", "change": 23.1 },
+    "successRate": { "value": 99.5, "trend": "up", "change": 0.3 }
+  },
+  "lifecycle": [
+    { "stage": "建设", "label": "能力建设", "icon": "fa-solid fa-wand-magic-sparkles", "page": "pages/ai-build/capability.html", "color": "blue", "active": true },
+    { "stage": "开放", "label": "能力开放", "icon": "fa-solid fa-door-open", "page": "pages/ai-open/open.html", "color": "cyan" },
+    { "stage": "消费", "label": "能力消费", "icon": "fa-solid fa-cart-shopping", "page": "pages/ai-open/consume.html", "color": "purple" },
+    { "stage": "运营", "label": "能力运营", "icon": "fa-solid fa-chart-line", "page": "pages/ai-operate/analytics.html", "color": "green" },
+    { "stage": "优化", "label": "持续优化", "icon": "fa-solid fa-arrows-rotate", "page": "pages/ai-build/prompt.html", "color": "orange" }
+  ],
+  "stats": {
+    "health": 99.9,
+    "onlineCapabilities": 42,
+    "successRate": 99.5,
+    "avgResponse": 230,
+    "errorRate": 0.12
+  },
+  "trend": [
+    { "date": "07-09", "calls": 3210 },
+    { "date": "07-10", "calls": 3456 },
+    { "date": "07-11", "calls": 3892 },
+    { "date": "07-12", "calls": 3567 },
+    { "date": "07-13", "calls": 4123 },
+    { "date": "07-14", "calls": 3847 },
+    { "date": "07-15", "calls": 4102 }
+  ],
+  "categories": [
+    { "label": "数据治理", "icon": "fa-solid fa-database", "count": 12, "change": 8.3, "color": "blue", "page": "pages/ai-build/capability.html" },
+    { "label": "数据检索", "icon": "fa-solid fa-magnifying-glass", "count": 9, "change": 15.2, "color": "purple", "page": "pages/ai-build/capability.html" },
+    { "label": "运营支持", "icon": "fa-solid fa-headset", "count": 8, "change": -2.1, "color": "cyan", "page": "pages/ai-operate/analytics.html" },
+    { "label": "开发支持", "icon": "fa-solid fa-code", "count": 11, "change": 22.1, "color": "green", "page": "pages/ai-build/capability.html" },
+    { "label": "数据安全", "icon": "fa-solid fa-shield-halved", "count": 5, "change": 5.7, "color": "orange", "page": "pages/ai-build/capability.html" },
+    { "label": "分析洞察", "icon": "fa-solid fa-chart-pie", "count": 6, "change": 0, "color": "gray", "page": "pages/ai-build/capability.html" }
+  ],
+  "quickAccess": [
+    { "label": "能力管理", "icon": "fa-solid fa-cube", "color": "blue", "page": "pages/ai-build/capability.html" },
+    { "label": "Prompt工程", "icon": "fa-solid fa-wand-magic-sparkles", "color": "cyan", "page": "pages/ai-build/prompt.html" },
+    { "label": "知识库", "icon": "fa-solid fa-books", "color": "green", "page": "pages/ai-build/knowledge.html" },
+    { "label": "模型管理", "icon": "fa-solid fa-brain", "color": "orange", "page": "pages/ai-build/model.html" },
+    { "label": "MCP服务", "icon": "fa-solid fa-plug", "color": "blue", "page": "pages/ai-build/mcp.html" },
+    { "label": "数据分析", "icon": "fa-solid fa-chart-line", "color": "purple", "page": "pages/ai-operate/analytics.html" },
+    { "label": "开放市场", "icon": "fa-solid fa-store", "color": "cyan", "page": "pages/ai-open/market.html" }
+  ],
+  "latestCapability": [
+    { "id": "cap-101", "name": "智能编目", "category": "数据治理", "owner": "张明", "time": "07-15 10:23", "status": "published" },
+    { "id": "cap-102", "name": "数据血缘分析", "category": "数据治理", "owner": "李华", "time": "07-14 16:08", "status": "published" },
+    { "id": "cap-103", "name": "异常检测", "category": "数据安全", "owner": "王芳", "time": "07-13 14:30", "status": "published" },
+    { "id": "cap-104", "name": "文本纠错", "category": "开发支持", "owner": "刘强", "time": "07-12 09:15", "status": "draft" },
+    { "id": "cap-105", "name": "语义搜索", "category": "数据检索", "owner": "陈思", "time": "07-11 11:45", "status": "published" }
+  ],
+  "latestInvocation": [
+    { "app": "政务数据平台", "capability": "智能编目", "tokens": 1284, "latency": 215, "result": "success", "time": "07-15 11:23" },
+    { "app": "经信局系统", "capability": "找数寻源", "tokens": 896, "latency": 198, "result": "success", "time": "07-15 11:18" },
+    { "app": "教育局系统", "capability": "数据脱敏", "tokens": 564, "latency": 180, "result": "success", "time": "07-15 11:12" },
+    { "app": "人社局平台", "capability": "运营助手", "tokens": 2340, "latency": 310, "result": "success", "time": "07-15 11:05" },
+    { "app": "卫健委系统", "capability": "OCR识别", "tokens": 420, "latency": 145, "result": "fail", "time": "07-15 10:58" }
+  ],
+  "topCapabilities": [
+    { "rank": 1, "name": "智能编目", "calls": 126000, "successRate": 99.8, "avgTime": "215ms", "tokens": "42.3万" },
+    { "rank": 2, "name": "找数寻源", "calls": 83000, "successRate": 99.2, "avgTime": "198ms", "tokens": "28.1万" },
+    { "rank": 3, "name": "OCR识别", "calls": 52000, "successRate": 98.7, "avgTime": "145ms", "tokens": "18.6万" },
+    { "rank": 4, "name": "数据脱敏", "calls": 45600, "successRate": 99.9, "avgTime": "180ms", "tokens": "15.2万" },
+    { "rank": 5, "name": "运营助手", "calls": 38900, "successRate": 99.5, "avgTime": "310ms", "tokens": "86.5万" },
+    { "rank": 6, "name": "开发助手", "calls": 28400, "successRate": 99.6, "avgTime": "280ms", "tokens": "62.8万" },
+    { "rank": 7, "name": "智能问答", "calls": 19600, "successRate": 98.9, "avgTime": "220ms", "tokens": "35.4万" },
+    { "rank": 8, "name": "文本纠错", "calls": 14200, "successRate": 99.1, "avgTime": "165ms", "tokens": "8.9万" },
+    { "rank": 9, "name": "数据对比", "calls": 9800, "successRate": 99.4, "avgTime": "195ms", "tokens": "6.2万" },
+    { "rank": 10, "name": "报告生成", "calls": 7200, "successRate": 98.5, "avgTime": "420ms", "tokens": "24.6万" }
+  ],
+  "announcement": {
+    "version": "v2.1.0",
+    "updates": [
+      { "tag": "新增", "text": "新增多模态推理与智能体协同能力" },
+      { "tag": "优化", "text": "平台响应时间降低40%" },
+      { "tag": "修复", "text": "知识库同步稳定性问题" }
+    ]
+  }
+}

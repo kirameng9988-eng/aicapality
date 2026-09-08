@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试Agent - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/agent.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <div class="ag-page">
+
+      <!-- Agent 身份头部 -->
+      <div class="ag-wb-head ag-test-head" id="test-head" style="display:none;">
+        <div class="ag-wb-head-main">
+          <button class="ag-back-btn" id="test-back-btn" title="返回工作台"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="ag-wb-avatar" id="test-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="ag-wb-id">
+            <div class="ag-wb-name-row">
+              <span class="ag-wb-name" id="test-name"></span>
+              <span id="test-category" class="ag-cat-tag"></span>
+              <span id="test-status"></span>
+              <span class="ag-wb-ver" id="test-version"></span>
+            </div>
+            <div class="ag-wb-role" id="test-role"></div>
+            <div class="ag-wb-desc" id="test-desc"></div>
+          </div>
+        </div>
+        <div class="ag-wb-head-actions">
+          <button class="btn btn-secondary" id="test-workbench-btn"><i class="fa-solid fa-sliders"></i> 返回工作台</button>
+        </div>
+      </div>
+
+      <!-- 测试定位说明 -->
+      <div class="ag-test-intro">
+        <i class="fa-solid fa-flask-vial"></i>
+        <div>
+          <b>这里展示的是 Agent 如何执行一次岗位任务，而不是对话。</b>
+          <span>输入一段真实任务，观察它在岗位目标的驱动下如何激活能力、检索知识、调用工具并产出结果。</span>
+        </div>
+      </div>
+
+      <div class="ag-test-layout">
+        <!-- 左列：任务输入 + 执行过程 -->
+        <div class="ag-test-main">
+          <div class="ag-test-card">
+            <div class="ag-test-card-head">
+              <div class="ag-test-card-title"><i class="fa-solid fa-terminal"></i> 下发任务</div>
+              <span class="ag-test-role-tag" id="test-role-tag"></span>
+            </div>
+            <div class="ag-test-examples" id="test-examples">
+              <!-- 示例任务 chips -->
+            </div>
+            <div class="ag-test-input-row">
+              <textarea class="form-textarea" id="test-task" rows="3"
+                placeholder="例如：对「企业资产经营月报.xlsx」进行编目，补充分类与标签，并生成资源描述。"></textarea>
+              <button type="button" class="btn btn-primary ag-test-run" id="test-run-btn">
+                <i class="fa-solid fa-play"></i> 运行测试
+              </button>
+            </div>
+            <div class="ag-test-cap-line" id="test-cap-line">
+              <!-- 已授权能力 chips -->
+            </div>
+          </div>
+
+          <div class="ag-test-card ag-exec-card">
+            <div class="ag-test-card-head">
+              <div class="ag-test-card-title"><i class="fa-solid fa-route"></i> 执行过程</div>
+              <span class="ag-exec-meta" id="test-exec-meta"></span>
+            </div>
+            <div class="ag-exec-placeholder" id="test-exec-placeholder">
+              <i class="fa-regular fa-hourglass"></i>
+              <div>下发任务后，这里将逐步展示 Agent 的执行路径。</div>
+            </div>
+            <div class="ag-exec-list" id="test-exec-list"></div>
+          </div>
+        </div>
+
+        <!-- 右列：最终结果 -->
+        <div class="ag-test-side">
+          <div class="ag-test-card ag-result-card">
+            <div class="ag-test-card-head">
+              <div class="ag-test-card-title"><i class="fa-solid fa-file-lines"></i> 最终结果</div>
+              <span class="ag-result-state" id="test-result-state"></span>
+            </div>
+            <div class="ag-result-placeholder" id="test-result-placeholder">
+              <i class="fa-solid fa-arrow-left-long"></i>
+              <div>运行完成后展示该岗位交付的成果。</div>
+            </div>
+            <div class="ag-result-body" id="test-result-body" style="display:none;"></div>
+          </div>
+          <div class="ag-test-stats" id="test-stats" style="display:none;"></div>
+        </div>
+      </div>
+
+    </div><!-- /.ag-page -->
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script src="../../assets/js/agent-test.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'agent.html' }, '*');
+      window.parent.postMessage({ type: 'contentLoaded', url: 'agent-test.html' }, '*');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      AgentTestPage.init();
+    });
+  </script>
+</body>
+</html>

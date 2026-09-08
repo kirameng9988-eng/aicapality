@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创建Agent - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/agent.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <div class="ag-page">
+
+      <!-- 页面头 -->
+      <div class="ag-page-head">
+        <div class="ag-page-head-title">
+          <button class="ag-back-btn" onclick="AgentCreate.goBack()" title="返回列表"><i class="fa-solid fa-arrow-left"></i></button>
+          <div>
+            <h1 class="ag-page-title">创建Agent</h1>
+            <p class="ag-page-sub">先定义一个岗位，再逐步赋予它能力。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="ag-create-layout">
+        <!-- 左侧：表单 -->
+        <div class="ag-create-main">
+          <div class="ag-card-plain">
+            <div class="ag-form-section-head">
+              <span class="ag-form-step">1</span>
+              <div>
+                <div class="ag-form-section-title">岗位身份</div>
+                <div class="ag-form-section-sub">定义这个Agent是谁、负责什么。技能、工具、知识与模型在创建之后于工作台中逐步配置。</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label-required">Agent名称</label>
+              <input class="form-input" id="ac-name" placeholder="例如：数据资源智能编目助手" maxlength="30" autocomplete="off">
+              <div class="form-help">用于识别该智能岗位的名称，建议简洁具体。</div>
+            </div>
+            <div class="form-group" style="margin-top: var(--space-4);">
+              <label class="form-label-required">岗位名称</label>
+              <input class="form-input" id="ac-role" placeholder="例如：数据资源编目专员" maxlength="20" autocomplete="off">
+              <div class="form-help">Agent 所承担的岗位角色，例如“数据质量分析专员”“数据产品运营专员”。</div>
+            </div>
+            <div class="form-group" style="margin-top: var(--space-4);">
+              <label class="form-label-required">岗位描述</label>
+              <textarea class="form-textarea" id="ac-desc" rows="4" maxlength="200"
+                placeholder="负责根据数据资源元数据及编目规范，完成数据资源分类、名称优化、描述生成和目录字段补全。"></textarea>
+              <div class="form-help">一句话说明该岗位的工作职责与目标，将用于生成岗位说明与能力推荐。</div>
+            </div>
+
+            <div class="ag-create-tip">
+              <i class="fa-solid fa-circle-info"></i>
+              <div>先定义Agent的岗位身份和工作职责。创建后可以继续完善岗位说明、技能、工具和知识，配置将在Agent工作台中完成。</div>
+            </div>
+          </div>
+
+          <div class="ag-create-actions">
+            <button class="btn btn-secondary" onclick="AgentCreate.goBack()"><i class="fa-solid fa-xmark"></i> 取消</button>
+            <button class="btn btn-primary" id="ac-submit" onclick="AgentCreate.submit()"><i class="fa-solid fa-wand-magic-sparkles"></i> 创建Agent</button>
+          </div>
+        </div>
+
+        <!-- 右侧：岗位画像预览 -->
+        <aside class="ag-create-aside">
+          <div class="ag-card-plain">
+            <div class="ag-aside-title"><i class="fa-solid fa-user-tie"></i> 岗位画像预览</div>
+            <div class="ag-preview-card" id="ac-preview">
+              <div class="ag-preview-avatar"><i class="fa-solid fa-user-tie"></i></div>
+              <div class="ag-preview-name" id="ac-preview-name">智能岗位名称</div>
+              <div class="ag-preview-role" id="ac-preview-role">岗位名称</div>
+              <div class="ag-preview-desc" id="ac-preview-desc">岗位描述将在保存后展示在这里，作为团队识别该Agent职责的依据。</div>
+            </div>
+          </div>
+          <div class="ag-card-plain ag-aside-note">
+            <div class="ag-aside-title"><i class="fa-solid fa-lightbulb"></i> 小提示</div>
+            <ul class="ag-tip-list">
+              <li>创建后Agent默认为<b>草稿</b>状态，不会对外提供。</li>
+              <li>进入工作台后，在岗位说明中键入 <b>@</b> 即可引用 Skill、MCP 工具、知识库或其他Agent。</li>
+              <li>完成岗位细化并通过测试后，再执行<b>发布</b>对外开放。</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+    </div><!-- /.ag-page -->
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script src="../../assets/js/agent-create.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'agent.html' }, '*');
+      window.parent.postMessage({ type: 'contentLoaded', url: 'agent-create.html' }, '*');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      AgentCreate.init();
+    });
+  </script>
+</body>
+</html>

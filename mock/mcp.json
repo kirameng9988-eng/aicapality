@@ -1,0 +1,585 @@
+{
+  "servers": [
+    {
+      "id": "mcp-001",
+      "name": "数据资源MCP",
+      "description": "提供数据资源访问、数据目录检索、元数据读取等能力",
+      "status": "active",
+      "version": "2.1.0",
+      "endpoint": "https://ai-platform.enterprise.com/mcp/data-resource",
+      "protocol": "SSE",
+      "owner": "张明",
+      "updatedAt": "2026-06-28 10:00",
+      "health": "healthy",
+      "toolCount": 8,
+      "calls": 342100,
+      "avgLatency": 125,
+      "onlineRate": 100,
+      "tags": ["数据资源", "元数据", "目录检索"],
+      "auth": {
+        "type": "fixed",
+        "headerKey": "X-API-Key",
+        "headerValue": "sk-live-4a8f9c2e1b3d",
+        "keyRotation": true,
+        "rotationDays": 90,
+        "tokenUrl": "",
+        "tokenRefreshInterval": 60
+      }
+    },
+    {
+      "id": "mcp-002",
+      "name": "数据目录MCP",
+      "description": "提供数据资产目录浏览、血缘分析、质量评估等能力",
+      "status": "active",
+      "version": "1.8.0",
+      "endpoint": "https://ai-platform.enterprise.com/mcp/data-catalog",
+      "protocol": "WebSocket",
+      "owner": "李娜",
+      "updatedAt": "2026-06-27 16:30",
+      "health": "healthy",
+      "toolCount": 6,
+      "calls": 218900,
+      "avgLatency": 185,
+      "onlineRate": 100,
+      "tags": ["数据目录", "血缘分析", "质量评估"],
+      "auth": {
+        "type": "dynamic",
+        "headerKey": "Authorization",
+        "headerValue": "Bearer {token}",
+        "keyRotation": true,
+        "rotationDays": 30,
+        "tokenUrl": "https://auth.enterprise.com/oauth/token",
+        "tokenRefreshInterval": 60
+      }
+    },
+    {
+      "id": "mcp-003",
+      "name": "知识库MCP",
+      "description": "提供知识库检索、RAG增强、智能问答等能力",
+      "status": "active",
+      "version": "3.0.0",
+      "endpoint": "https://ai-platform.enterprise.com/mcp/knowledge",
+      "protocol": "SSE",
+      "owner": "王强",
+      "updatedAt": "2026-06-28 08:45",
+      "health": "healthy",
+      "toolCount": 5,
+      "calls": 456200,
+      "avgLatency": 220,
+      "onlineRate": 100,
+      "tags": ["知识库", "RAG", "智能问答"],
+      "auth": {
+        "type": "fixed",
+        "headerKey": "X-API-Key",
+        "headerValue": "sk-knowledge-7e2f4a8b1c3d",
+        "keyRotation": false,
+        "rotationDays": 0,
+        "tokenUrl": "",
+        "tokenRefreshInterval": 60
+      }
+    },
+    {
+      "id": "mcp-004",
+      "name": "审批MCP",
+      "description": "提供审批流程发起、状态查询、历史记录等能力",
+      "status": "active",
+      "version": "1.5.0",
+      "endpoint": "https://ai-platform.enterprise.com/mcp/approval",
+      "protocol": "SSE",
+      "owner": "赵雪",
+      "updatedAt": "2026-06-26 14:20",
+      "health": "healthy",
+      "toolCount": 4,
+      "calls": 89200,
+      "avgLatency": 95,
+      "onlineRate": 100,
+      "tags": ["审批", "流程"],
+      "auth": {
+        "type": "none",
+        "headerKey": "",
+        "headerValue": "",
+        "keyRotation": false,
+        "rotationDays": 0,
+        "tokenUrl": "",
+        "tokenRefreshInterval": 60
+      }
+    },
+    {
+      "id": "mcp-005",
+      "name": "地图MCP",
+      "description": "提供地理信息查询、路径规划、坐标转换等能力",
+      "status": "active",
+      "version": "1.2.0",
+      "endpoint": "https://ai-platform.enterprise.com/mcp/map",
+      "protocol": "WebSocket",
+      "owner": "刘伟",
+      "updatedAt": "2026-06-25 11:00",
+      "health": "degraded",
+      "toolCount": 6,
+      "calls": 45600,
+      "avgLatency": 350,
+      "onlineRate": 66.7,
+      "tags": ["地图", "地理信息", "路径规划"],
+      "auth": {
+        "type": "fixed",
+        "headerKey": "X-Map-Token",
+        "headerValue": "map-9x7k2m5n8p1q4r",
+        "keyRotation": true,
+        "rotationDays": 180,
+        "tokenUrl": "",
+        "tokenRefreshInterval": 60
+      }
+    },
+    {
+      "id": "mcp-006",
+      "name": "天气MCP",
+      "description": "提供实时天气查询、预报、预警等能力",
+      "status": "inactive",
+      "version": "1.0.0",
+      "endpoint": "https://ai-platform.enterprise.com/mcp/weather",
+      "protocol": "SSE",
+      "owner": "陈晓燕",
+      "updatedAt": "2026-06-20 09:30",
+      "health": "offline",
+      "toolCount": 5,
+      "calls": 0,
+      "avgLatency": 0,
+      "onlineRate": 0,
+      "tags": ["天气", "预报", "预警"],
+      "auth": {
+        "type": "none",
+        "headerKey": "",
+        "headerValue": "",
+        "keyRotation": false,
+        "rotationDays": 0,
+        "tokenUrl": "",
+        "tokenRefreshInterval": 60
+      }
+    },
+    {
+      "id": "mcp-007",
+      "name": "企业服务MCP",
+      "description": "提供企业信息查询、组织架构、通讯录等能力",
+      "status": "active",
+      "version": "2.0.0",
+      "endpoint": "https://ai-platform.enterprise.com/mcp/enterprise",
+      "protocol": "SSE",
+      "owner": "张明",
+      "updatedAt": "2026-06-28 09:00",
+      "health": "healthy",
+      "toolCount": 8,
+      "calls": 123500,
+      "avgLatency": 88,
+      "onlineRate": 100,
+      "tags": ["企业信息", "组织架构", "通讯录"],
+      "auth": {
+        "type": "dynamic",
+        "headerKey": "X-Auth-Token",
+        "headerValue": "eyJhbGciOiJIUzI1NiJ9.{token}",
+        "keyRotation": true,
+        "rotationDays": 7,
+        "tokenUrl": "https://auth.enterprise.com/v2/token",
+        "tokenRefreshInterval": 30
+      }
+    },
+    {
+      "id": "mcp-008",
+      "name": "文件系统MCP",
+      "description": "提供文件读取、写入、搜索等本地文件系统操作能力",
+      "status": "active",
+      "version": "1.6.0",
+      "endpoint": "https://ai-platform.enterprise.com/mcp/filesystem",
+      "protocol": "WebSocket",
+      "owner": "刘伟",
+      "updatedAt": "2026-06-27 17:00",
+      "health": "healthy",
+      "toolCount": 4,
+      "calls": 89090,
+      "avgLatency": 45,
+      "onlineRate": 100,
+      "tags": ["文件", "存储", "搜索"],
+      "auth": {
+        "type": "none",
+        "headerKey": "",
+        "headerValue": "",
+        "keyRotation": false,
+        "rotationDays": 0,
+        "tokenUrl": "",
+        "tokenRefreshInterval": 60
+      }
+    }
+  ],
+  "tools": [
+    {
+      "id": "tool-001",
+      "skillRefCount": 6,
+      "serverId": "mcp-001",
+      "serverName": "数据资源MCP",
+      "name": "get_data_resources",
+      "displayName": "获取数据资源列表",
+      "description": "根据条件查询可用的数据资源，返回资源列表及基本信息",
+      "category": "数据资源",
+      "icon": "fa-database",
+      "inputParams": [
+        {"name": "category", "type": "string", "required": false, "description": "资源分类"},
+        {"name": "tags", "type": "array", "required": false, "description": "资源标签"},
+        {"name": "page", "type": "integer", "required": false, "description": "页码"}
+      ],
+      "outputSchema": "array[DataResource]",
+      "apiConfig": {
+        "method": "GET",
+        "path": "/api/metadata/list",
+        "paramMapping": [
+          {"name": "category", "in": "query"},
+          {"name": "tags", "in": "query"},
+          {"name": "page", "in": "query"}
+        ],
+        "responseMapping": "$.data.list",
+        "pagination": {
+          "totalPath": "$.data.total",
+          "pageParam": "page",
+          "pageSizeParam": "page_size"
+        }
+      },
+      "status": "active",
+      "calls": 89200,
+      "successRate": 99.95,
+      "avgLatency": 125
+    },
+    {
+      "id": "tool-002",
+      "skillRefCount": 4,
+      "serverId": "mcp-001",
+      "serverName": "数据资源MCP",
+      "name": "get_resource_metadata",
+      "displayName": "获取资源元数据",
+      "description": "根据资源ID获取详细的元数据信息，包括Schema、统计信息等",
+      "category": "数据资源",
+      "icon": "fa-info-circle",
+      "inputParams": [
+        {"name": "resource_id", "type": "string", "required": true, "description": "资源唯一标识"}
+      ],
+      "outputSchema": "ResourceMetadata",
+      "apiConfig": {
+        "method": "GET",
+        "path": "/api/metadata/{resource_id}",
+        "paramMapping": [
+          {"name": "resource_id", "in": "path"}
+        ],
+        "responseMapping": "$.data",
+        "pagination": null
+      },
+      "status": "active",
+      "calls": 65400,
+      "successRate": 99.98,
+      "avgLatency": 85
+    },
+    {
+      "id": "tool-003",
+      "skillRefCount": 8,
+      "serverId": "mcp-001",
+      "serverName": "数据资源MCP",
+      "name": "search_data_catalog",
+      "displayName": "搜索数据目录",
+      "description": "基于关键词搜索数据目录，返回匹配的数据资产列表",
+      "category": "数据资源",
+      "icon": "fa-magnifying-glass",
+      "inputParams": [
+        {"name": "keyword", "type": "string", "required": true, "description": "搜索关键词"},
+        {"name": "filters", "type": "object", "required": false, "description": "筛选条件"}
+      ],
+      "outputSchema": "array[DataAsset]",
+      "status": "active",
+      "calls": 187500,
+      "successRate": 99.87,
+      "avgLatency": 165
+    },
+    {
+      "id": "tool-004",
+      "skillRefCount": 5,
+      "serverId": "mcp-002",
+      "serverName": "数据目录MCP",
+      "name": "get_data_lineage",
+      "displayName": "获取数据血缘",
+      "description": "查询指定数据表或字段的血缘关系，包括上游来源和下游去向",
+      "category": "血缘分析",
+      "icon": "fa-project-diagram",
+      "inputParams": [
+        {"name": "table_name", "type": "string", "required": true, "description": "表名称"},
+        {"name": "direction", "type": "enum", "required": false, "description": "血缘方向: upstream/downstream/both"}
+      ],
+      "outputSchema": "LineageGraph",
+      "status": "active",
+      "calls": 45600,
+      "successRate": 99.72,
+      "avgLatency": 320
+    },
+    {
+      "id": "tool-005",
+      "skillRefCount": 4,
+      "serverId": "mcp-002",
+      "serverName": "数据目录MCP",
+      "name": "assess_data_quality",
+      "displayName": "数据质量评估",
+      "description": "对指定数据集进行质量评估，返回完整性、一致性、准确性等指标",
+      "category": "质量评估",
+      "icon": "fa-chart-pie",
+      "inputParams": [
+        {"name": "dataset_id", "type": "string", "required": true, "description": "数据集ID"},
+        {"name": "dimensions", "type": "array", "required": false, "description": "评估维度"}
+      ],
+      "outputSchema": "QualityReport",
+      "status": "active",
+      "calls": 78200,
+      "successRate": 99.65,
+      "avgLatency": 280
+    },
+    {
+      "id": "tool-006",
+      "skillRefCount": 9,
+      "serverId": "mcp-003",
+      "serverName": "知识库MCP",
+      "name": "search_knowledge",
+      "displayName": "知识库检索",
+      "description": "基于语义检索从知识库中获取相关内容，支持向量相似度匹配",
+      "category": "知识检索",
+      "icon": "fa-book-open",
+      "inputParams": [
+        {"name": "query", "type": "string", "required": true, "description": "检索query"},
+        {"name": "kb_ids", "type": "array", "required": false, "description": "指定知识库ID列表"},
+        {"name": "top_k", "type": "integer", "required": false, "description": "返回数量"}
+      ],
+      "outputSchema": "array[KnowledgeChunk]",
+      "status": "active",
+      "calls": 289600,
+      "successRate": 99.92,
+      "avgLatency": 195
+    },
+    {
+      "id": "tool-007",
+      "skillRefCount": 7,
+      "serverId": "mcp-003",
+      "serverName": "知识库MCP",
+      "name": "rag_answer",
+      "displayName": "RAG智能问答",
+      "description": "结合知识库检索和大模型生成，提供基于知识库的智能问答",
+      "category": "智能问答",
+      "icon": "fa-robot",
+      "inputParams": [
+        {"name": "question", "type": "string", "required": true, "description": "问题"},
+        {"name": "kb_ids", "type": "array", "required": false, "description": "知识库ID列表"},
+        {"name": "model", "type": "string", "required": false, "description": "指定模型"}
+      ],
+      "outputSchema": "RAGResponse",
+      "status": "active",
+      "calls": 156800,
+      "successRate": 99.78,
+      "avgLatency": 850
+    },
+    {
+      "id": "tool-008",
+      "skillRefCount": 3,
+      "serverId": "mcp-004",
+      "serverName": "审批MCP",
+      "name": "start_approval",
+      "displayName": "发起审批",
+      "description": "创建新的审批流程实例，返回审批单号和当前状态",
+      "category": "审批流程",
+      "icon": "fa-paper-plane",
+      "inputParams": [
+        {"name": "template_id", "type": "string", "required": true, "description": "审批模板ID"},
+        {"name": "payload", "type": "object", "required": true, "description": "审批数据"}
+      ],
+      "outputSchema": "ApprovalInstance",
+      "status": "active",
+      "calls": 34500,
+      "successRate": 99.95,
+      "avgLatency": 95
+    },
+    {
+      "id": "tool-009",
+      "skillRefCount": 2,
+      "serverId": "mcp-004",
+      "serverName": "审批MCP",
+      "name": "get_approval_status",
+      "displayName": "查询审批状态",
+      "description": "根据审批单号查询当前审批状态和历史记录",
+      "category": "审批流程",
+      "icon": "fa-clipboard-list",
+      "inputParams": [
+        {"name": "approval_id", "type": "string", "required": true, "description": "审批单号"}
+      ],
+      "outputSchema": "ApprovalStatus",
+      "status": "active",
+      "calls": 54700,
+      "successRate": 99.99,
+      "avgLatency": 65
+    },
+    {
+      "id": "tool-010",
+      "skillRefCount": 1,
+      "serverId": "mcp-005",
+      "serverName": "地图MCP",
+      "name": "get_location_info",
+      "displayName": "获取位置信息",
+      "description": "根据坐标或地址名称获取地理位置信息",
+      "category": "地理信息",
+      "icon": "fa-location-dot",
+      "inputParams": [
+        {"name": "location", "type": "string", "required": true, "description": "坐标或地址"}
+      ],
+      "outputSchema": "LocationInfo",
+      "status": "active",
+      "calls": 12300,
+      "successRate": 98.50,
+      "avgLatency": 280
+    },
+    {
+      "id": "tool-011",
+      "skillRefCount": 2,
+      "serverId": "mcp-005",
+      "serverName": "地图MCP",
+      "name": "route_planning",
+      "displayName": "路径规划",
+      "description": "计算两个或多个地点之间的最优路径",
+      "category": "路径规划",
+      "icon": "fa-route",
+      "inputParams": [
+        {"name": "origin", "type": "string", "required": true, "description": "起点"},
+        {"name": "destination", "type": "string", "required": true, "description": "终点"},
+        {"name": "mode", "type": "enum", "required": false, "description": "出行方式"}
+      ],
+      "outputSchema": "RouteResult",
+      "status": "degraded",
+      "calls": 8900,
+      "successRate": 95.20,
+      "avgLatency": 450
+    },
+    {
+      "id": "tool-012",
+      "skillRefCount": 3,
+      "serverId": "mcp-007",
+      "serverName": "企业服务MCP",
+      "name": "get_employee_info",
+      "displayName": "获取员工信息",
+      "description": "根据工号或姓名查询员工基本信息",
+      "category": "企业信息",
+      "icon": "fa-user",
+      "inputParams": [
+        {"name": "employee_id", "type": "string", "required": false, "description": "员工工号"},
+        {"name": "name", "type": "string", "required": false, "description": "员工姓名"}
+      ],
+      "outputSchema": "EmployeeInfo",
+      "status": "active",
+      "calls": 67800,
+      "successRate": 99.98,
+      "avgLatency": 55
+    },
+    {
+      "id": "tool-013",
+      "skillRefCount": 2,
+      "serverId": "mcp-007",
+      "serverName": "企业服务MCP",
+      "name": "get_org_structure",
+      "displayName": "获取组织架构",
+      "description": "获取公司或指定部门的组织架构信息",
+      "category": "组织架构",
+      "icon": "fa-sitemap",
+      "inputParams": [
+        {"name": "dept_id", "type": "string", "required": false, "description": "部门ID"}
+      ],
+      "outputSchema": "OrgStructure",
+      "status": "active",
+      "calls": 34500,
+      "successRate": 99.99,
+      "avgLatency": 78
+    },
+    {
+      "id": "tool-014",
+      "skillRefCount": 1,
+      "serverId": "mcp-008",
+      "serverName": "文件系统MCP",
+      "name": "read_file",
+      "displayName": "读取文件",
+      "description": "读取指定路径的文件内容",
+      "category": "文件操作",
+      "icon": "fa-file-lines",
+      "inputParams": [
+        {"name": "path", "type": "string", "required": true, "description": "文件路径"}
+      ],
+      "outputSchema": "FileContent",
+      "status": "active",
+      "calls": 45600,
+      "successRate": 99.85,
+      "avgLatency": 42
+    },
+    {
+      "id": "tool-015",
+      "skillRefCount": 1,
+      "serverId": "mcp-008",
+      "serverName": "文件系统MCP",
+      "name": "search_files",
+      "displayName": "搜索文件",
+      "description": "根据条件搜索文件系统中的文件",
+      "category": "文件操作",
+      "icon": "fa-magnifying-glass",
+      "inputParams": [
+        {"name": "pattern", "type": "string", "required": true, "description": "搜索模式"},
+        {"name": "path", "type": "string", "required": false, "description": "搜索目录"}
+      ],
+      "outputSchema": "array[FileInfo]",
+      "status": "active",
+      "calls": 23400,
+      "successRate": 99.90,
+      "avgLatency": 68
+    }
+  ],
+  "playground": {
+    "selectedServer": "mcp-001",
+    "selectedTool": "tool-001",
+    "inputParams": {
+      "category": "sales",
+      "tags": ["重要", "一手"],
+      "page": 1
+    },
+    "response": {
+      "success": true,
+      "result": [
+        {
+          "resource_id": "res-001",
+          "name": "销售主题库",
+          "category": "sales",
+          "tags": ["重要", "一手", "日报"],
+          "owner": "销售部",
+          "size": "2.3GB",
+          "record_count": 1250000,
+          "updated_at": "2026-06-28"
+        },
+        {
+          "resource_id": "res-002",
+          "name": "客户主数据",
+          "category": "sales",
+          "tags": ["重要", "一手"],
+          "owner": "客户管理部",
+          "size": "856MB",
+          "record_count": 450000,
+          "updated_at": "2026-06-27"
+        }
+      ],
+      "total": 2,
+      "page": 1,
+      "page_size": 10
+    },
+    "executionTime": 187,
+    "tokens": 2840,
+    "status": "success",
+    "logs": [
+      {"time": "10:23:45.123", "level": "info", "message": "开始执行 MCP 调用"},
+      {"time": "10:23:45.125", "level": "info", "message": "选择Server: 数据资源MCP (mcp-001)"},
+      {"time": "10:23:45.128", "level": "info", "message": "选择Tool: get_data_resources"},
+      {"time": "10:23:45.234", "level": "info", "message": "发送请求到 https://ai-platform.enterprise.com/mcp/data-resource"},
+      {"time": "10:23:45.301", "level": "success", "message": "请求成功，耗时 187ms"},
+      {"time": "10:23:45.310", "level": "info", "message": "解析响应数据，返回 2 条记录"}
+    ]
+  }
+}

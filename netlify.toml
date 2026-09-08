@@ -1,0 +1,4 @@
+# AI能力开放平台 Demo - Netlify 部署配置
+# 纯静态站点,无构建步骤;发布目录为仓库根目录(含 index.html)
+[build]
+  publish = "."

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Capability Marketplace - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/market.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <div class="market-page">
+
+      <!-- ③ Main Tabs + Featured -->
+      <section class="market-section-gap">
+        <!-- Tab Switcher -->
+        <div class="market-tabs-wrapper">
+          <div class="market-main-tabs">
+            <button class="market-main-tab active" data-tab="featured" id="tab-featured">
+              <i class="fa-solid fa-fire"></i> 热门能力
+            </button>
+            <button class="market-main-tab" data-tab="all" id="tab-all">
+              <i class="fa-solid fa-layer-group"></i> 全部能力
+            </button>
+          </div>
+          <div class="market-action-tabs">
+            <button class="market-action-tab" onclick="Market.openMyApplications()">
+              <i class="fa-solid fa-file-alt"></i> 我的申请
+            </button>
+            <button class="market-action-tab" onclick="Market.openMyFavorites()">
+              <i class="fa-solid fa-heart"></i> 我的收藏
+            </button>
+          </div>
+        </div>
+
+        <!-- Featured View (3-per-row grid) -->
+        <div id="featured-view">
+          <div class="featured-grid" id="featured-grid">
+            <!-- Rendered by JavaScript -->
+          </div>
+
+          <!-- 操作指引图 -->
+          <div class="guide-section">
+            <div class="guide-section-header">
+              <h3 class="guide-section-title"><i class="fa-solid fa-compass"></i> 快速上手指南</h3>
+            </div>
+            <div class="guide-flow" id="guide-flow">
+              <!-- Rendered by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- All Capabilities View (hidden by default) -->
+        <div id="all-view" style="display:none">
+          <!-- Filter Toolbar -->
+          <div class="filter-toolbar">
+            <div class="filter-group">
+              <div class="filter-input">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search-input" placeholder="搜索能力名称、描述或标签...">
+              </div>
+            </div>
+            <div class="filter-group">
+              <span class="filter-label">能力类型</span>
+              <select class="filter-select" id="filter-type" style="display:none" onchange="Market.handleFilterChange()">
+                <option value="">全部</option>
+                <option value="Prompt">Prompt</option>
+                <option value="Agent">Agent</option>
+                <option value="Knowledge">Knowledge</option>
+                <option value="Model">Model</option>
+                <option value="MCP">MCP</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <span class="filter-label">分类</span>
+              <select class="filter-select" id="filter-category" onchange="Market.handleFilterChange()">
+                <option value="">全部分类</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <span class="filter-label">排序</span>
+              <select class="filter-select" id="filter-sort" onchange="Market.handleFilterChange()">
+                <option value="hot">热门推荐</option>
+                <option value="newest">最新发布</option>
+                <option value="rating">评分最高</option>
+                <option value="calls">调用量最高</option>
+              </select>
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn-ghost btn-sm" onclick="Market.resetFilters()">
+                <i class="fa-solid fa-rotate-left"></i> 重置
+              </button>
+            </div>
+          </div>
+
+          <!-- AI能力列表 -->
+          <div class="section-header" style="margin-top:var(--space-6)">
+            <h2 class="section-title">
+              <i class="fa-solid fa-layer-group"></i>
+              AI能力
+            </h2>
+            <span class="section-action" id="capability-count">
+              共 <strong>0</strong> 个能力
+            </span>
+          </div>
+          <div class="capability-grid" id="capability-grid">
+            <!-- Rendered by JavaScript -->
+          </div>
+          <!-- Pagination -->
+          <div class="market-pagination" id="pagination-container">
+            <!-- Rendered by JavaScript -->
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ⑤ Detail Drawer -->
+  <div class="detail-drawer-overlay" id="detail-drawer-overlay"></div>
+  <div class="detail-drawer" id="detail-drawer">
+    <div class="detail-drawer-header">
+      <div class="detail-drawer-title">
+        <div class="detail-drawer-title-icon" style="background: #4F46E5">
+          <i class="fa-solid fa-folder-tree"></i>
+        </div>
+        <span>智能编目</span>
+      </div>
+      <button class="detail-drawer-close" onclick="Market.closeDetailDrawer()">×</button>
+    </div>
+    <div class="detail-drawer-body">
+      <!-- Populated by JavaScript -->
+    </div>
+    <div class="detail-drawer-footer">
+      <button class="btn btn-secondary" onclick="Market.openApplyModal()">
+        <i class="fa-solid fa-paper-plane"></i>
+        申请使用
+      </button>
+      <button class="btn btn-primary" onclick="Market.openExperiencePage(Market.selectedCapability?.id)">
+        <i class="fa-solid fa-play"></i>
+        立即体验
+      </button>
+    </div>
+  </div>
+
+  <!-- ⑥ Experience Modal -->
+  <div class="experience-modal-overlay" id="experience-modal-overlay">
+    <div class="experience-modal">
+      <div class="experience-modal-header">
+        <div class="experience-modal-title">
+          <div class="experience-modal-title-icon" style="background: #4F46E5">
+            <i class="fa-solid fa-play"></i>
+          </div>
+          <span>在线体验</span>
+        </div>
+        <button class="experience-modal-close" onclick="Market.closeExperienceModal()">×</button>
+      </div>
+      <div class="experience-modal-body">
+        <div class="experience-input-section">
+          <label class="experience-input-label">输入</label>
+          <textarea class="experience-textarea" id="experience-input" placeholder="请输入您的问题..."></textarea>
+          <div class="experience-examples" id="experience-examples">
+            <!-- Rendered by JavaScript -->
+          </div>
+        </div>
+        <button class="experience-run-btn" id="experience-run-btn" onclick="Market.runExperience()">
+          <i class="fa-solid fa-bolt"></i>
+          运行
+        </button>
+
+        <div class="experience-result-section" id="experience-result">
+          <div class="experience-result-header">
+            <div class="experience-result-title">运行结果</div>
+            <div class="experience-result-stats">
+              <div class="experience-result-stat">
+                <i class="fa-solid fa-microchip"></i>
+                <span id="result-tokens">256</span> Tokens
+              </div>
+              <div class="experience-result-stat">
+                <i class="fa-solid fa-clock"></i>
+                <span id="result-latency">0.23</span>s
+              </div>
+            </div>
+          </div>
+          <div class="experience-result-content" id="experience-output">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <div class="experience-result-loading hidden" id="experience-loading">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          正在处理中，请稍候...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apply Modal -->
+  <div class="apply-modal-overlay" id="apply-modal-overlay">
+    <div class="apply-modal">
+      <div class="apply-modal-header">
+        <div class="apply-modal-title">申请使用能力</div>
+        <button class="apply-modal-close" onclick="Market.closeApplyModal()">×</button>
+      </div>
+      <div class="apply-modal-body">
+        <form id="apply-form">
+          <div class="apply-form-group">
+            <label class="apply-form-label">能力名称</label>
+            <input type="text" class="apply-form-input" id="apply-capability-name" readonly>
+          </div>
+          <div class="apply-form-group">
+            <label class="apply-form-label">应用名称 <span style="color: #EF4444">*</span></label>
+            <input type="text" class="apply-form-input" id="apply-app-name" placeholder="请输入您的应用名称" required>
+          </div>
+          <div class="apply-form-group">
+            <label class="apply-form-label">接入方式</label>
+            <select class="apply-form-select" id="apply-protocol">
+              <option value="mcp">MCP</option>
+              <option value="openapi">Open API</option>
+              <option value="sdk">SDK</option>
+            </select>
+          </div>
+          <div class="apply-form-group">
+            <label class="apply-form-label">使用场景 <span style="color: #EF4444">*</span></label>
+            <textarea class="apply-form-textarea" id="apply-use-case" placeholder="请简述您的使用场景和需求" required></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="apply-modal-footer">
+        <button class="btn btn-secondary" onclick="Market.closeApplyModal()">取消</button>
+        <button class="btn btn-primary" onclick="Market.submitApply()">提交申请</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Applications Modal -->
+  <div class="list-modal-overlay" id="my-applications-overlay">
+    <div class="list-modal">
+      <div class="list-modal-header">
+        <div class="list-modal-title">
+          <i class="fa-solid fa-file-alt"></i>
+          我的申请记录
+        </div>
+        <button class="list-modal-close" onclick="Market.closeMyApplications()">×</button>
+      </div>
+      <div class="list-modal-body" id="my-applications-body">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- My Favorites Modal -->
+  <div class="list-modal-overlay" id="my-favorites-overlay">
+    <div class="list-modal">
+      <div class="list-modal-header">
+        <div class="list-modal-title">
+          <i class="fa-solid fa-heart"></i>
+          我的收藏
+        </div>
+        <button class="list-modal-close" onclick="Market.closeMyFavorites()">×</button>
+      </div>
+      <div class="list-modal-body" id="my-favorites-body">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script src="../../assets/js/application-store.js"></script>
+  <script src="../../assets/js/market.js"></script>
+
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'market.html' }, '*');
+    }
+  </script>
+</body>
+</html>

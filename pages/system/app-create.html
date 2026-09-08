@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新建应用 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <div class="content-card">
+      <!-- Header -->
+      <div style="padding: var(--space-5) var(--space-6); border-bottom: 1px solid var(--color-border);">
+        <div style="display: flex; align-items: center; gap: var(--space-4);">
+          <button class="admin-btn admin-btn-ghost" id="btn-back" style="padding: var(--space-2);">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <h1 class="page-title" id="page-title" style="margin: 0;">新建应用</h1>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div style="padding: var(--space-6);">
+        <form id="app-form">
+          <!-- Basic Info Section -->
+          <div style="margin-bottom: var(--space-6);">
+            <h3 style="font-size: var(--font-size-md); font-weight: 600; color: var(--color-text-primary); margin: 0 0 var(--space-4) 0; display: flex; align-items: center; gap: var(--space-2);">
+              <i class="fa-solid fa-info-circle" style="color: var(--color-primary);"></i>
+              基本信息
+            </h3>
+            <div style="background: var(--color-bg); border-radius: var(--radius-lg); padding: var(--space-5);">
+              <div class="admin-form-group">
+                <label class="admin-form-label">应用名称 <span class="required">*</span></label>
+                <input type="text" class="admin-form-input" id="app-name" placeholder="请输入应用名称" maxlength="50">
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-form-label">应用编码 <span class="required">*</span></label>
+                <input type="text" class="admin-form-input" id="app-code" placeholder="请输入应用编码，如 data-system" maxlength="30">
+                <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: var(--space-1);">
+                  仅允许小写字母、数字和连字符（-），创建后不可修改
+                </div>
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-form-label">应用类型</label>
+                <select class="admin-form-select" id="app-type">
+                  <option value="业务应用">业务应用</option>
+                  <option value="门户应用">门户应用</option>
+                  <option value="管理应用">管理应用</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+              <div class="admin-form-group">
+                <label class="admin-form-label">应用描述</label>
+                <textarea class="admin-form-textarea" id="app-description" placeholder="请输入应用描述" rows="3" maxlength="200"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Section -->
+          <div style="margin-bottom: var(--space-6);">
+            <h3 style="font-size: var(--font-size-md); font-weight: 600; color: var(--color-text-primary); margin: 0 0 var(--space-4) 0; display: flex; align-items: center; gap: var(--space-2);">
+              <i class="fa-solid fa-toggle-on" style="color: var(--color-primary);"></i>
+              状态
+            </h3>
+            <div style="background: var(--color-bg); border-radius: var(--radius-lg); padding: var(--space-5);">
+              <div style="display: flex; align-items: center; gap: var(--space-3);">
+                <label class="admin-config-toggle" style="position: relative; width: 44px; height: 24px;">
+                  <input type="checkbox" id="app-status" checked>
+                  <span class="admin-config-toggle-slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: var(--color-border-dark); border-radius: 24px; transition: var(--transition-fast);"></span>
+                </label>
+                <span id="status-text" style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">启用</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Access Info Section (only shown when creating new) -->
+          <div id="access-info-section" style="margin-bottom: var(--space-6);">
+            <h3 style="font-size: var(--font-size-md); font-weight: 600; color: var(--color-text-primary); margin: 0 0 var(--space-4) 0; display: flex; align-items: center; gap: var(--space-2);">
+              <i class="fa-solid fa-key" style="color: var(--color-primary);"></i>
+              接入信息
+            </h3>
+            <div style="background: var(--color-bg); border-radius: var(--radius-lg); padding: var(--space-5);">
+              <div class="admin-form-group" style="margin-bottom: var(--space-4);">
+                <label class="admin-form-label">接入方式</label>
+                <div style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">API</div>
+              </div>
+              <div class="admin-form-group" style="margin-bottom: 0;">
+                <label class="admin-form-label">应用凭证</label>
+                <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-4);">
+                  <div style="margin-bottom: var(--space-3);">
+                    <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: var(--space-1);">Client ID</div>
+                    <code id="preview-client-id" style="font-size: 13px; color: var(--color-text-secondary);">创建后自动生成</code>
+                  </div>
+                  <div>
+                    <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: var(--space-1);">Client Secret</div>
+                    <code id="preview-client-secret" style="font-size: 13px; color: var(--color-text-secondary);">创建后自动生成</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div style="display: flex; justify-content: flex-end; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+            <button type="button" class="admin-btn admin-btn-secondary" id="btn-cancel">取消</button>
+            <button type="submit" class="admin-btn admin-btn-primary" id="btn-submit">
+              <i class="fa-solid fa-check"></i> 保存
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script src="../../assets/js/application-store.js"></script>
+  <script>
+    // Get edit ID from URL
+    function getEditId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    // Check if edit mode
+    const editId = getEditId();
+    const isEditMode = !!editId;
+
+    // Load app data for edit
+    function loadApp(id) {
+      return ApplicationStore.get(id);
+    }
+
+    // Generate random string
+    function generateRandomString(length) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    // Validate code format
+    function isValidCode(code) {
+      return /^[a-z0-9-]+$/.test(code);
+    }
+
+    // Check if code exists (excluding current app in edit mode)
+    function isCodeExists(code, excludeId) {
+      return ApplicationStore.list().some(a => a.code === code && a.id !== excludeId);
+    }
+
+    // Go back
+    function goBack() {
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'navigate', url: 'app.html' }, '*');
+      } else {
+        window.location.href = 'app.html';
+      }
+    }
+
+    // Show toast
+    function showToast(message, type) {
+      type = type || 'success';
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'admin-toast admin-toast-' + type;
+      const icon = type === 'success' ? 'fa-check-circle' : 'fa-circle-exclamation';
+      toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('active'));
+      setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Form elements
+    const form = document.getElementById('app-form');
+    const nameInput = document.getElementById('app-name');
+    const codeInput = document.getElementById('app-code');
+    const typeSelect = document.getElementById('app-type');
+    const descInput = document.getElementById('app-description');
+    const statusToggle = document.getElementById('app-status');
+    const statusText = document.getElementById('status-text');
+    const accessInfoSection = document.getElementById('access-info-section');
+
+    // Status toggle handler
+    statusToggle.addEventListener('change', () => {
+      statusText.textContent = statusToggle.checked ? '启用' : '停用';
+    });
+
+    // Code input handler - enforce lowercase
+    codeInput.addEventListener('input', () => {
+      codeInput.value = codeInput.value.toLowerCase();
+    });
+
+    // Form submit handler
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = nameInput.value.trim();
+      const code = codeInput.value.trim();
+      const type = typeSelect.value;
+      const description = descInput.value.trim();
+      const status = statusToggle.checked ? 'active' : 'inactive';
+
+      // Validation
+      if (!name) {
+        showToast('请输入应用名称', 'error');
+        nameInput.focus();
+        return;
+      }
+      if (!code) {
+        showToast('请输入应用编码', 'error');
+        codeInput.focus();
+        return;
+      }
+      if (!isValidCode(code)) {
+        showToast('应用编码仅允许小写字母、数字和连字符', 'error');
+        codeInput.focus();
+        return;
+      }
+      if (isCodeExists(code, editId)) {
+        showToast('该应用编码已存在', 'error');
+        codeInput.focus();
+        return;
+      }
+
+      // Get stored apps
+      const apps = ApplicationStore.list();
+
+      if (isEditMode) {
+        // Update existing app
+        const index = apps.findIndex(a => a.id === editId);
+        if (index !== -1) {
+          apps[index] = {
+            ...apps[index],
+            name,
+            code,
+            type,
+            description,
+            status
+          };
+          ApplicationStore.save(apps);
+          showToast('应用更新成功');
+          setTimeout(() => {
+            // Navigate to detail page
+            if (window.parent !== window) {
+              window.parent.postMessage({ type: 'navigate', url: `app-detail.html?id=${editId}` }, '*');
+            } else {
+              window.location.href = `app-detail.html?id=${editId}`;
+            }
+          }, 1000);
+        }
+      } else {
+        // Create new app
+        const newApp = {
+          id: 'app-' + Date.now(),
+          name,
+          code,
+          type,
+          description,
+          status,
+          createTime: new Date().toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          }).replace(/\//g, '-'),
+          lastCall: '-',
+          clientId: 'app_' + generateRandomString(16),
+          clientSecret: 'app_' + generateRandomString(32),
+          secretVisible: false,
+          authorizedAgents: []
+        };
+        ApplicationStore.upsert(newApp);
+        showToast('应用创建成功');
+        setTimeout(() => {
+          // Navigate to detail page
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'navigate', url: `app-detail.html?id=${newApp.id}` }, '*');
+          } else {
+            window.location.href = `app-detail.html?id=${newApp.id}`;
+          }
+        }, 1000);
+      }
+    });
+
+    // Cancel button
+    document.getElementById('btn-cancel').addEventListener('click', goBack);
+
+    // Back button
+    document.getElementById('btn-back').addEventListener('click', goBack);
+
+    // Menu highlight
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'app.html' }, '*');
+    }
+
+    // Initialize
+    window.addEventListener('load', () => {
+      if (isEditMode) {
+        // Edit mode
+        document.getElementById('page-title').textContent = '编辑应用';
+        document.title = '编辑应用 - AI能力开放平台';
+        accessInfoSection.style.display = 'none';
+
+        const app = loadApp(editId);
+        if (!app) {
+          showToast('应用不存在', 'error');
+          setTimeout(goBack, 1000);
+          return;
+        }
+
+        nameInput.value = app.name;
+        codeInput.value = app.code;
+        codeInput.readOnly = true;
+        codeInput.style.background = 'var(--color-bg-alt)';
+        codeInput.style.cursor = 'not-allowed';
+        typeSelect.value = app.type;
+        descInput.value = app.description || '';
+        statusToggle.checked = app.status === 'active';
+        statusText.textContent = app.status === 'active' ? '启用' : '停用';
+      } else {
+        // Create mode
+        document.getElementById('page-title').textContent = '新建应用';
+        accessInfoSection.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

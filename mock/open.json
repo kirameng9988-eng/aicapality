@@ -1,0 +1,520 @@
+{
+  "overview": {
+    "slogan": "一次发布，多种开放方式，让 AI 能力快速接入业务系统。",
+    "kpis": {
+      "openCapabilities": { "value": 48, "change": 5, "trend": "up", "label": "开放能力数" },
+      "mcpServices": { "value": 6, "change": 0, "trend": "neutral", "label": "MCP服务" },
+      "apiCount": { "value": 8, "change": 2, "trend": "up", "label": "API数量" },
+      "sdkCount": { "value": 5, "change": 0, "trend": "neutral", "label": "SDK数量" },
+      "totalCalls": { "value": 2846390, "change": 23, "trend": "up", "label": "调用次数" },
+      "appCount": { "value": 28, "change": 3, "trend": "up", "label": "接入应用" }
+    }
+  },
+  "flow": {
+    "steps": [
+      { "stage": "选择能力", "label": "选择能力", "icon": "fa-hand-pointer", "desc": "从能力中心挑选所需AI能力" },
+      { "stage": "选择开放方式", "label": "选择开放方式", "icon": "fa-plug", "desc": "MCP / API / SDK 任选" },
+      { "stage": "生成调用地址", "label": "生成调用地址", "icon": "fa-key", "desc": "自动生成端点和凭证" },
+      { "stage": "在线调试", "label": "在线调试", "icon": "fa-bug", "desc": "验证接口可用性" },
+      { "stage": "接入业务系统", "label": "接入业务系统", "icon": "fa-building", "desc": "生产环境集成调用" }
+    ]
+  },
+  "mcp": {
+    "servers": [
+      {
+        "id": "mcp-001",
+        "name": "元数据智能编目",
+        "description": "对数据集进行自动分类、标签标注和目录编制",
+        "endpoint": "/mcp/catalog",
+        "status": "online",
+        "calls": 256000,
+        "tools": 8,
+        "resources": 12,
+        "prompts": 3,
+        "healthScore": 99.8,
+        "avgLatency": 45,
+        "lastHeartbeat": "2026-07-15 09:30:00",
+        "method": "POST",
+        "auth": "Bearer Token",
+        "version": "v1.0.0",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "text", "type": "string", "required": true, "desc": "数据集描述内容", "example": "某市2024年政务数据，包含人口、经济、用地等字段" },
+          { "name": "catalogLevel", "type": "integer", "required": false, "desc": "目录层级深度", "example": "2" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"result\": \"智能分类完成，共处理 128 条数据记录。\",\n    \"tags\": [\"政务数据\", \"公共数据\", \"高价值数据集\"],\n    \"catalogLevel\": 2,\n    \"confidence\": 0.94,\n    \"processingTime\": \"45ms\"\n  },\n  \"requestId\": \"req-20260715-093000-a1b2c3\"\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "请求参数格式或值不符合要求" },
+          { "code": 401, "msg": "未授权", "desc": "Token 无效或已过期" },
+          { "code": 500, "msg": "服务内部错误", "desc": "服务处理异常，请稍后重试" }
+        ],
+        "curlExample": "curl -X POST 'http://api.example.com/mcp/catalog' \\\n  -H 'Authorization: Bearer your-token-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"text\": \"某市2024年政务数据，包含人口、经济、用地等字段\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"元数据智能编目\",\n    text=\"某市2024年政务数据，包含人口、经济、用地等字段\",\n    catalogLevel=2\n)\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"text\", \"某市2024年政务数据，包含人口、经济、用地等字段\");\nparams.put(\"catalogLevel\", 2);\nCapabilityResult result = client.invoke(\"元数据智能编目\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "mcp-002",
+        "name": "数据质量检测",
+        "description": "自动检测数据集完整性、一致性和规范性问题",
+        "endpoint": "/mcp/quality",
+        "status": "online",
+        "calls": 189000,
+        "tools": 6,
+        "resources": 8,
+        "prompts": 2,
+        "healthScore": 99.5,
+        "avgLatency": 62,
+        "lastHeartbeat": "2026-07-15 09:29:55",
+        "method": "POST",
+        "auth": "Bearer Token",
+        "version": "v1.0.0",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "datasetId", "type": "string", "required": true, "desc": "数据集唯一标识", "example": "ds-2024-001" },
+          { "name": "rules", "type": "array", "required": false, "desc": "检测规则列表", "example": "[\"completeness\", \"consistency\"]" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"datasetId\": \"ds-2024-001\",\n    \"issues\": [\n      { \"type\": \"missing_value\", \"field\": \"age\", \"count\": 23 },\n      { \"type\": \"outlier\", \"field\": \"income\", \"count\": 5 }\n    ],\n    \"qualityScore\": 87.5,\n    \"processingTime\": \"62ms\"\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "数据集ID格式不正确" },
+          { "code": 404, "msg": "数据集不存在", "desc": "指定的数据集ID未找到" },
+          { "code": 500, "msg": "服务内部错误", "desc": "服务处理异常" }
+        ],
+        "curlExample": "curl -X POST 'http://api.example.com/mcp/quality' \\\n  -H 'Authorization: Bearer your-token-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"datasetId\": \"ds-2024-001\", \"rules\": [\"completeness\", \"consistency\"]}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"数据质量检测\",\n    datasetId=\"ds-2024-001\",\n    rules=[\"completeness\", \"consistency\"]\n)\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"datasetId\", \"ds-2024-001\");\nparams.put(\"rules\", Arrays.asList(\"completeness\", \"consistency\"));\nCapabilityResult result = client.invoke(\"数据质量检测\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "mcp-003",
+        "name": "智能找数寻源",
+        "description": "根据自然语言描述定位数据资产及其来源",
+        "endpoint": "/mcp/search",
+        "status": "online",
+        "calls": 312000,
+        "tools": 12,
+        "resources": 25,
+        "prompts": 4,
+        "healthScore": 99.2,
+        "avgLatency": 88,
+        "lastHeartbeat": "2026-07-15 09:30:05",
+        "method": "POST",
+        "auth": "Bearer Token",
+        "version": "v1.0.0",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "query", "type": "string", "required": true, "desc": "自然语言查询", "example": "我想找近三年某市的GDP数据" },
+          { "name": "limit", "type": "integer", "required": false, "desc": "返回结果数量上限", "example": "10" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"results\": [\n      { \"id\": \"ds-gdp-001\", \"name\": \"某市GDP统计\", \"source\": \"统计局\", \"matchScore\": 0.95 },\n      { \"id\": \"ds-gdp-002\", \"name\": \"某市历年GDP\", \"source\": \"年鉴\", \"matchScore\": 0.88 }\n    ],\n    \"total\": 2,\n    \"processingTime\": \"88ms\"\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "查询内容不能为空" },
+          { "code": 401, "msg": "未授权", "desc": "Token 无效或已过期" },
+          { "code": 500, "msg": "服务内部错误", "desc": "服务处理异常" }
+        ],
+        "curlExample": "curl -X POST 'http://api.example.com/mcp/search' \\\n  -H 'Authorization: Bearer your-token-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"query\": \"我想找近三年某市的GDP数据\", \"limit\": 10}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"智能找数寻源\",\n    query=\"我想找近三年某市的GDP数据\",\n    limit=10\n)\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"query\", \"我想找近三年某市的GDP数据\");\nparams.put(\"limit\", 10);\nCapabilityResult result = client.invoke(\"智能找数寻源\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "mcp-004",
+        "name": "数据血缘分析",
+        "description": "追踪和可视化数据从源头到消费端的完整流转路径",
+        "endpoint": "/mcp/lineage",
+        "status": "testing",
+        "calls": 12000,
+        "tools": 5,
+        "resources": 15,
+        "prompts": 2,
+        "healthScore": 95.0,
+        "avgLatency": 150,
+        "lastHeartbeat": "2026-07-15 09:28:00",
+        "method": "GET",
+        "auth": "Bearer Token",
+        "version": "v0.9.0",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" }
+        ],
+        "params": [
+          { "name": "datasetId", "type": "string", "required": true, "desc": "数据集唯一标识", "example": "ds-2024-001" },
+          { "name": "direction", "type": "string", "required": false, "desc": "追溯方向: upstream/downstream/both", "example": "both" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"datasetId\": \"ds-2024-001\",\n    \"lineage\": {\n      \"upstream\": [\n        { \"id\": \"ds-source-001\", \"name\": \"原始数据表\", \"distance\": 1 }\n      ],\n      \"downstream\": [\n        { \"id\": \"ds-report-001\", \"name\": \"统计报表\", \"distance\": 1 }\n      ]\n    },\n    \"processingTime\": \"150ms\"\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "数据集ID格式不正确" },
+          { "code": 404, "msg": "数据集不存在", "desc": "指定的数据集ID未找到" }
+        ],
+        "curlExample": "curl -X GET 'http://api.example.com/mcp/lineage?datasetId=ds-2024-001&direction=both' \\\n  -H 'Authorization: Bearer your-token-here'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"数据血缘分析\",\n    datasetId=\"ds-2024-001\",\n    direction=\"both\"\n)\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"datasetId\", \"ds-2024-001\");\nparams.put(\"direction\", \"both\");\nCapabilityResult result = client.invoke(\"数据血缘分析\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "mcp-005",
+        "name": "数据脱敏服务",
+        "description": "敏感数据自动识别和脱敏处理，支持多种脱敏策略",
+        "endpoint": "/mcp/mask",
+        "status": "online",
+        "calls": 156000,
+        "tools": 7,
+        "resources": 6,
+        "prompts": 2,
+        "healthScore": 99.6,
+        "avgLatency": 55,
+        "lastHeartbeat": "2026-07-15 09:29:48",
+        "method": "POST",
+        "auth": "API Key",
+        "version": "v1.0.0",
+        "headers": [
+          { "name": "X-API-Key", "required": true, "example": "your-api-key-here", "desc": "API密钥" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "data", "type": "string", "required": true, "desc": "待脱敏数据内容", "example": "姓名: 张三, 手机: 13800138000, 身份证: 110101199001011234" },
+          { "name": "strategy", "type": "string", "required": false, "desc": "脱敏策略: mask/partial/replace", "example": "mask" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"original\": \"姓名: 张三, 手机: 13800138000\",\n    \"masked\": \"姓名: 张*, 手机: 138****8000\",\n    \"fields\": [\n      { \"field\": \"姓名\", \"strategy\": \"partial\", \"original\": \"张三\", \"masked\": \"张*\" },\n      { \"field\": \"手机\", \"strategy\": \"mask\", \"original\": \"13800138000\", \"masked\": \"138****8000\" }\n    ],\n    \"processingTime\": \"55ms\"\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "数据内容为空或策略无效" },
+          { "code": 401, "msg": "API Key无效", "desc": "API Key 不正确或已失效" }
+        ],
+        "curlExample": "curl -X POST 'http://api.example.com/mcp/mask' \\\n  -H 'X-API-Key: your-api-key-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"data\": \"姓名: 张三, 手机: 13800138000\", \"strategy\": \"mask\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"数据脱敏服务\",\n    data=\"姓名: 张三, 手机: 13800138000\",\n    strategy=\"mask\"\n)\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"data\", \"姓名: 张三, 手机: 13800138000\");\nparams.put(\"strategy\", \"mask\");\nCapabilityResult result = client.invoke(\"数据脱敏服务\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "mcp-006",
+        "name": "指标预测分析",
+        "description": "基于历史数据的关键业务指标趋势预测",
+        "endpoint": "/mcp/forecast",
+        "status": "online",
+        "calls": 98000,
+        "tools": 9,
+        "resources": 18,
+        "prompts": 3,
+        "healthScore": 98.8,
+        "avgLatency": 210,
+        "lastHeartbeat": "2026-07-15 09:30:10",
+        "method": "POST",
+        "auth": "Bearer Token",
+        "version": "v1.0.0",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "metricName", "type": "string", "required": true, "desc": "指标名称", "example": "某市GDP" },
+          { "name": "periods", "type": "integer", "required": false, "desc": "预测周期数", "example": "3" },
+          { "name": "unit", "type": "string", "required": false, "desc": "周期单位: month/quarter/year", "example": "year" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"metricName\": \"某市GDP\",\n    \"forecast\": [\n      { \"period\": \"2025\", \"value\": 12500, \"lower\": 11800, \"upper\": 13200 },\n      { \"period\": \"2026\", \"value\": 13800, \"lower\": 12900, \"upper\": 14700 },\n      { \"period\": \"2027\", \"value\": 15200, \"lower\": 14100, \"upper\": 16300 }\n    ],\n    \"confidence\": 0.92,\n    \"processingTime\": \"210ms\"\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "指标名称不能为空" },
+          { "code": 404, "msg": "指标不存在", "desc": "指定的指标未找到历史数据" },
+          { "code": 500, "msg": "服务内部错误", "desc": "预测模型服务异常" }
+        ],
+        "curlExample": "curl -X POST 'http://api.example.com/mcp/forecast' \\\n  -H 'Authorization: Bearer your-token-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"metricName\": \"某市GDP\", \"periods\": 3, \"unit\": \"year\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"指标预测分析\",\n    metricName=\"某市GDP\",\n    periods=3,\n    unit=\"year\"\n)\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"metricName\", \"某市GDP\");\nparams.put(\"periods\", 3);\nparams.put(\"unit\", \"year\");\nCapabilityResult result = client.invoke(\"指标预测分析\", params);\nSystem.out.println(result.getData());"
+      }
+    ]
+  },
+  "api": {
+    "apis": [
+      {
+        "id": "api-001",
+        "name": "智能编目",
+        "url": "/v1/capabilities/smart-catalog",
+        "method": "POST",
+        "auth": "Bearer Token",
+        "version": "v2.1.0",
+        "status": "online",
+        "calls": 28430,
+        "description": "对数据集进行自动分类、标签标注和目录编制",
+        "category": "数据治理",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "text", "type": "string", "required": true, "desc": "数据集描述内容", "example": "某市2024年政务数据" },
+          { "name": "catalogLevel", "type": "integer", "required": false, "desc": "目录层级深度", "example": "2" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"catalogId\": \"cat-001\",\n    \"tags\": [\"政务数据\", \"公共数据\"],\n    \"confidence\": 0.94\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "请求参数格式不正确" },
+          { "code": 401, "msg": "未授权", "desc": "Token无效或已过期" },
+          { "code": 500, "msg": "服务内部错误", "desc": "服务处理异常" }
+        ],
+        "curlExample": "curl -X POST 'https://api.example.com/v1/capabilities/smart-catalog' \\\n  -H 'Authorization: Bearer your-token-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"text\": \"某市2024年政务数据\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"智能编目\", text=\"某市2024年政务数据\")\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"text\", \"某市2024年政务数据\");\nCapabilityResult result = client.invoke(\"智能编目\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "api-002",
+        "name": "找数寻源",
+        "url": "/v1/capabilities/data-search",
+        "method": "POST",
+        "auth": "Bearer Token",
+        "version": "v1.8.0",
+        "status": "online",
+        "calls": 21890,
+        "description": "根据自然语言描述定位数据资产及其来源",
+        "category": "数据检索",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "query", "type": "string", "required": true, "desc": "自然语言查询", "example": "我想找近三年某市的GDP数据" },
+          { "name": "limit", "type": "integer", "required": false, "desc": "返回结果数量", "example": "10" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"results\": [\n      { \"id\": \"ds-gdp-001\", \"name\": \"某市GDP统计\", \"matchScore\": 0.95 }\n    ]\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "查询内容不能为空" },
+          { "code": 401, "msg": "未授权", "desc": "Token无效" }
+        ],
+        "curlExample": "curl -X POST 'https://api.example.com/v1/capabilities/data-search' \\\n  -H 'Authorization: Bearer your-token-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"query\": \"我想找近三年某市的GDP数据\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"找数寻源\", query=\"我想找近三年某市的GDP数据\")\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"query\", \"我想找近三年某市的GDP数据\");\nCapabilityResult result = client.invoke(\"找数寻源\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "api-003",
+        "name": "运营助手",
+        "url": "/v1/capabilities/ops-assistant",
+        "method": "POST",
+        "auth": "API Key",
+        "version": "v1.5.0",
+        "status": "online",
+        "calls": 19240,
+        "description": "数据质量监控和问题诊断",
+        "category": "运营支持",
+        "headers": [
+          { "name": "X-API-Key", "required": true, "example": "your-api-key-here", "desc": "API密钥" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "datasetId", "type": "string", "required": true, "desc": "数据集ID", "example": "ds-2024-001" },
+          { "name": "checkType", "type": "string", "required": false, "desc": "检查类型", "example": "quality" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"issues\": [],\n    \"qualityScore\": 95.5\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "数据集ID不能为空" },
+          { "code": 401, "msg": "API Key无效", "desc": "API Key不正确" }
+        ],
+        "curlExample": "curl -X POST 'https://api.example.com/v1/capabilities/ops-assistant' \\\n  -H 'X-API-Key: your-api-key-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"datasetId\": \"ds-2024-001\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"运营助手\", datasetId=\"ds-2024-001\")\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"datasetId\", \"ds-2024-001\");\nCapabilityResult result = client.invoke(\"运营助手\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "api-004",
+        "name": "开发助手",
+        "url": "/v1/capabilities/dev-assistant",
+        "method": "POST",
+        "auth": "OAuth2.0",
+        "version": "v2.0.0",
+        "status": "online",
+        "calls": 14560,
+        "description": "接口文档生成和示例代码编写",
+        "category": "开发支持",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-access-token", "desc": "OAuth2.0访问令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "apiSpec", "type": "string", "required": true, "desc": "API规格描述", "example": "用户登录接口" },
+          { "name": "language", "type": "string", "required": false, "desc": "目标语言", "example": "python" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"doc\": \"## 用户登录\\n...\",\n    \"code\": \"def login():\\n    pass\"\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "API规格描述不能为空" },
+          { "code": 401, "msg": "OAuth令牌无效", "desc": "访问令牌已失效" }
+        ],
+        "curlExample": "curl -X POST 'https://api.example.com/v1/capabilities/dev-assistant' \\\n  -H 'Authorization: Bearer your-access-token' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"apiSpec\": \"用户登录接口\", \"language\": \"python\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"开发助手\", apiSpec=\"用户登录接口\", language=\"python\")\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"apiSpec\", \"用户登录接口\");\nparams.put(\"language\", \"python\");\nCapabilityResult result = client.invoke(\"开发助手\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "api-005",
+        "name": "数据脱敏",
+        "url": "/v1/capabilities/data-mask",
+        "method": "POST",
+        "auth": "Bearer Token",
+        "version": "v1.2.0",
+        "status": "online",
+        "calls": 9870,
+        "description": "敏感数据自动识别和脱敏处理",
+        "category": "数据安全",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "data", "type": "string", "required": true, "desc": "待脱敏数据", "example": "张三 13800138000" },
+          { "name": "strategy", "type": "string", "required": false, "desc": "脱敏策略", "example": "mask" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"masked\": \"张* 138****8000\"\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "数据内容不能为空" },
+          { "code": 401, "msg": "未授权", "desc": "Token无效" }
+        ],
+        "curlExample": "curl -X POST 'https://api.example.com/v1/capabilities/data-mask' \\\n  -H 'Authorization: Bearer your-token-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"data\": \"张三 13800138000\", \"strategy\": \"mask\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"数据脱敏\", data=\"张三 13800138000\", strategy=\"mask\")\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"data\", \"张三 13800138000\");\nparams.put(\"strategy\", \"mask\");\nCapabilityResult result = client.invoke(\"数据脱敏\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "api-006",
+        "name": "指标预测",
+        "url": "/v1/capabilities/metric-forecast",
+        "method": "POST",
+        "auth": "API Key",
+        "version": "v1.0.0",
+        "status": "online",
+        "calls": 8560,
+        "description": "关键业务指标趋势预测",
+        "category": "数据治理",
+        "headers": [
+          { "name": "X-API-Key", "required": true, "example": "your-api-key-here", "desc": "API密钥" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "metricName", "type": "string", "required": true, "desc": "指标名称", "example": "某市GDP" },
+          { "name": "periods", "type": "integer", "required": false, "desc": "预测周期", "example": "3" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"forecast\": [\n      { \"period\": \"2025\", \"value\": 12500 }\n    ]\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "指标名称不能为空" },
+          { "code": 404, "msg": "指标不存在", "desc": "未找到历史数据" }
+        ],
+        "curlExample": "curl -X POST 'https://api.example.com/v1/capabilities/metric-forecast' \\\n  -H 'X-API-Key: your-api-key-here' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"metricName\": \"某市GDP\", \"periods\": 3}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"指标预测\", metricName=\"某市GDP\", periods=3)\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"metricName\", \"某市GDP\");\nparams.put(\"periods\", 3);\nCapabilityResult result = client.invoke(\"指标预测\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "api-007",
+        "name": "数据血缘",
+        "url": "/v1/capabilities/data-lineage",
+        "method": "GET",
+        "auth": "Bearer Token",
+        "version": "v0.9.0",
+        "status": "testing",
+        "calls": 0,
+        "description": "追踪和可视化数据流转路径",
+        "category": "数据治理",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-token-here", "desc": "认证令牌" }
+        ],
+        "params": [
+          { "name": "datasetId", "type": "string", "required": true, "desc": "数据集ID", "example": "ds-2024-001" },
+          { "name": "direction", "type": "string", "required": false, "desc": "追溯方向", "example": "both" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"lineage\": {\n      \"upstream\": [],\n      \"downstream\": []\n    }\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "数据集ID格式不正确" },
+          { "code": 404, "msg": "数据集不存在", "desc": "未找到数据集" }
+        ],
+        "curlExample": "curl -X GET 'https://api.example.com/v1/capabilities/data-lineage?datasetId=ds-2024-001&direction=both' \\\n  -H 'Authorization: Bearer your-token-here'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"数据血缘\", datasetId=\"ds-2024-001\", direction=\"both\")\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"datasetId\", \"ds-2024-001\");\nparams.put(\"direction\", \"both\");\nCapabilityResult result = client.invoke(\"数据血缘\", params);\nSystem.out.println(result.getData());"
+      },
+      {
+        "id": "api-008",
+        "name": "知识问答",
+        "url": "/v1/capabilities/kb-qa",
+        "method": "POST",
+        "auth": "OAuth2.0",
+        "version": "v2.2.0",
+        "status": "reviewing",
+        "calls": 3200,
+        "description": "基于知识库的智能问答",
+        "category": "运营支持",
+        "headers": [
+          { "name": "Authorization", "required": true, "example": "Bearer your-access-token", "desc": "OAuth2.0访问令牌" },
+          { "name": "Content-Type", "required": true, "example": "application/json", "desc": "请求内容类型" }
+        ],
+        "params": [
+          { "name": "question", "type": "string", "required": true, "desc": "问题内容", "example": "数据治理的最佳实践是什么？" },
+          { "name": "kbId", "type": "string", "required": false, "desc": "知识库ID", "example": "kb-001" }
+        ],
+        "responseExample": "{\n  \"success\": true,\n  \"data\": {\n    \"answer\": \"数据治理的最佳实践包括...\",\n    \"sources\": [\"kb-doc-001\"]\n  }\n}",
+        "errorCodes": [
+          { "code": 400, "msg": "参数错误", "desc": "问题内容不能为空" },
+          { "code": 401, "msg": "OAuth令牌无效", "desc": "访问令牌已失效" }
+        ],
+        "curlExample": "curl -X POST 'https://api.example.com/v1/capabilities/kb-qa' \\\n  -H 'Authorization: Bearer your-access-token' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"question\": \"数据治理的最佳实践是什么？\"}'",
+        "pythonExample": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"知识问答\", question=\"数据治理的最佳实践是什么？\")\nprint(result.data)",
+        "javaExample": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nMap<String, Object> params = new HashMap<>();\nparams.put(\"question\", \"数据治理的最佳实践是什么？\");\nCapabilityResult result = client.invoke(\"知识问答\", params);\nSystem.out.println(result.getData());"
+      }
+    ]
+  },
+  "sdk": {
+    "sdks": [
+      {
+        "language": "Java",
+        "version": "v2.1.0",
+        "updatedAt": "2026-06-20",
+        "downloads": 4823,
+        "docUrl": "#",
+        "exampleCode": "import com.example.ai.*;\n\nAIClient client = new AIClient(\"your-api-key\");\nCapabilityResult result = client.invoke(\"智能编目\",\n  Map.of(\"text\", \"数据集描述\"));\nSystem.out.println(result.getData());",
+        "package": "com.example:ai-sdk:2.1.0"
+      },
+      {
+        "language": "Python",
+        "version": "v2.1.0",
+        "updatedAt": "2026-06-20",
+        "downloads": 8921,
+        "docUrl": "#",
+        "exampleCode": "from ai_sdk import AIClient\n\nclient = AIClient(api_key=\"your-api-key\")\nresult = client.invoke(\"智能编目\",\n  text=\"数据集描述\")\nprint(result.data)",
+        "package": "pip install ai-sdk==2.1.0"
+      },
+      {
+        "language": "Go",
+        "version": "v1.8.0",
+        "updatedAt": "2026-06-15",
+        "downloads": 2341,
+        "docUrl": "#",
+        "exampleCode": "import \"github.com/example/ai-sdk-go\"\n\nclient := ai.NewClient(\"your-api-key\")\nresult, err := client.Invoke(\"智能编目\",\n  map[string]interface{}{\n    \"text\": \"数据集描述\",\n  })",
+        "package": "go get github.com/example/ai-sdk-go@v1.8.0"
+      },
+      {
+        "language": "Node.js",
+        "version": "v2.0.0",
+        "updatedAt": "2026-06-18",
+        "downloads": 6543,
+        "docUrl": "#",
+        "exampleCode": "const { AIClient } = require('ai-sdk');\n\nconst client = new AIClient({ apiKey: 'your-api-key' });\nconst result = await client.invoke('智能编目', {\n  text: '数据集描述'\n});",
+        "package": "npm install ai-sdk@2.0.0"
+      },
+      {
+        "language": "JavaScript",
+        "version": "v2.0.0",
+        "updatedAt": "2026-06-18",
+        "downloads": 4200,
+        "docUrl": "#",
+        "exampleCode": "import { AIClient } from 'ai-sdk';\n\nconst client = new AIClient({ apiKey: 'your-api-key' });\nconst result = await client.invoke('智能编目', {\n  text: '数据集描述'\n});",
+        "package": "npm install ai-sdk@2.0.0"
+      }
+    ]
+  },
+  "playground": {
+    "sampleResponse": {
+      "success": true,
+      "data": {
+        "result": "智能分类完成，共处理 128 条数据记录。",
+        "tags": ["政务数据", "公共数据", "高价值数据集"],
+        "catalogLevel": 2,
+        "confidence": 0.94,
+        "processingTime": "45ms"
+      },
+      "requestId": "req-20260715-093000-a1b2c3",
+      "latency": 45,
+      "tokens": { "input": 320, "output": 280 }
+    }
+  }
+}

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP 服务详情 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/open.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-back">
+        <a href="open.html" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-arrow-left"></i> 返回
+        </a>
+      </div>
+    </div>
+
+    <!-- Detail Content -->
+    <div class="detail-content" id="detailContent">
+      <!-- Loading -->
+      <div class="loading-state">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>加载中...</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script>
+    (async function() {
+      'use strict';
+
+      // Get server ID from URL
+      const params = new URLSearchParams(window.location.search);
+      const serverId = params.get('id');
+
+      if (!serverId) {
+        document.getElementById('detailContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon"><i class="fa-solid fa-exclamation-triangle"></i></div>
+            <div class="empty-state-title">缺少服务ID参数</div>
+            <div class="empty-state-desc">请从 MCP 服务列表页面进入</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Get mock data
+      const data = MockData.open;
+      const server = data.mcp?.servers?.find(s => s.id === serverId);
+
+      if (!server) {
+        document.getElementById('detailContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon"><i class="fa-solid fa-search"></i></div>
+            <div class="empty-state-title">未找到服务</div>
+            <div class="empty-state-desc">服务 ID: ${serverId}</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Update page title
+      const _titleEl = document.getElementById('pageTitle');
+      const _subtitleEl = document.getElementById('pageSubtitle');
+      if (_titleEl) _titleEl.textContent = server.name;
+      if (_subtitleEl) _subtitleEl.textContent = server.description;
+
+      // Render detail content
+      const content = `
+        <!-- Basic Info Card -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <i class="fa-solid fa-server"></i>
+            <span>基本信息</span>
+          </div>
+          <div class="detail-card-body">
+            <div class="detail-info-grid">
+              <div class="detail-info-item">
+                <div class="detail-info-label">服务名称</div>
+                <div class="detail-info-value">${server.name}</div>
+              </div>
+              <div class="detail-info-item">
+                <div class="detail-info-label">服务状态</div>
+                <div class="detail-info-value">
+                  <span class="health-indicator ${server.status}">
+                    <span class="health-dot"></span>
+                    ${statusLabel(server.status)}
+                  </span>
+                </div>
+              </div>
+              <div class="detail-info-item full-width">
+                <div class="detail-info-label">服务描述</div>
+                <div class="detail-info-value">${server.description || '-'}</div>
+              </div>
+              <div class="detail-info-item full-width">
+                <div class="detail-info-label">Endpoint</div>
+                <div class="detail-info-value">
+                  <div class="detail-endpoint">
+                    <code>${server.endpoint}</code>
+                    <button class="detail-copy-btn" onclick="copyText('${server.endpoint}')">
+                      <i class="fa-solid fa-copy"></i> 复制
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <i class="fa-solid fa-chart-bar"></i>
+            <span>调用统计</span>
+          </div>
+          <div class="detail-card-body">
+            <div class="detail-stats-grid">
+              <div class="detail-stat-item">
+                <div class="detail-stat-value">${formatNumber(server.calls)}</div>
+                <div class="detail-stat-label">总调用次数</div>
+              </div>
+              <div class="detail-stat-item">
+                <div class="detail-stat-value">${server.healthScore}%</div>
+                <div class="detail-stat-label">健康度</div>
+              </div>
+              <div class="detail-stat-item">
+                <div class="detail-stat-value">${server.avgLatency}ms</div>
+                <div class="detail-stat-label">平均延迟</div>
+              </div>
+              <div class="detail-stat-item">
+                <div class="detail-stat-value">${server.lastHeartbeat}</div>
+                <div class="detail-stat-label">最后心跳</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capabilities Card -->
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <i class="fa-solid fa-puzzle-piece"></i>
+            <span>能力组件</span>
+          </div>
+          <div class="detail-card-body">
+            <div class="capability-items">
+              <div class="capability-item">
+                <div class="capability-icon"><i class="fa-solid fa-toolbox"></i></div>
+                <div class="capability-info">
+                  <div class="capability-value">${server.tools}</div>
+                  <div class="capability-label">Tools</div>
+                </div>
+              </div>
+              <div class="capability-item">
+                <div class="capability-icon"><i class="fa-solid fa-database"></i></div>
+                <div class="capability-info">
+                  <div class="capability-value">${server.resources}</div>
+                  <div class="capability-label">Resources</div>
+                </div>
+              </div>
+              <div class="capability-item">
+                <div class="capability-icon"><i class="fa-solid fa-terminal"></i></div>
+                <div class="capability-info">
+                  <div class="capability-value">${server.prompts}</div>
+                  <div class="capability-label">Prompts</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="detail-actions">
+          <a href="debug.html?type=mcp&id=${server.id}" class="btn btn-primary" target="_blank">
+            <i class="fa-solid fa-bug"></i> 在线调试
+          </a>
+          <button class="btn btn-secondary" onclick="copyText('${server.endpoint}')">
+            <i class="fa-solid fa-copy"></i> 复制 Endpoint
+          </button>
+        </div>
+      `;
+
+      document.getElementById('detailContent').innerHTML = content;
+
+      // Helper functions
+      function formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return String(num);
+      }
+
+      function statusLabel(status) {
+        const labels = {
+          online: '在线',
+          testing: '测试中',
+          offline: '停用',
+          reviewing: '审核中',
+          published: '已发布',
+          healthy: '健康',
+          degraded: '降级'
+        };
+        return labels[status] || status;
+      }
+
+      function copyText(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          Toast.show('已复制到剪贴板', 'success');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

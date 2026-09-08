@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>提示词管理 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/prompt.css">
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <!-- 3-Column Studio Layout -->
+    <div class="prompt-studio">
+
+      <!-- Left: Prompt Card Grid -->
+      <div class="studio-cards">
+        <div class="studio-cards-header">
+          <div class="cards-title">
+            <i class="fa-solid fa-layer-group"></i>
+            Prompt 列表
+            <span class="cards-count" id="cardsCount">0</span>
+          </div>
+          <div class="cards-actions">
+            <button class="btn-sm" id="newPrompt">
+              <i class="fa-solid fa-plus"></i>新建
+            </button>
+            <button class="btn-sm" id="importPrompt">
+              <i class="fa-solid fa-upload"></i>导入
+            </button>
+          </div>
+        </div>
+        <div class="cards-search-row">
+          <div class="search-box">
+            <i class="fa-solid fa-search search-icon"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索 Prompt...">
+          </div>
+        </div>
+        <div class="cards-filter-row">
+          <select class="filter-select" id="categoryFilter">
+            <option value="">全部分类</option>
+            <option value="数据问答">数据问答</option>
+            <option value="数据编目">数据编目</option>
+            <option value="数据开发">数据开发</option>
+            <option value="运营助手">运营助手</option>
+            <option value="审批助手">审批助手</option>
+            <option value="开发助手">开发助手</option>
+            <option value="知识问答">知识问答</option>
+            <option value="Agent Prompt">Agent Prompt</option>
+          </select>
+          <select class="filter-select" id="statusFilter">
+            <option value="">全部状态</option>
+            <option value="published">已发布</option>
+            <option value="testing">测试中</option>
+            <option value="draft">草稿</option>
+          </select>
+        </div>
+        <div class="prompt-card-grid" id="promptCardGrid">
+          <!-- Prompt cards rendered here -->
+        </div>
+        <div class="prompt-card-pagination" id="promptPagination">
+          <!-- Pagination rendered here -->
+        </div>
+      </div>
+
+      <!-- Center: Prompt Editor -->
+      <div class="studio-editor">
+        <div class="editor-section">
+          <div class="editor-header">
+            <div class="editor-title">
+              <h3 id="editorTitle">选择 Prompt</h3>
+              <span class="editor-badge" id="editorBadge"></span>
+            </div>
+            <div class="editor-actions">
+              <div class="model-info">
+                <span class="model-label">模型:</span>
+                <span class="model-name" id="modelName">--</span>
+              </div>
+              <div class="temp-control">
+                <span class="temp-label">温度:</span>
+                <input type="range" class="temp-slider" id="tempSlider" min="0" max="1" step="0.1" value="0.7">
+                <span class="temp-value" id="tempValue">0.7</span>
+              </div>
+              <select class="version-selector" id="versionSelect">
+                <option value="">--</option>
+              </select>
+              <span class="version-count" id="versionCount">0 个版本</span>
+              <button class="btn-sm btn-sm-primary">
+                <i class="fa-solid fa-save"></i>保存
+              </button>
+            </div>
+          </div>
+          <div class="editor-tabs">
+            <button class="editor-tab active" data-tab="system">系统提示词</button>
+            <button class="editor-tab" data-tab="user">用户提示词</button>
+            <button class="editor-tab" data-tab="assistant">助手提示词</button>
+          </div>
+          <div class="editor-content">
+            <!-- System Prompt -->
+            <div class="editor-pane active" id="systemPromptPane">
+              <div class="code-editor">
+                <div class="code-editor-header">
+                  <div class="code-editor-title">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>系统提示词</span>
+                  </div>
+                  <span class="code-editor-lang">Markdown</span>
+                </div>
+                <div class="code-editor-body" id="systemPromptEditor">
+                  <div class="empty-state-inline">
+                    <i class="fa-solid fa-hand-pointer"></i>
+                    <h3>选择左侧 Prompt</h3>
+                    <p>从卡片列表中选择一个 Prompt 开始编辑</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- User Prompt -->
+            <div class="editor-pane" id="userPromptPane">
+              <div class="code-editor">
+                <div class="code-editor-header">
+                  <div class="code-editor-title">
+                    <i class="fa-solid fa-user"></i>
+                    <span>用户提示词</span>
+                  </div>
+                  <span class="code-editor-lang">Template</span>
+                </div>
+                <div class="code-editor-body" id="userPromptEditor"></div>
+              </div>
+            </div>
+            <!-- Assistant Prompt -->
+            <div class="editor-pane" id="assistantPromptPane">
+              <div class="code-editor">
+                <div class="code-editor-header">
+                  <div class="code-editor-title">
+                    <i class="fa-solid fa-comment"></i>
+                    <span>助手提示词</span>
+                  </div>
+                  <span class="code-editor-lang">Markdown</span>
+                </div>
+                <div class="code-editor-body" id="assistantPromptEditor"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Tabbed Detail Panel -->
+      <div class="studio-detail">
+        <div class="detail-tabs">
+          <button class="detail-tab active" data-detail-tab="variables">
+            <i class="fa-solid fa-list-check"></i>变量管理
+          </button>
+          <button class="detail-tab" data-detail-tab="performance">
+            <i class="fa-solid fa-gauge-high"></i>压力指标
+          </button>
+          <button class="detail-tab" data-detail-tab="versions">
+            <i class="fa-solid fa-history"></i>版本历史
+          </button>
+          <button class="detail-tab" data-detail-tab="test">
+            <i class="fa-solid fa-flask"></i>提示词测试
+          </button>
+        </div>
+        <div class="detail-content">
+          <!-- Variables Tab -->
+          <div class="detail-pane active" id="detailVariables">
+            <div class="detail-pane-header">
+              <span class="detail-pane-title">变量列表</span>
+              <button class="btn-sm" id="addVariableBtn">
+                <i class="fa-solid fa-plus"></i>添加
+              </button>
+            </div>
+            <div class="detail-pane-body" id="variablesList">
+              <div class="empty-state-inline" style="padding: var(--space-8);">
+                <i class="fa-solid fa-list-check" style="font-size:28px;"></i>
+                <h3>暂无变量</h3>
+                <p>选择一个 Prompt 查看其变量</p>
+              </div>
+            </div>
+          </div>
+          <!-- Performance Tab -->
+          <div class="detail-pane" id="detailPerformance">
+            <div class="detail-pane-header">
+              <span class="detail-pane-title">压力指标</span>
+            </div>
+            <div class="detail-pane-body" id="performanceStats">
+              <div class="empty-state-inline" style="padding: var(--space-8);">
+                <i class="fa-solid fa-gauge-high" style="font-size:28px;"></i>
+                <h3>暂无数据</h3>
+                <p>选择一个 Prompt 查看指标</p>
+              </div>
+            </div>
+          </div>
+          <!-- Versions Tab -->
+          <div class="detail-pane" id="detailVersions">
+            <div class="detail-pane-header">
+              <span class="detail-pane-title">版本历史</span>
+            </div>
+            <div class="detail-pane-body" id="versionList">
+              <div class="empty-state-inline" style="padding: var(--space-8);">
+                <i class="fa-solid fa-history" style="font-size:28px;"></i>
+                <h3>暂无版本</h3>
+                <p>选择一个 Prompt 查看版本</p>
+              </div>
+            </div>
+          </div>
+          <!-- Test Tab -->
+          <div class="detail-pane" id="detailTest">
+            <div class="detail-pane-header">
+              <span class="detail-pane-title">提示词测试</span>
+              <button class="btn-sm btn-sm-primary" id="runTestBtn">
+                <i class="fa-solid fa-play"></i>运行
+              </button>
+            </div>
+            <div class="detail-pane-body">
+              <div class="test-controls-row" id="testControlsRow">
+                <div class="test-control-item">
+                  <span class="test-control-label">模型</span>
+                  <select class="test-model-select" id="testModel">
+                    <option value="GPT-4o">GPT-4o</option>
+                    <option value="Claude-3.5-Sonnet">Claude-3.5-Sonnet</option>
+                    <option value="Qwen-Max">Qwen-Max</option>
+                    <option value="ERNIE-4">ERNIE-4</option>
+                  </select>
+                </div>
+                <div class="test-control-item">
+                  <span class="test-control-label">温度</span>
+                  <span class="test-control-value" id="testTempDisplay">0.7</span>
+                </div>
+              </div>
+              <div class="test-variables-area" id="testInputs">
+                <div class="empty-state-inline">
+                  <i class="fa-solid fa-keyboard" style="font-size:24px;"></i>
+                  <p>选择 Prompt 后在此填写变量</p>
+                </div>
+              </div>
+              <div class="test-output-section" id="testOutputSection" style="display:none;">
+                <div class="test-output-label">
+                  <i class="fa-solid fa-terminal"></i>返回结果
+                </div>
+                <div class="test-output-meta" id="testOutputMeta"></div>
+                <div class="test-output-body" id="testOutputBody"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/prompt.js"></script>
+  <script>
+    window.addEventListener('message', function(event) {
+      if (event.data === 'unload') {
+        window.scrollTo(0, 0);
+      }
+    });
+    window.parent.postMessage({ type: 'contentLoaded', url: 'prompt.html' }, '*');
+  </script>
+</body>
+</html>

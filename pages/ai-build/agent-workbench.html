@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent工作台 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/button.css">
+  <link rel="stylesheet" href="../../assets/css/agent.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <div class="ag-page">
+
+      <!-- Agent 身份头部 -->
+      <div class="ag-wb-head" id="wb-head" style="display:none;">
+        <div class="ag-wb-head-main">
+          <button class="ag-back-btn" onclick="AgentWorkbench.goList()" title="返回Agent列表"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="ag-wb-avatar" id="wb-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="ag-wb-id">
+            <div class="ag-wb-name-row">
+              <span class="ag-wb-name" id="wb-name"></span>
+              <span id="wb-category" class="ag-cat-tag"></span>
+              <span id="wb-status"></span>
+              <span class="ag-wb-ver" id="wb-version"></span>
+            </div>
+            <div class="ag-wb-role" id="wb-role"></div>
+            <div class="ag-wb-desc" id="wb-desc"></div>
+          </div>
+        </div>
+        <div class="ag-wb-head-actions">
+          <button class="btn btn-secondary" id="wb-test-btn"><i class="fa-solid fa-flask-vial"></i> 测试Agent</button>
+          <button class="btn btn-primary" id="wb-save-btn"><i class="fa-solid fa-floppy-disk"></i> 保存</button>
+          <button class="btn btn-primary ag-btn-publish" id="wb-publish-btn"><i class="fa-solid fa-rocket"></i> 发布</button>
+        </div>
+      </div>
+
+      <!-- 工作台页签 -->
+      <div class="ag-wb-tabs" id="wb-tabs" style="display:none;">
+        <button type="button" class="ag-wb-tab active" data-tab="inst" onclick="AgentWorkbench.setTab('inst')">
+          <i class="fa-solid fa-align-left"></i>岗位说明
+        </button>
+        <button type="button" class="ag-wb-tab" data-tab="cap" onclick="AgentWorkbench.setTab('cap')">
+          <i class="fa-solid fa-puzzle-piece"></i>能力<span class="ag-wb-badge" id="tab-badge-cap">0</span>
+        </button>
+        <button type="button" class="ag-wb-tab" data-tab="model" onclick="AgentWorkbench.setTab('model')">
+          <i class="fa-solid fa-microchip"></i>模型
+        </button>
+        <button type="button" class="ag-wb-tab" data-tab="run" onclick="AgentWorkbench.setTab('run')">
+          <i class="fa-solid fa-sliders"></i>运行设置
+        </button>
+        <button type="button" class="ag-wb-tab" data-tab="vers" onclick="AgentWorkbench.setTab('vers')">
+          <i class="fa-solid fa-code-branch"></i>版本<span class="ag-wb-badge" id="tab-badge-vers">0</span>
+        </button>
+      </div>
+
+      <!-- ============ 岗位说明 ============ -->
+      <section class="ag-wb-pane" id="pane-inst">
+        <div class="ag-wb-inst-grid">
+          <div class="ag-wb-inst-main">
+
+            <!-- 自然语言编辑器 -->
+            <div class="ag-editor-card">
+              <div class="ag-editor-head">
+                <div class="ag-editor-title"><i class="fa-solid fa-align-left"></i> 岗位说明</div>
+                <button type="button" class="btn btn-ghost btn-sm" id="wb-instr-btn" onclick="AgentWorkbench.insertMention()">
+                  <i class="fa-solid fa-at"></i> 引用资源
+                </button>
+              </div>
+              <div class="ag-editor-sub">定义这个Agent的职责、目标、工作方式和边界。键入 <b>@</b> 可引用 Skill、MCP 工具、知识库或其它智能岗位。</div>
+              <div class="ag-instr-wrap" id="wb-instr-wrap">
+                <div class="ag-instr" id="wb-instr" contenteditable="true" spellcheck="false"></div>
+                <div class="ag-instr-ph" id="wb-instr-ph">例如：你是一名专业的数据资源编目专员。你的主要职责是……（输入 @ 引用平台能力）</div>
+                <div class="ag-pick-pop" id="wb-pick-pop"></div>
+              </div>
+              <div class="ag-editor-foot">
+                <span id="wb-instr-stat"><i class="fa-regular fa-keyboard"></i> 自然语言岗位说明</span>
+                <span class="muted-text">@ 引用将在下方生成能力速览，并同步到「能力」页。</span>
+              </div>
+            </div>
+
+            <!-- AI能力推荐 -->
+            <div class="ag-rec-card" id="wb-recommend">
+              <div class="ag-rec-head">
+                <div class="ag-rec-title"><i class="fa-solid fa-wand-magic-sparkles"></i> 推荐能力</div>
+                <span class="ag-rec-hint">根据岗位说明与职责，分析平台已有能力后给出建议</span>
+              </div>
+              <div class="ag-rec-list" id="wb-rec-list">
+                <div class="ag-rec-empty">完善岗位说明后，将根据岗位职责推荐可关联的能力。</div>
+              </div>
+              <div class="ag-rec-foot" id="wb-rec-foot"></div>
+            </div>
+          </div>
+
+          <!-- 右侧速览 -->
+          <div class="ag-wb-inst-side">
+            <div class="ag-wb-sidecard">
+              <div class="ag-wb-sidecard-title"><i class="fa-solid fa-layer-group"></i> 能力速览</div>
+              <div class="ag-wb-side-kpis">
+                <div class="ag-wb-side-kpi"><b id="side-skill">0</b><span>Skill</span></div>
+                <div class="ag-wb-side-kpi"><b id="side-tool">0</b><span>MCP工具</span></div>
+                <div class="ag-wb-side-kpi"><b id="side-kb">0</b><span>知识库</span></div>
+                <div class="ag-wb-side-kpi"><b id="side-agent">0</b><span>Agent</span></div>
+              </div>
+              <div class="ag-wb-side-res" id="wb-side-res"></div>
+            </div>
+            <div class="ag-wb-sidecard">
+              <div class="ag-wb-sidecard-title"><i class="fa-solid fa-microchip"></i> 运行模型</div>
+              <div class="ag-wb-side-model">
+                <span id="wb-side-model-name">—</span>
+                <button type="button" class="ag-link-btn" onclick="AgentWorkbench.setTab('model')">更换</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 能力 ============ -->
+      <section class="ag-wb-pane hidden" id="pane-cap">
+        <div class="ag-cap-head">
+          <div class="ag-cap-head-text">
+            <div class="ag-cap-title"><i class="fa-solid fa-puzzle-piece"></i> 能力</div>
+            <div class="ag-cap-sub">集中查看Agent已关联的资源。在岗位说明中键入 @，或通过「添加能力」均可建立关联。</div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="AgentWorkbench.openCapAdd()">
+            <i class="fa-solid fa-plus"></i> 添加能力
+          </button>
+        </div>
+        <div class="ag-cap-groups" id="wb-cap-groups">
+          <!-- 四组资源由 workbench.js 渲染 -->
+        </div>
+      </section>
+
+      <!-- ============ 模型 ============ -->
+      <section class="ag-wb-pane hidden" id="pane-model">
+        <div class="ag-model-card" id="wb-model-card">
+          <div class="ag-model-icon"><i class="fa-solid fa-microchip"></i></div>
+          <div class="ag-model-body">
+            <div class="ag-model-name" id="wb-model-name">—</div>
+            <div class="ag-model-meta" id="wb-model-meta">—</div>
+            <div class="ag-model-desc" id="wb-model-desc">模型是Agent的理解与推理引擎，不随岗位说明通过 @ 引用。</div>
+          </div>
+          <button type="button" class="btn btn-secondary" id="wb-model-btn"><i class="fa-solid fa-rotate"></i> 更换模型</button>
+        </div>
+        <div class="ag-model-note">
+          <i class="fa-solid fa-circle-info"></i>
+          <div>模型属于Agent的运行配置。更换后仅对当前岗位生效，建议按任务复杂度选择（编目/审核类选用低温度高确定性模型）。</div>
+        </div>
+      </section>
+
+      <!-- ============ 运行设置 ============ -->
+      <section class="ag-wb-pane hidden" id="pane-run">
+        <div class="ag-run-grid">
+          <div class="ag-run-main">
+            <div class="ag-run-group">
+              <div class="ag-run-row">
+                <div class="ag-run-label">Temperature</div>
+                <div class="ag-run-control">
+                  <input type="range" class="ag-range" id="run-temp" min="0" max="1" step="0.05" value="0.3">
+                  <span class="ag-range-val" id="run-temp-val">0.3</span>
+                </div>
+                <div class="ag-run-help">控制输出随机性：数值越低，回答越稳定、越遵循规范。</div>
+              </div>
+              <div class="ag-run-row">
+                <div class="ag-run-label">最大执行轮次</div>
+                <div class="ag-run-control">
+                  <input class="form-input ag-run-input" id="run-iter" type="number" min="1" max="30" value="5">
+                </div>
+                <div class="ag-run-help">Agent 调用工具/自我检查的最大步数上限，防止无限执行。</div>
+              </div>
+              <div class="ag-run-row">
+                <div class="ag-run-label">超时时间</div>
+                <div class="ag-run-control">
+                  <select class="form-select ag-run-select" id="run-timeout">
+                    <option value="30">30 秒</option>
+                    <option value="60">60 秒</option>
+                    <option value="120" selected>120 秒</option>
+                    <option value="300">300 秒</option>
+                    <option value="600">600 秒</option>
+                  </select>
+                </div>
+                <div class="ag-run-help">单次任务执行的超时上限，超过则终止并返回超时提示。</div>
+              </div>
+              <div class="ag-run-row">
+                <div class="ag-run-label">自动调用工具</div>
+                <div class="ag-run-control ag-run-switch">
+                  <label class="form-switch-wrapper">
+                    <input type="checkbox" class="form-switch" id="run-auto" checked>
+                    <span class="form-switch-label">开启后，任务执行中按需自动调用已授权的 MCP 工具</span>
+                  </label>
+                  <span class="ag-run-switch-tip" id="run-auto-tip">关闭后仅执行推理，工具调用需人工确认</span>
+                </div>
+                <div class="ag-run-help">开启后按需自动调用已授权的 MCP 工具，否则每次调用前需人工确认。</div>
+              </div>
+              <div class="ag-run-row">
+                <div class="ag-run-label">保留上下文</div>
+                <div class="ag-run-control ag-run-switch">
+                  <label class="form-switch-wrapper">
+                    <input type="checkbox" class="form-switch" id="run-ctx" checked>
+                    <span class="form-switch-label">多轮任务间保留历史对话上下文</span>
+                  </label>
+                  <span class="ag-run-switch-tip" id="run-ctx-tip">关闭后逐轮隔离上下文，更节省资源</span>
+                </div>
+                <div class="ag-run-help">关闭后将逐轮隔离上下文，更节省资源。</div>
+              </div>
+            </div>
+            <div class="ag-run-actions">
+              <button type="button" class="btn btn-secondary" onclick="AgentWorkbench.resetSettings()"><i class="fa-solid fa-rotate-left"></i> 恢复默认</button>
+              <span class="muted-text" id="run-saved-hint"></span>
+            </div>
+          </div>
+          <div class="ag-run-note">
+            <div class="ag-run-note-title"><i class="fa-solid fa-lightbulb"></i> 设置建议</div>
+            <ul class="ag-tip-list">
+              <li>面向规范审核类岗位，建议 <b>Temperature ≤ 0.2</b>。</li>
+              <li>涉及工具链调用较长的岗位，可适当调大执行轮次与超时时间。</li>
+              <li>以上改动即时进入当前工作区，点击顶部「保存」持久化。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 版本 ============ -->
+      <section class="ag-wb-pane hidden" id="pane-vers">
+        <div class="ag-vers-head" id="wb-vers-head"></div>
+        <div class="ag-vers-list" id="wb-vers-list"></div>
+      </section>
+
+    </div><!-- /.ag-page -->
+  </div><!-- /.app-content -->
+
+  <!-- Scripts -->
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script src="../../assets/js/modal.js"></script>
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script src="../../assets/js/agent-workbench.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'agent.html' }, '*');
+      window.parent.postMessage({ type: 'contentLoaded', url: 'agent-workbench.html' }, '*');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+      AgentWorkbench.init();
+    });
+  </script>
+</body>
+</html>

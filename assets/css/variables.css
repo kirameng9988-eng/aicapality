@@ -1,0 +1,178 @@
+/* =====================================================
+   AI Capability Open Platform - Design Tokens
+   Design System Variables (CSS Custom Properties)
+   ===================================================== */
+
+:root {
+  /* === Brand Primary Colors === */
+  --color-primary: #4F46E5;              /* Indigo - main brand */
+  --color-primary-hover: #4338CA;        /* Primary hover state */
+  --color-primary-active: #3730A3;       /* Primary active/pressed */
+  --color-primary-light: #EEF2FF;        /* Primary light background */
+  --color-primary-dark: #1E1B4B;         /* Primary dark */
+
+  /* === Semantic Colors === */
+  --color-success: #108981;              /* Emerald - success */
+  --color-success-light: #ECFDF5;
+  --color-success-dark: #059669;
+
+  --color-warning: #F59E0B;              /* Amber - warning */
+  --color-warning-light: #FFFBEB;
+  --color-warning-dark: #D97706;
+
+  --color-danger: #EF4444;               /* Red - danger/error */
+  --color-danger-light: #FEF2F2;
+  --color-danger-dark: #DC2626;
+
+  --color-info: #0EA5E9;                 /* Sky - info */
+  --color-info-light: #ECFEFF;
+  --color-info-dark: #0284C7;
+
+  /* === Text Colors === */
+  --color-text-primary: #0F172A;         /* Headings, primary text */
+  --color-text-secondary: #475569;       /* Body text */
+  --color-text-muted: #94A3B8;           /* Placeholder, disabled */
+  --color-text-inverse: #FFFFFF;         /* Text on dark backgrounds */
+
+  /* === Border & Divider === */
+  --color-border: #E2E8F0;               /* Default border */
+  --color-border-light: #F1F5F9;         /* Subtle border */
+  --color-border-dark: #CBD5E1;          /* Emphasized border */
+  --color-divider: #E2E8F0;              /* Divider lines */
+
+  /* === Background Colors === */
+  --color-bg: #F8FAFC;                   /* Page background */
+  --color-bg-alt: #F1F5F9;               /* Alternate background */
+  --color-surface: #FFFFFF;              /* Card, panel surface */
+  --color-surface-elevated: #FFFFFF;     /* Elevated surface */
+
+  /* === Sidebar (Light Theme) === */
+  --sidebar-width: 240px;
+  --sidebar-bg: #FFFFFF;                 /* White background */
+  --sidebar-text: #1F2937;               /* Dark text */
+  --sidebar-text-muted: #687280;        /* Secondary text */
+  --sidebar-item-hover: #F3F4F6;         /* Light gray hover */
+  --sidebar-item-active: #4F46E5;        /* Primary blue */
+  --sidebar-item-active-bg: #EEF2FF;     /* Light primary bg */
+  --sidebar-group-title: #1F2937;        /* Bold dark text */
+  --sidebar-border: #E5E7EB;             /* Light border */
+  --sidebar-secondary-item-bg: #F9FAFB;  /* Secondary item bg */
+
+  /* === Header (Deep Blue Gradient Nav) === */
+  --header-height: 60px;
+  --header-bg: #0a1730;              /* gradient start */
+  --header-bg-end: #10275a;          /* gradient end */
+  --header-shadow: 0 2px 12px rgba(9, 17, 35, 0.28);
+
+  /* === Card === */
+  --card-bg: #FFFFFF;
+  --card-border: #E2E8F0;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+
+  /* === Chart Colors === */
+  --chart-primary: #4F46E5;
+  --chart-success: #10B981;
+  --chart-warning: #F59E0B;
+  --chart-danger: #EF4444;
+  --chart-info: #0EA5E9;
+  --chart-purple: #8B5CF6;
+  --chart-pink: #EC4899;
+  --chart-cyan: #06B6D4;
+  --chart-orange: #F97316;
+  --chart-gray: #64748B;
+
+  /* === Typography === */
+  --font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+
+  /* Font Sizes */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 36px;
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === Spacing === */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* === Border Radius === */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadows === */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  /* === Transitions === */
+  --transition-fast: 120ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+  --transition-bounce: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* === Z-Index Scale === */
+  --z-base: 0;
+  --z-dropdown: 300;
+  --z-sticky: 400;
+  --z-fixed: 500;
+  --z-modal-backdrop: 600;
+  --z-modal: 700;
+  --z-popover: 800;
+  --z-tooltip: 900;
+
+  /* === Focus Ring === */
+  --focus-ring: 0 0 0 2px var(--color-primary-light), 0 0 0 4px var(--color-primary);
+  --focus-ring-offset: 2px;
+
+  /* === Status Colors === */
+  --status-draft-bg: #F1F5F9;
+  --status-draft-text: #64748B;
+  --status-published-bg: #ECFDF5;
+  --status-published-text: #059669;
+  --status-running-bg: #ECFEFF;
+  --status-running-text: #0891B2;
+  --status-stopped-bg: #FEF2F2;
+  --status-stopped-text: #DC2626;
+  --status-success-bg: #ECFDF5;
+  --status-success-text: #059669;
+  --status-failed-bg: #FEF2F2;
+  --status-failed-text: #DC2626;
+  --status-pending-bg: #FFFBEB;
+  --status-pending-text: #D97706;
+  --status-error-bg: #FEF2F2;
+  --status-error-text: #DC2626;
+}

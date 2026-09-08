@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>上传文档 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/knowledge.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Upload Area Styles */
+    .upload-area {
+      border: 2px dashed var(--color-border-dark);
+      border-radius: var(--radius-xl);
+      padding: var(--space-10);
+      text-align: center;
+      transition: all var(--transition-normal);
+      background: var(--color-bg);
+      cursor: pointer;
+    }
+
+    .upload-area:hover,
+    .upload-area.dragover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-light);
+    }
+
+    .upload-area.dragover {
+      transform: scale(1.01);
+    }
+
+    .upload-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto var(--space-4);
+      background: var(--color-primary-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--color-primary);
+    }
+
+    .upload-title {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .upload-desc {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .upload-formats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .format-tag {
+      padding: var(--space-1) var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    /* File List */
+    .file-list {
+      margin-top: var(--space-5);
+    }
+
+    .file-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+    }
+
+    .file-list-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-2);
+      transition: all var(--transition-fast);
+    }
+
+    .file-item:hover {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .file-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .file-icon.pdf { background: #FEF2F2; color: #EF4444; }
+    .file-icon.docx { background: #EFF6FF; color: #3B82F6; }
+    .file-icon.xlsx { background: #ECFDF5; color: #10B981; }
+    .file-icon.md { background: #F5F3FF; color: #6366F1; }
+    .file-icon.html { background: #FFF7ED; color: #F97316; }
+    .file-icon.json { background: #FDF4FF; color: #8B5CF6; }
+
+    .file-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .file-name {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-meta {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    .file-status {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .file-status-badge {
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .file-status-badge.pending { background: #F1F5F9; color: #64748B; }
+    .file-status-badge.uploading { background: #FEF3C7; color: #D97706; }
+    .file-status-badge.success { background: #ECFDF5; color: #059669; }
+    .file-status-badge.error { background: #FEF2F2; color: #DC2626; }
+
+    .file-progress {
+      width: 100px;
+      height: 4px;
+      background: var(--color-border);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .file-progress-bar {
+      height: 100%;
+      background: var(--color-primary);
+      border-radius: var(--radius-full);
+      transition: width var(--transition-fast);
+    }
+
+    .file-action {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: none;
+      background: none;
+    }
+
+    .file-action:hover {
+      background: var(--color-bg);
+      color: var(--color-danger);
+    }
+
+    /* Parse Config */
+    .parse-config {
+      margin-top: var(--space-5);
+      padding: var(--space-4);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+    }
+
+    .parse-config-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .parse-config-title i {
+      color: var(--color-primary);
+    }
+  </style>
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <!-- Page Header -->
+    <div class="knowledge-page-header" style="margin-bottom: var(--space-6);">
+      <div class="knowledge-page-header-left">
+        <div style="display: flex; align-items: center; gap: var(--space-3);">
+          <a href="knowledge.html" class="btn btn-ghost btn-sm" style="padding: var(--space-2);">
+            <i class="fa-solid fa-arrow-left"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <!-- Target Knowledge Base -->
+      <div class="card" style="margin-bottom: var(--space-5);">
+        <div class="card-body">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label form-label-required">目标知识库</label>
+            <select class="form-select" id="target-kb" onchange="handleKbChange()">
+              <option value="">请选择目标知识库</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Area -->
+      <div class="card" style="margin-bottom: var(--space-5);">
+        <div class="card-body">
+          <div class="upload-area" id="upload-area">
+            <input type="file" id="file-input" multiple accept=".pdf,.docx,.xlsx,.md,.html,.json" style="display: none;">
+            <div class="upload-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div class="upload-title">拖拽文件到此处，或点击上传</div>
+            <div class="upload-desc">支持批量上传，单个文件大小不超过 50MB</div>
+            <div class="upload-formats">
+              <span class="format-tag">PDF</span>
+              <span class="format-tag">DOCX</span>
+              <span class="format-tag">XLSX</span>
+              <span class="format-tag">MD</span>
+              <span class="format-tag">HTML</span>
+              <span class="format-tag">JSON</span>
+            </div>
+          </div>
+
+          <!-- File List -->
+          <div class="file-list" id="file-list" style="display: none;">
+            <div class="file-list-header">
+              <span class="file-list-title">待上传文件 (<span id="file-count">0</span>)</span>
+              <button class="btn btn-ghost btn-sm" onclick="clearFileList()">
+                <i class="fa-solid fa-trash"></i>
+                清空列表
+              </button>
+            </div>
+            <div id="file-items"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parse Config -->
+      <div class="parse-config">
+        <div class="parse-config-title">
+          <i class="fa-solid fa-gear"></i>
+          解析配置
+        </div>
+
+        <div class="form-row" style="margin-bottom: var(--space-4);">
+          <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-checkbox-wrapper">
+              <input type="checkbox" class="form-checkbox" id="auto-chunk" checked>
+              <span class="form-checkbox-label">自动分块</span>
+            </div>
+            <div class="form-help">上传后自动将文档切分为Chunk</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-checkbox-wrapper">
+              <input type="checkbox" class="form-checkbox" id="auto-embedding" checked>
+              <span class="form-checkbox-label">自动Embedding</span>
+            </div>
+            <div class="form-help">分块完成后自动进行向量化处理</div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">文档标签</label>
+          <input type="text" class="form-input" id="doc-tags" placeholder="输入标签，多个标签用逗号分隔">
+          <div class="form-help">为上传的文档添加标签，便于分类检索</div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-5);">
+        <a href="knowledge.html" class="btn btn-secondary btn-lg">
+          <i class="fa-solid fa-arrow-left"></i>
+          取消
+        </a>
+        <button type="button" class="btn btn-primary btn-lg" id="upload-btn" onclick="startUpload()" disabled>
+          <i class="fa-solid fa-upload"></i>
+          开始上传
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script>
+    let uploadedFiles = [];
+    let knowledgeBases = [];
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadKnowledgeBases();
+      initUploadArea();
+    });
+
+    // Load knowledge bases
+    async function loadKnowledgeBases() {
+      const data = await loadMockData('knowledge');
+      if (data && data.knowledgeBases) {
+        knowledgeBases = data.knowledgeBases;
+        const select = document.getElementById('target-kb');
+        knowledgeBases.forEach(kb => {
+          const option = document.createElement('option');
+          option.value = kb.id;
+          option.textContent = kb.name + ' (' + kb.docCount + ' 文档)';
+          select.appendChild(option);
+        });
+
+        // Check if KB ID is in URL
+        const params = new URLSearchParams(window.location.search);
+        const kbId = params.get('kb');
+        if (kbId) {
+          select.value = kbId;
+        }
+      }
+    }
+
+    // Handle KB change
+    function handleKbChange() {
+      updateUploadButton();
+    }
+
+    // Initialize upload area
+    function initUploadArea() {
+      const uploadArea = document.getElementById('upload-area');
+      const fileInput = document.getElementById('file-input');
+
+      // Click to upload
+      uploadArea.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      // File input change
+      fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+      });
+
+      // Drag and drop
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+      });
+
+      uploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+      });
+
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+      });
+    }
+
+    // Handle files
+    function handleFiles(files) {
+      const targetKb = document.getElementById('target-kb').value;
+      if (!targetKb) {
+        Toast.warning('请先选择目标知识库');
+        return;
+      }
+
+      for (const file of files) {
+        // Validate file type
+        const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/markdown',
+                          'text/html', 'application/json'];
+        const validExtensions = ['.pdf', '.docx', '.xlsx', '.md', '.html', '.json'];
+
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!validExtensions.includes(ext)) {
+          Toast.danger('不支持的文件格式: ' + file.name);
+          continue;
+        }
+
+        // Validate file size (50MB)
+        if (file.size > 50 * 1024 * 1024) {
+          Toast.danger('文件过大: ' + file.name + ' (最大50MB)');
+          continue;
+        }
+
+        // Add to list
+        const fileObj = {
+          id: 'file-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+          file: file,
+          name: file.name,
+          size: formatFileSize(file.size),
+          format: ext.replace('.', '').toUpperCase(),
+          status: 'pending',
+          progress: 0
+        };
+
+        uploadedFiles.push(fileObj);
+      }
+
+      renderFileList();
+      updateUploadButton();
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // Get file icon class
+    function getFileIconClass(format) {
+      const map = {
+        'PDF': 'pdf',
+        'DOCX': 'docx',
+        'XLSX': 'xlsx',
+        'MD': 'md',
+        'HTML': 'html',
+        'JSON': 'json'
+      };
+      return map[format] || '';
+    }
+
+    // Get file icon
+    function getFileIcon(format) {
+      const map = {
+        'PDF': 'fa-file-pdf',
+        'DOCX': 'fa-file-word',
+        'XLSX': 'fa-file-excel',
+        'MD': 'fa-file-lines',
+        'HTML': 'fa-file-code',
+        'JSON': 'fa-brackets-json'
+      };
+      return map[format] || 'fa-file';
+    }
+
+    // Render file list
+    function renderFileList() {
+      const container = document.getElementById('file-list');
+      const itemsContainer = document.getElementById('file-items');
+      const countEl = document.getElementById('file-count');
+
+      if (uploadedFiles.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'block';
+      countEl.textContent = uploadedFiles.length;
+
+      itemsContainer.innerHTML = uploadedFiles.map(file => `
+        <div class="file-item" data-id="${file.id}">
+          <div class="file-icon ${getFileIconClass(file.format)}">
+            <i class="fa-solid ${getFileIcon(file.format)}"></i>
+          </div>
+          <div class="file-info">
+            <div class="file-name" title="${file.name}">${file.name}</div>
+            <div class="file-meta">${file.format} · ${file.size}</div>
+          </div>
+          <div class="file-status">
+            ${file.status === 'uploading' ? `
+              <div class="file-progress">
+                <div class="file-progress-bar" style="width: ${file.progress}%"></div>
+              </div>
+            ` : ''}
+            <span class="file-status-badge ${file.status}">${getStatusText(file.status)}</span>
+          </div>
+          <button class="file-action" onclick="removeFile('${file.id}')" title="移除">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Get status text
+    function getStatusText(status) {
+      const map = {
+        'pending': '等待中',
+        'uploading': '上传中',
+        'success': '完成',
+        'error': '失败'
+      };
+      return map[status] || status;
+    }
+
+    // Remove file
+    function removeFile(fileId) {
+      uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
+      renderFileList();
+      updateUploadButton();
+    }
+
+    // Clear file list
+    function clearFileList() {
+      uploadedFiles = [];
+      renderFileList();
+      updateUploadButton();
+    }
+
+    // Update upload button state
+    function updateUploadButton() {
+      const btn = document.getElementById('upload-btn');
+      const kb = document.getElementById('target-kb').value;
+      btn.disabled = !kb || uploadedFiles.length === 0;
+    }
+
+    // Start upload
+    function startUpload() {
+      const targetKb = document.getElementById('target-kb').value;
+      if (!targetKb) {
+        Toast.warning('请选择目标知识库');
+        return;
+      }
+
+      if (uploadedFiles.length === 0) {
+        Toast.warning('请选择要上传的文件');
+        return;
+      }
+
+      const kbName = knowledgeBases.find(kb => kb.id === targetKb)?.name || targetKb;
+
+      // Start uploading files
+      let completed = 0;
+      uploadedFiles.forEach((file, index) => {
+        file.status = 'uploading';
+        file.progress = 0;
+        renderFileList();
+
+        // Simulate upload progress
+        const interval = setInterval(() => {
+          file.progress += Math.random() * 30;
+          if (file.progress >= 100) {
+            file.progress = 100;
+            file.status = 'success';
+            clearInterval(interval);
+            completed++;
+
+            if (completed === uploadedFiles.length) {
+              Toast.success(`成功上传 ${completed} 个文件到「${kbName}」`);
+              // Reset after a delay
+              setTimeout(() => {
+                window.location.href = 'knowledge.html';
+              }, 1500);
+            }
+          }
+          renderFileList();
+        }, 200 + Math.random() * 300);
+      });
+    }
+
+    // Notify parent
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'document-upload.html' }, '*');
+    }
+  </script>
+</body>
+</html>

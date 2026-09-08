@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在线调试 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/open.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-back">
+        <a href="open.html" class="btn btn-secondary btn-sm">
+          <i class="fa-solid fa-arrow-left"></i> 返回
+        </a>
+      </div>
+    </div>
+
+    <!-- Debug Content -->
+    <div class="debug-page-content">
+      <!-- Service Selector -->
+      <div class="debug-service-selector">
+        <div class="debug-form-group">
+          <label class="debug-form-label">选择服务 / 接口</label>
+          <select class="debug-form-select" id="debugServer">
+            <option value="">-- 请选择 --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Request Section -->
+      <div class="debug-section">
+        <div class="debug-section-header">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>请求参数</span>
+        </div>
+        <div class="debug-section-body">
+          <div class="debug-form-group">
+            <label class="debug-form-label">请求参数（JSON 格式）</label>
+            <textarea class="debug-form-textarea" id="debugParams" placeholder='{"text": "测试数据"}'>{"text": "测试数据"}</textarea>
+          </div>
+          <div class="debug-actions">
+            <button class="btn btn-primary" id="debugRun">
+              <i class="fa-solid fa-play"></i> 运行
+            </button>
+            <button class="btn btn-secondary" id="debugClear">
+              <i class="fa-solid fa-trash"></i> 清空
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Response Section -->
+      <div class="debug-section">
+        <div class="debug-section-header">
+          <i class="fa-solid fa-reply"></i>
+          <span>响应结果</span>
+          <span class="debug-response-status" id="responseStatus"></span>
+        </div>
+        <div class="debug-section-body">
+          <div class="debug-output" id="debugOutput">
+            <div class="debug-output-placeholder">
+              <i class="fa-solid fa-terminal"></i>
+              <span>点击「运行」发起请求...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/utils.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script>
+    (async function() {
+      'use strict';
+
+      // Get params from URL
+      const params = new URLSearchParams(window.location.search);
+      const typeParam = params.get('type');
+      const idParam = params.get('id');
+
+      const data = MockData.open;
+
+      // Populate server dropdown
+      const serverSelect = document.getElementById('debugServer');
+
+      // Add MCP servers
+      if (data.mcp?.servers?.length > 0) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = 'MCP 服务';
+        data.mcp.servers.forEach(server => {
+          const option = document.createElement('option');
+          option.value = `mcp:${server.id}`;
+          option.textContent = server.name;
+          option.dataset.type = 'mcp';
+          option.dataset.id = server.id;
+          option.dataset.endpoint = server.endpoint;
+          if (typeParam === 'mcp' && idParam === server.id) {
+            option.selected = true;
+          }
+          optgroup.appendChild(option);
+        });
+        serverSelect.appendChild(optgroup);
+      }
+
+      // Add APIs
+      if (data.api?.apis?.length > 0) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = 'Open API';
+        data.api.apis.forEach(api => {
+          const option = document.createElement('option');
+          option.value = `api:${api.id}`;
+          option.textContent = api.name;
+          option.dataset.type = 'api';
+          option.dataset.id = api.id;
+          option.dataset.url = api.url;
+          option.dataset.method = api.method;
+          if (typeParam === 'api' && idParam === api.id) {
+            option.selected = true;
+          }
+          optgroup.appendChild(option);
+        });
+        serverSelect.appendChild(optgroup);
+      }
+
+      // Update page subtitle based on selection
+      serverSelect.addEventListener('change', () => {
+        const selected = serverSelect.options[serverSelect.selectedIndex];
+        const _subEl = document.getElementById('pageSubtitle');
+        if (!_subEl) return;
+        if (selected && selected.value) {
+          _subEl.textContent = `正在调试: ${selected.textContent}`;
+        } else {
+          _subEl.textContent = '测试 API 接口或 MCP 服务';
+        }
+      });
+
+      // Run button click handler
+      document.getElementById('debugRun').addEventListener('click', runDebug);
+
+      // Clear button click handler
+      document.getElementById('debugClear').addEventListener('click', () => {
+        document.getElementById('debugParams').value = '{"text": "测试数据"}';
+        document.getElementById('debugOutput').innerHTML = `
+          <div class="debug-output-placeholder">
+            <i class="fa-solid fa-terminal"></i>
+            <span>点击「运行」发起请求...</span>
+          </div>
+        `;
+        document.getElementById('responseStatus').textContent = '';
+      });
+
+      async function runDebug() {
+        const selected = serverSelect.options[serverSelect.selectedIndex];
+        if (!selected || !selected.value) {
+          Toast.show('请先选择服务或接口', 'warning');
+          return;
+        }
+
+        const outputEl = document.getElementById('debugOutput');
+        const statusEl = document.getElementById('responseStatus');
+        const type = selected.dataset.type;
+        const id = selected.dataset.id;
+
+        // Show loading
+        outputEl.innerHTML = `
+          <div class="debug-output-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>执行中...</span>
+          </div>
+        `;
+
+        // Simulate request
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Get sample response based on type
+        let response;
+        if (type === 'mcp') {
+          response = data.playground?.sampleResponse || {
+            success: true,
+            data: { result: 'MCP 调用成功' },
+            requestId: 'req-' + Date.now()
+          };
+        } else {
+          response = {
+            success: true,
+            data: {
+              result: 'API 调用成功',
+              processed: true,
+              confidence: 0.95
+            },
+            requestId: 'req-' + Date.now(),
+            latency: 45,
+            tokens: { inputTokens: 320, outputTokens: 280 }
+          };
+        }
+
+        // Display response
+        const responseJson = JSON.stringify(response, null, 2);
+        outputEl.innerHTML = `
+          <div class="debug-output-success">
+            <i class="fa-solid fa-check-circle"></i>
+            <span>请求成功</span>
+          </div>
+          <pre class="debug-output-content">${escapeHtml(responseJson)}</pre>
+        `;
+        statusEl.innerHTML = '<span class="success">成功 · 45ms</span>';
+
+        Toast.show('请求成功', 'success');
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // If type and id were provided in URL, trigger initial selection
+      if (typeParam && idParam) {
+        const event = new Event('change');
+        serverSelect.dispatchEvent(event);
+      }
+    })();
+  </script>
+</body>
+</html>

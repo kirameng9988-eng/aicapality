@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>编辑知识库 - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/component.css">
+  <link rel="stylesheet" href="../../assets/css/form.css">
+  <link rel="stylesheet" href="../../assets/css/knowledge.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="app-content" id="app-content">
+    <!-- Page Header -->
+    <div class="knowledge-page-header" style="margin-bottom: var(--space-6);">
+      <div class="knowledge-page-header-left">
+        <div style="display: flex; align-items: center; gap: var(--space-3);">
+          <a href="knowledge.html" class="btn btn-ghost btn-sm" style="padding: var(--space-2);">
+            <i class="fa-solid fa-arrow-left"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading-state" class="empty-state" style="padding: 60px;">
+      <div class="empty-state-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      <div class="empty-state-title">加载中...</div>
+      <div class="empty-state-desc">正在获取知识库信息</div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card" id="form-card" style="display: none;">
+      <div class="card-body">
+        <form id="knowledge-form">
+          <!-- 基本信息 -->
+          <div style="margin-bottom: var(--space-6);">
+            <h3 class="form-section-title" style="font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-light);">
+              <i class="fa-solid fa-info-circle" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+              基本信息
+            </h3>
+
+            <div class="form-group">
+              <label class="form-label form-label-required">知识库名称</label>
+              <input type="text" class="form-input" id="kb-name" placeholder="请输入知识库名称" maxlength="50">
+              <div class="form-help">知识库的显示名称，最多50个字符</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">知识库描述</label>
+              <textarea class="form-textarea" id="kb-description" placeholder="请输入知识库描述信息" rows="3" maxlength="200"></textarea>
+              <div class="form-help">描述知识库的用途和内容，最多200个字符</div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label form-label-required">所属业务部门</label>
+                <select class="form-select" id="kb-business">
+                  <option value="">请选择部门</option>
+                  <option value="数据治理部">数据治理部</option>
+                  <option value="数据平台部">数据平台部</option>
+                  <option value="运营支持部">运营支持部</option>
+                  <option value="开发平台部">开发平台部</option>
+                  <option value="安全合规部">安全合规部</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label form-label-required">知识库类型</label>
+                <select class="form-select" id="kb-type">
+                  <option value="">请选择类型</option>
+                  <option value="标准规范">标准规范</option>
+                  <option value="资产目录">资产目录</option>
+                  <option value="运营手册">运营手册</option>
+                  <option value="技术文档">技术文档</option>
+                  <option value="规则配置">规则配置</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label form-label-required">负责人</label>
+              <select class="form-select" id="kb-owner">
+                <option value="">请选择负责人</option>
+                <option value="张明">张明</option>
+                <option value="李娜">李娜</option>
+                <option value="王强">王强</option>
+                <option value="刘伟">刘伟</option>
+                <option value="赵雪">赵雪</option>
+                <option value="陈晓燕">陈晓燕</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Embedding配置 -->
+          <div style="margin-bottom: var(--space-6);">
+            <h3 class="form-section-title" style="font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-light);">
+              <i class="fa-solid fa-brain" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+              Embedding 配置
+            </h3>
+
+            <div class="form-group">
+              <label class="form-label form-label-required">Embedding 模型</label>
+              <select class="form-select" id="kb-embedding-model">
+                <option value="">请选择模型</option>
+                <option value="text-embedding-3-large">text-embedding-3-large (3072维)</option>
+                <option value="text-embedding-3-small">text-embedding-3-small (1536维)</option>
+                <option value="text-embedding-2">text-embedding-2 (1536维)</option>
+              </select>
+              <div class="form-help">选择用于将文档内容向量化的模型，影响检索质量</div>
+            </div>
+          </div>
+
+          <!-- 分块策略 -->
+          <div style="margin-bottom: var(--space-6);">
+            <h3 class="form-section-title" style="font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-light);">
+              <i class="fa-solid fa-scissors" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+              分块策略配置
+            </h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label form-label-required">Chunk 大小</label>
+                <div class="input-group">
+                  <input type="number" class="form-input" id="kb-chunk-size" value="500" min="100" max="2000" step="50">
+                  <span class="input-group-addon">字符</span>
+                </div>
+                <div class="form-help">每个Chunk的最大字符数，建议500-1000</div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label form-label-required">重叠大小</label>
+                <div class="input-group">
+                  <input type="number" class="form-input" id="kb-chunk-overlap" value="50" min="0" max="500" step="10">
+                  <span class="input-group-addon">字符</span>
+                </div>
+                <div class="form-help">相邻Chunk之间的重叠字符数</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="form-checkbox-wrapper">
+                <input type="checkbox" class="form-checkbox" id="kb-auto-chunk" checked>
+                <span class="form-checkbox-label">启用智能分块</span>
+              </div>
+              <div class="form-help">启用后系统将根据语义段落自动调整分块边界</div>
+            </div>
+          </div>
+
+          <!-- 高级配置 -->
+          <div>
+            <h3 class="form-section-title" style="font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-light);">
+              <i class="fa-solid fa-gear" style="color: var(--color-primary); margin-right: var(--space-2);"></i>
+              高级配置
+            </h3>
+
+            <div class="form-group">
+              <div class="form-checkbox-wrapper">
+                <input type="checkbox" class="form-checkbox" id="kb-auto-embedding" checked>
+                <span class="form-checkbox-label">上传后自动进行Embedding</span>
+              </div>
+              <div class="form-help">启用后文档上传将自动触发Embedding流程</div>
+            </div>
+
+            <div class="form-group">
+              <div class="form-checkbox-wrapper">
+                <input type="checkbox" class="form-checkbox" id="kb-enabled" checked>
+                <span class="form-checkbox-label">启用知识库</span>
+              </div>
+              <div class="form-help">禁用的知识库将不会在检索时返回结果</div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card-footer" style="display: flex; justify-content: flex-end; gap: var(--space-3);">
+        <a href="knowledge.html" class="btn btn-secondary btn-lg">
+          <i class="fa-solid fa-arrow-left"></i>
+          取消
+        </a>
+        <button type="button" class="btn btn-primary btn-lg" onclick="submitForm()">
+          <i class="fa-solid fa-check"></i>
+          保存修改
+        </button>
+      </div>
+    </div>
+
+    <!-- Not Found State -->
+    <div id="not-found-state" class="empty-state" style="padding: 60px; display: none;">
+      <div class="empty-state-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="empty-state-title">知识库不存在</div>
+      <div class="empty-state-desc">无法找到指定的知识库，请检查链接是否正确</div>
+      <div style="margin-top: var(--space-4);">
+        <a href="knowledge.html" class="btn btn-primary">
+          <i class="fa-solid fa-arrow-left"></i>
+          返回知识库列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/toast.js"></script>
+  <script>
+    // Get knowledge base ID from URL
+    function getKbId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    // Load knowledge base data
+    async function loadKnowledgeBase() {
+      const kbId = getKbId();
+
+      if (!kbId) {
+        showNotFound();
+        return;
+      }
+
+      const data = await loadMockData('knowledge');
+      if (!data) {
+        showNotFound();
+        return;
+      }
+
+      const kb = data.knowledgeBases.find(k => k.id === kbId);
+      if (!kb) {
+        showNotFound();
+        return;
+      }
+
+      // Populate form with existing data
+      document.getElementById('kb-name').value = kb.name;
+      document.getElementById('kb-description').value = kb.description || '';
+      document.getElementById('kb-business').value = kb.business;
+      document.getElementById('kb-type').value = kb.type;
+      document.getElementById('kb-owner').value = kb.owner || '';
+      document.getElementById('kb-embedding-model').value = kb.embeddingModel || 'text-embedding-3-large';
+
+      // Check status
+      document.getElementById('kb-enabled').checked = kb.status === 'active';
+
+      // Update page title
+      const _tEl = document.getElementById('page-title');
+      const _sEl = document.getElementById('page-subtitle');
+      if (_tEl) _tEl.textContent = '编辑知识库：' + kb.name;
+      if (_sEl) _sEl.textContent = '修改知识库 "' + kb.name + '" 的配置信息';
+
+      // Show form
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('form-card').style.display = 'block';
+    }
+
+    // Show not found state
+    function showNotFound() {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('not-found-state').style.display = 'flex';
+    }
+
+    // Form validation
+    function validateForm() {
+      const name = document.getElementById('kb-name').value.trim();
+      const business = document.getElementById('kb-business').value;
+      const type = document.getElementById('kb-type').value;
+      const owner = document.getElementById('kb-owner').value;
+      const chunkSize = document.getElementById('kb-chunk-size').value;
+      const chunkOverlap = document.getElementById('kb-chunk-overlap').value;
+
+      if (!name) {
+        Toast.danger('请输入知识库名称');
+        document.getElementById('kb-name').focus();
+        return false;
+      }
+
+      if (!business) {
+        Toast.danger('请选择所属业务部门');
+        document.getElementById('kb-business').focus();
+        return false;
+      }
+
+      if (!type) {
+        Toast.danger('请选择知识库类型');
+        document.getElementById('kb-type').focus();
+        return false;
+      }
+
+      if (!owner) {
+        Toast.danger('请选择负责人');
+        document.getElementById('kb-owner').focus();
+        return false;
+      }
+
+      if (parseInt(chunkOverlap) >= parseInt(chunkSize)) {
+        Toast.danger('重叠大小必须小于Chunk大小');
+        document.getElementById('kb-chunk-overlap').focus();
+        return false;
+      }
+
+      return true;
+    }
+
+    // Submit form
+    function submitForm() {
+      if (!validateForm()) {
+        return;
+      }
+
+      const formData = {
+        id: getKbId(),
+        name: document.getElementById('kb-name').value.trim(),
+        description: document.getElementById('kb-description').value.trim(),
+        business: document.getElementById('kb-business').value,
+        type: document.getElementById('kb-type').value,
+        owner: document.getElementById('kb-owner').value,
+        embeddingModel: document.getElementById('kb-embedding-model').value,
+        chunkSize: parseInt(document.getElementById('kb-chunk-size').value),
+        chunkOverlap: parseInt(document.getElementById('kb-chunk-overlap').value),
+        autoChunk: document.getElementById('kb-auto-chunk').checked,
+        autoEmbedding: document.getElementById('kb-auto-embedding').checked,
+        enabled: document.getElementById('kb-enabled').checked
+      };
+
+      // Simulate API call
+      Toast.success('知识库配置已保存！');
+
+      // Navigate back after a short delay
+      setTimeout(() => {
+        window.location.href = 'knowledge.html';
+      }, 1000);
+    }
+
+    // Keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        submitForm();
+      }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadKnowledgeBase);
+
+    // Notify parent
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'knowledge-edit.html' }, '*');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI能力开放平台</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <!-- 顶部导航栏 -->
+  <header class="top-header">
+    <!-- 左:品牌 LOGO(闪电)+ 平台名称(中/英两行) -->
+    <div class="top-header-logo">
+      <div class="brand-logo" title="AI能力开放平台">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/>
+        </svg>
+      </div>
+      <div class="brand-name">
+        <b>AI能力开放平台</b>
+        <span>AI Capability Open Platform</span>
+      </div>
+    </div>
+
+    <!-- 右:企业标签 + 分割线 + 用户 -->
+    <div class="top-header-actions">
+      <div class="header-user" id="header-user">
+        <span class="user-avatar">林</span>
+        <span class="user-meta">
+          <b>林砚舟</b>
+          <span>平台管理员</span>
+        </span>
+        <i class="fa-solid fa-chevron-down header-user-arrow"></i>
+        <div class="header-user-dropdown" id="header-user-dropdown">
+          <a href="#" class="dropdown-item"><i class="fa-regular fa-user"></i>个人中心</a>
+          <a href="#" class="dropdown-item"><i class="fa-solid fa-right-from-bracket"></i>退出登录</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主容器 -->
+  <div class="app-container">
+    <!-- 左侧功能菜单 -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <nav class="sidebar-nav" id="sidebar-nav">
+        <!-- 由 sidebar.js 动态渲染 -->
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="app-main">
+      <!-- 面包屑 -->
+      <div class="content-breadcrumb" id="content-breadcrumb">
+        <span>能力市场</span>
+        <div class="breadcrumb-right">
+          <a href="#" class="breadcrumb-link" id="breadcrumb-my-applications"><i class="fa-regular fa-file-lines"></i> 我的申请</a>
+          <a href="#" class="breadcrumb-link" id="breadcrumb-my-favorites"><i class="fa-regular fa-star"></i> 我的收藏</a>
+        </div>
+      </div>
+
+      <!-- iframe 内容区域 -->
+      <div class="app-content-iframe">
+        <iframe
+          id="content-frame"
+          name="content-frame"
+          src="pages/ai-open/market.html"
+          frameborder="0"
+          scrolling="yes"
+        ></iframe>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/menu.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/toast.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    // Listen for navigate messages from iframe pages
+    window.addEventListener('message', (e) => {
+      if (e.data?.type === 'navigate' && e.data.url) {
+        const iframe = document.getElementById('content-frame');
+        if (iframe) {
+          iframe.src = e.data.url;
+          // Update sidebar active state
+          if (typeof setActiveMenu === 'function') {
+            const filename = e.data.url.split('/').pop().split('?')[0];
+            setActiveMenu(filename);
+          }
+          // Update breadcrumb
+          const breadcrumb = document.getElementById('content-breadcrumb');
+          if (breadcrumb && e.data.breadcrumb) {
+            breadcrumb.innerHTML = e.data.breadcrumb;
+          }
+        }
+      }
+    });
+
+    // Breadcrumb links: tell iframe to open my-applications / my-favorites
+    document.getElementById('breadcrumb-my-applications')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('content-frame').contentWindow?.postMessage({ type: 'openMyApplications' }, '*');
+    });
+    document.getElementById('breadcrumb-my-favorites')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('content-frame').contentWindow?.postMessage({ type: 'openMyFavorites' }, '*');
+    });
+  </script>
+</body>
+</html>

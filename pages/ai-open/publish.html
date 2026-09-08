@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capability Publish Center（能力发布中心） - AI能力开放平台</title>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/publish.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="content-page">
+  <div class="app-content">
+    <!-- ① 宣传语 -->
+    <p class="publish-slogan">
+      让AI能力像产品一样发布、运营和持续迭代。统一发布 Prompt / Agent / Knowledge / Model / MCP，全生命周期管理。
+    </p>
+
+    <!-- ② KPI 概览（4 指标，无标题） -->
+    <div class="kpi-grid-5">
+      <div class="kpi-card-publish">
+        <div class="kpi-icon-publish kpi-icon-pending">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <div class="kpi-content-publish">
+          <div class="kpi-label-publish">待发布能力</div>
+          <div class="kpi-value-publish" data-kpi="pending">-</div>
+        </div>
+      </div>
+      <div class="kpi-card-publish">
+        <div class="kpi-icon-publish kpi-icon-published">
+          <i class="fa-solid fa-check-circle"></i>
+        </div>
+        <div class="kpi-content-publish">
+          <div class="kpi-label-publish">已发布能力</div>
+          <div class="kpi-value-publish" data-kpi="published">-</div>
+        </div>
+      </div>
+      <div class="kpi-card-publish">
+        <div class="kpi-icon-publish kpi-icon-approving">
+          <i class="fa-solid fa-clipboard-list"></i>
+        </div>
+        <div class="kpi-content-publish">
+          <div class="kpi-label-publish">审批中</div>
+          <div class="kpi-value-publish" data-kpi="approving">-</div>
+        </div>
+      </div>
+      <div class="kpi-card-publish">
+        <div class="kpi-icon-publish kpi-icon-rate">
+          <i class="fa-solid fa-percent"></i>
+        </div>
+        <div class="kpi-content-publish">
+          <div class="kpi-label-publish">发布成功率</div>
+          <div class="kpi-value-publish" data-kpi="rate">-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 待发布列表 + 发布记录 页签切换 -->
+    <div class="publish-tabs">
+      <div class="publish-tab-header">
+        <button class="publish-tab active" data-tab="pending">
+          <i class="fa-solid fa-list"></i> 待发布列表
+        </button>
+        <button class="publish-tab" data-tab="history">
+          <i class="fa-solid fa-history"></i> 发布记录
+        </button>
+        <div class="publish-tab-actions">
+          <button class="btn btn-secondary btn-sm" onclick="openFlowModal()">
+            <i class="fa-solid fa-diagram-next"></i> 发布流程
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="openValidationModal()">
+            <i class="fa-solid fa-clipboard-check"></i> 发布校验
+          </button>
+        </div>
+      </div>
+
+      <!-- 待发布列表面板 -->
+      <div class="publish-tab-panel active" id="panel-pending">
+        <div class="pending-list-header">
+          <div class="search-box">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" placeholder="搜索能力名称或负责人...">
+          </div>
+          <div class="filter-dropdown">
+            <button class="filter-btn">
+              <i class="fa-solid fa-filter"></i>
+              筛选
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <div class="filter-menu">
+              <div class="filter-menu-item active" data-filter="all">
+                <i class="fa-solid fa-border-all"></i> 全部
+              </div>
+              <div class="filter-menu-item" data-filter="submitted">
+                <i class="fa-solid fa-clock"></i> 待审核
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="pending-table-wrap">
+          <table class="pending-table">
+            <thead>
+              <tr>
+                <th>能力名称</th>
+                <th>类型</th>
+                <th>版本</th>
+                <th>负责人</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="pending-table-body">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 发布记录面板 -->
+      <div class="publish-tab-panel" id="panel-history">
+        <div class="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>发布时间</th>
+                <th>能力名称</th>
+                <th>版本</th>
+                <th>结果</th>
+                <th>审批</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.app-content -->
+
+  <!-- 居中 Modal（发布流程 / 发布校验） -->
+  <div class="publish-modal" id="publish-modal">
+    <div class="publish-modal-box">
+      <div class="publish-modal-header">
+        <h3 class="publish-modal-title" id="publish-modal-title">标题</h3>
+        <button class="publish-modal-close" onclick="closePublishModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="publish-modal-body" id="publish-modal-body">
+        <!-- Dynamic content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer Overlay -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+
+  <!-- 发布配置 Drawer -->
+  <div class="drawer" id="publish-drawer">
+    <div class="drawer-header">
+      <h3 class="drawer-title">发布配置</h3>
+      <button class="drawer-close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-form-group">
+        <label class="drawer-form-label">
+          发布名称 <span class="required">*</span>
+        </label>
+        <input type="text" class="drawer-form-input" id="publish-name" placeholder="输入能力名称">
+      </div>
+      <div class="drawer-form-group">
+        <label class="drawer-form-label">
+          版本 <span class="required">*</span>
+        </label>
+        <input type="text" class="drawer-form-input" id="publish-version" placeholder="例如: 1.0.0">
+      </div>
+      <div class="drawer-form-group">
+        <label class="drawer-form-label">发布说明</label>
+        <textarea class="drawer-form-textarea" id="publish-note" placeholder="描述本次发布的主要变更..."></textarea>
+      </div>
+      <div class="drawer-form-group">
+        <label class="drawer-form-label">
+          发布环境 <span class="required">*</span>
+        </label>
+        <div class="environment-options">
+          <div class="env-option">测试</div>
+          <div class="env-option">预发布</div>
+          <div class="env-option">生产</div>
+        </div>
+      </div>
+      <div class="drawer-form-group">
+        <label class="drawer-form-label">
+          开放协议 <span class="required">*</span>
+        </label>
+        <div class="protocol-options">
+          <div class="protocol-option">
+            <div class="protocol-icon">
+              <i class="fa-solid fa-plug"></i>
+            </div>
+            <div class="protocol-name">MCP</div>
+            <div class="protocol-desc">Model Context Protocol</div>
+          </div>
+          <div class="protocol-option">
+            <div class="protocol-icon">
+              <i class="fa-solid fa-code"></i>
+            </div>
+            <div class="protocol-name">OpenAPI</div>
+            <div class="protocol-desc">RESTful API</div>
+          </div>
+          <div class="protocol-option">
+            <div class="protocol-icon">
+              <i class="fa-solid fa-box"></i>
+            </div>
+            <div class="protocol-name">SDK</div>
+            <div class="protocol-desc">软件开发工具包</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" onclick="closeDrawers()">取消</button>
+      <button class="btn btn-primary" onclick="confirmPublish()">
+        <i class="fa-solid fa-rocket"></i> 确认发布
+      </button>
+    </div>
+  </div>
+
+  <!-- 详情 Drawer -->
+  <div class="drawer" id="detail-drawer">
+    <div class="drawer-header">
+      <h3 class="drawer-title" id="detail-drawer-title">详情</h3>
+      <button class="drawer-close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="drawer-body" id="detail-drawer-body">
+      <!-- Dynamic content -->
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" onclick="closeDrawers()">关闭</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../assets/js/mock-loader.js"></script>
+  <script src="../../assets/js/agent.js"></script>
+  <script src="../../assets/js/publish.js"></script>
+  <script>
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'menuHighlight', url: 'publish.html' }, '*');
+    }
+  </script>
+</body>
+</html>
